@@ -5,7 +5,7 @@
   "use strict";
 
   /* ضع هنا المفتاح العام VAPID (الناتج من: npx web-push generate-vapid-keys) */
-  var VAPID_PUBLIC = "BOzjgnNNFhbPL4HX8lvxvN6oMB78QckDsb1sFoSxWzL5ezSJXHwecl9KkyRRNkAtUG1fZb1fxjSEHz071s4cVGM";
+  var VAPID_PUBLIC = "BDc_WB07YMDjxAC6wLDobxtpNKSDqqO1zYdI-YyY4yZ4H3WI2_1LXB_LSgwpSRoDY9ZO_7AnCeRVc1Y-dfFqDtk";
 
   var SW_URL = "sw.js", DISMISS_KEY = "eduassess_push_dismiss", OFF_KEY = "eduassess_push_off", DAY = 864e5;
   var sb = null, mounts = [], regP = null;
@@ -152,6 +152,7 @@
     ],
     teacher: [
       ["sub_new", "userplus", "مشترك جديد", "عندما يشترك طالب معك"],
+      ["exam_enter", "eye", "طالب دخل اختبارًا", "فور دخول طالب لاختبارك لتتابع من يختبر الآن"],
       ["exam_done", "check", "طالب أنهى اختبارًا", "عند تسليم طالب لاختبارك مع درجته"],
       ["exam_reminder", "clock", "تذكير باختباراتك", "قبل موعد بدء اختبار أنشأته"],
       ["message", "chat", "رسائل الطلاب", "عند وصول رسالة جديدة من طالب"],
