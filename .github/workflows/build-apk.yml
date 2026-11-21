@@ -1,0 +1,51 @@
+name: build-apk
+on:
+  workflow_dispatch: {}
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21 }
+
+      - name: تجهيز ملفات التطبيق (www)
+        run: |
+          mkdir -p www
+          cp index.html exam.html teacher.html push.js sw.js manifest.webmanifest www/
+          cp -r assets www/assets
+          if [ -f supabase.js ]; then cp supabase.js www/; fi
+          for f in assets/edu.css assets/edu.js; do
+            [ -f "$f" ] || { echo "ملف ناقص في المستودع: $f"; exit 1; }
+          done
+
+      - name: إنشاء مشروع أندرويد (Capacitor)
+        run: |
+          npm init -y
+          npm i @capacitor/core@7 @capacitor/cli@7 @capacitor/android@7
+          npx cap init "EduAssess Pro" com.eduassess.app --web-dir www
+          npx cap add android
+          npx cap sync android
+
+      - name: أيقونة التطبيق
+        run: |
+          R=android/app/src/main/res
+          rm -rf $R/mipmap-anydpi-v26
+          for pair in mdpi:48 hdpi:72 xhdpi:96 xxhdpi:144 xxxhdpi:192; do
+            d=${pair%%:*}; s=${pair##*:}
+            convert assets/icon-512.png -resize ${s}x${s} $R/mipmap-$d/ic_launcher.png
+            cp $R/mipmap-$d/ic_launcher.png $R/mipmap-$d/ic_launcher_round.png
+            cp $R/mipmap-$d/ic_launcher.png $R/mipmap-$d/ic_launcher_foreground.png
+          done
+
+      - name: بناء ملف APK
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: EduAssess-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
