@@ -18,7 +18,7 @@ jobs:
           mkdir -p www
           cp index.html exam.html teacher.html i18n.js i18n-dict.js push.js native.js sw.js ui.js ui.css manifest.webmanifest www/
           cp -r assets www/assets
-          if [ -f supabase.js ]; then cp supabase.js www/; fi
+          if [ -f supabase.js ]; then cp supabase.js www/; else echo "::warning::supabase.js غير موجود في المستودع — لن يتصل التطبيق بقاعدة البيانات"; fi
           for f in assets/edu.css assets/edu.js; do
             [ -f "$f" ] || { echo "تنبيه: الملف غير موجود في المستودع وسيُنشأ فارغًا: $f"; touch "www/$f"; }
           done
@@ -29,7 +29,7 @@ jobs:
       - name: إنشاء مشروع أندرويد (Capacitor)
         run: |
           npm init -y
-          npm i @capacitor/core@7 @capacitor/cli@7 @capacitor/android@7 @capacitor/local-notifications@7 sharp@0.33
+          npm i @capacitor/core@7 @capacitor/cli@7 @capacitor/android@7 @capacitor/local-notifications@7 @capacitor/push-notifications@7 sharp@0.33
           npx cap init "EduAssess Pro" com.eduassess.app --web-dir www
           npx cap add android
 
@@ -53,6 +53,18 @@ jobs:
       - name: صلاحيات الإشعارات
         run: |
           sed -i 's#<application#<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>\n    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>\n    <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>\n    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>\n    <application#' android/app/src/main/AndroidManifest.xml
+
+      - name: Firebase (إشعارات تصل والتطبيق مغلق)
+        env:
+          GSJ: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          if [ -z "$GSJ" ]; then
+            echo "::error::السر GOOGLE_SERVICES_JSON غير موجود. بدونه لن تصل أي إشعارات والتطبيق مغلق. أضفه من Settings > Secrets and variables > Actions (محتوى ملف google-services.json بعد تحويله إلى base64)."
+            exit 1
+          fi
+          echo "$GSJ" | base64 -d > android/app/google-services.json || { echo "::error::قيمة GOOGLE_SERVICES_JSON ليست base64 صالحًا"; exit 1; }
+          grep -q '"package_name": *"com.eduassess.app"' android/app/google-services.json || { echo "::error::يجب أن يكون package_name داخل google-services.json هو com.eduassess.app (سجّل تطبيق أندرويد بهذا الاسم في Firebase)"; exit 1; }
+          echo "تم وضع google-services.json"
 
       - run: npx cap sync android
 

@@ -15,8 +15,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 22 }
-      - run: npm install --no-save web-push@3 @supabase/supabase-js@2
+        with: { node-version: 20 }
+      - run: npm install --no-save web-push@3 @supabase/supabase-js@2 firebase-admin@12
       - run: node scripts/send-push.js
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -24,3 +24,4 @@ jobs:
           VAPID_PUBLIC: ${{ secrets.VAPID_PUBLIC }}
           VAPID_PRIVATE: ${{ secrets.VAPID_PRIVATE }}
           VAPID_SUBJECT: ${{ secrets.VAPID_SUBJECT }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
