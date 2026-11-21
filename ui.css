@@ -130,3 +130,22 @@ h3 .eu-ei,h4 .eu-ei{margin-inline-end:.3em;color:var(--eu-gold)}
 .np-it input:checked~.np-sw:after{transform:translateX(-18px)}
 .np-it input:focus-visible~.np-sw{outline:3px solid rgba(31,99,224,.4);outline-offset:2px}
 .np-foot{font-size:12px;color:var(--eu-mut);text-align:center;line-height:1.7}
+
+/* ===== باقات الاشتراك: بطاقات مدمجة ومرتبة على الجوال ===== */
+@media(max-width:720px){
+ #plans{gap:16px!important;margin-top:6px}
+ .plan{display:grid!important;grid-template-columns:1fr auto;grid-template-areas:"h price" "per price" "save save" "btn btn";align-items:center;column-gap:12px;row-gap:2px;text-align:right;padding:18px 18px 16px!important;border-radius:22px!important}
+ .plan h3{grid-area:h;margin:0!important;font-size:19px!important}
+ .plan .price{grid-area:price;justify-self:end;align-items:baseline}
+ .plan .price b{font-size:38px!important}
+ .plan .price sup{font-size:15px!important;margin:0 3px 0 0}
+ .plan .per{grid-area:per;margin:0!important;font-size:12.5px}
+ .plan .save{grid-area:save;justify-self:start;margin:8px 0 0!important}
+ .plan .save.off{display:none}
+ .plan .btn{grid-area:btn;margin-top:12px!important;min-height:46px}
+ .plan .ribbon{top:-12px;left:auto;right:18px;transform:none}
+ /* شريط التنقل السفلي: لا يتحرك ولا يخرج عن الشاشة */
+ .tabs{overflow:clip!important;left:8px!important;right:8px!important}
+ .tabs button{min-width:0;padding-inline:0!important}
+ .tabs button span{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9.5px}
+}

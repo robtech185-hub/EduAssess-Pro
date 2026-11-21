@@ -369,7 +369,7 @@ h2,h3,h4,.brand b,.btn,.tabs button{font-family:'Readex Pro','IBM Plex Sans Arab
 <h3 id="atitle" style="margin-top:12px">تسجيل دخول المعلم</h3><div style="text-align:right">
 <div id="regf" class="hide"><label>الاسم الثلاثي</label><input id="fn"><label>رقم الواتساب (مع رمز الدولة)</label><input id="wa" type="tel" dir="ltr" placeholder="+201012345678"><label>الدولة</label><select id="co"></select></div>
 <label>البريد الإلكتروني</label><input id="em" type="email" dir="ltr"><label>كلمة المرور (6 أحرف على الأقل)</label><input id="pw" type="password" dir="ltr"></div>
-<button class="btn g" id="go" style="width:100%;margin-top:8px">دخول</button><p id="msg" class="err"></p>
+<button class="btn g" id="go" style="width:100%;margin-top:8px">دخول</button><p id="amsg" class="err"></p>
 <p style="margin-top:12px"><a href="#" id="sw" style="color:var(--deep);font-weight:700">ليس لديك حساب؟ سجّل وابدأ تجربة مجانية 3 أيام</a></p></div></div>
 
 <div id="app" class="hide"><div class="top"><div class="w"><div class="bm"><span class="lg"><img src="assets/icon-192.png" alt="" width="46" height="46"></span><div class="brand"><small>لوحة المعلم</small><b>EduAssess Pro</b></div></div>
@@ -423,8 +423,8 @@ h2,h3,h4,.brand b,.btn,.tabs button{font-family:'Readex Pro','IBM Plex Sans Arab
 </div></div>
 
 <script>
-window.addEventListener('error',e=>{const m=document.getElementById('msg');if(m)m.textContent='خطأ في الصفحة: '+e.message});
-window.addEventListener('unhandledrejection',e=>{const m=document.getElementById('msg');if(m)m.textContent='خطأ: '+((e.reason&&e.reason.message)||e.reason)});
+window.addEventListener('error',e=>{const m=document.getElementById('amsg');if(m)m.textContent='خطأ في الصفحة: '+e.message});
+window.addEventListener('unhandledrejection',e=>{const m=document.getElementById('amsg');if(m)m.textContent='خطأ: '+((e.reason&&e.reason.message)||e.reason)});
 const $=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const WA='201012645837',PLANS=[[1,6],[2,11],[3,16]],MAXQ=10;let me,end,active,reg=false;
 let dn=null;try{dn=new Intl.DisplayNames(['ar'],{type:'region'})}catch(e){}
@@ -433,22 +433,22 @@ const cname=c=>{try{const n=dn&&dn.of(c);if(n&&n!==c)return n}catch(e){}return F
 {let L=[...new Set("AF AL DZ AD AO AG AR AM AU AT AZ BS BH BD BB BY BE BZ BJ BT BO BA BW BR BN BG BF BI KH CM CA CV CF TD CL CN CO KM CG CD CR CI HR CU CY CZ DK DJ DM DO EC EG SV GQ ER EE SZ ET FJ FI FR GA GM GE DE GH GR GD GT GN GW GY HT HN HU IS IN ID IR IQ IE IL IT JM JP JO KZ KE KI KW KG LA LV LB LS LR LY LI LT LU MG MW MY MV ML MT MH MR MU MX FM MD MC MN ME MA MZ MM NA NR NP NL NZ NI NE NG KP MK NO OM PK PW PS PA PG PY PE PH PL PT QA RO RU RW KN LC VC WS SM ST SA SN RS SC SL SG SK SI SB SO ZA KR SS ES LK SD SR SE CH SY TW TJ TZ TH TL TG TO TT TN TR TM TV UG UA AE GB US UY UZ VU VA VE VN YE ZM ZW XK".split(' ').map(cname))];try{L.sort((a,b)=>a.localeCompare(b,'ar'))}catch(e){L.sort()}L.forEach(n=>$('co').add(new Option(n,n)))}
 $('co').value=cname('EG');
 const getRole=()=>{try{return localStorage.getItem('edu_role')}catch(e){return null}};
-function lockRole(){if(getRole()==='student'){reg=false;$('regf').classList.add('hide');$('sw').style.display='none';$('go').textContent='دخول';$('atitle').textContent='تسجيل دخول المعلم';if(!$('msg').textContent)$('msg').textContent='هذا الجهاز مسجّل كطالب — لا يمكن إنشاء حساب معلم.'}}
+function lockRole(){if(getRole()==='student'){reg=false;$('regf').classList.add('hide');$('sw').style.display='none';$('go').textContent='دخول';$('atitle').textContent='تسجيل دخول المعلم';if(!$('amsg').textContent)$('amsg').textContent='هذا الجهاز مسجّل كطالب — لا يمكن إنشاء حساب معلم.'}}
 $('sw').onclick=e=>{e.preventDefault();if(getRole()==='student')return lockRole();reg=!reg;$('regf').classList.toggle('hide',!reg);$('go').textContent=reg?'إنشاء حساب':'دخول';$('atitle').textContent=reg?'تسجيل معلم جديد':'تسجيل دخول المعلم';$('sw').textContent=reg?'لديك حساب؟ سجّل دخولك':'ليس لديك حساب؟ سجّل وابدأ تجربة مجانية 3 أيام'};
 // رقم هاتف دولي: + اختيارية ثم 7-15 رقمًا
 const cleanPhone=p=>{p=p.replace(/[\s\-().]/g,'');return p.startsWith('00')?'+'+p.slice(2):p},okPhone=p=>/^\+?[0-9]{7,15}$/.test(cleanPhone(p));
-$('go').onclick=async()=>{$('msg').textContent='';if(reg&&getRole()==='student')return lockRole();const email=$('em').value.trim(),password=$('pw').value;let r;
+$('go').onclick=async()=>{$('amsg').textContent='';if(reg&&getRole()==='student')return lockRole();const email=$('em').value.trim(),password=$('pw').value;let r;
  if(reg){const fn=$('fn').value.trim(),wa=$('wa').value.trim();
-  if(fn.split(/\s+/).length<3)return $('msg').textContent='اكتب الاسم الثلاثي';if(!okPhone(wa))return $('msg').textContent='رقم واتساب غير صحيح — اكتبه مع رمز الدولة';
+  if(fn.split(/\s+/).length<3)return $('amsg').textContent='اكتب الاسم الثلاثي';if(!okPhone(wa))return $('amsg').textContent='رقم واتساب غير صحيح — اكتبه مع رمز الدولة';
   r=await sbClient.auth.signUp({email,password,options:{data:{role:'teacher',full_name:fn,whatsapp:cleanPhone(wa),country:$('co').value}}});
   if(!r.error){try{localStorage.setItem('edu_role','teacher')}catch(e){}}
-  if(!r.error&&!r.data.session)return $('msg').textContent='تم التسجيل. أكّد بريدك من الرسالة المرسلة ثم سجّل دخولك.'}
+  if(!r.error&&!r.data.session)return $('amsg').textContent='تم التسجيل. أكّد بريدك من الرسالة المرسلة ثم سجّل دخولك.'}
  else r=await sbClient.auth.signInWithPassword({email,password});
- if(r.error)return $('msg').textContent='تعذر: '+r.error.message;try{sessionStorage.setItem('edu_hi','1')}catch(e){}boot()};
+ if(r.error)return $('amsg').textContent='تعذر: '+r.error.message;try{sessionStorage.setItem('edu_hi','1')}catch(e){}boot()};
 async function boot(){const{data:{session}}=await sbClient.auth.getSession();if(!session)return;
- if(session.user&&session.user.user_metadata&&session.user.user_metadata.role==='student'){try{localStorage.setItem('edu_role','student')}catch(e){}await sbClient.auth.signOut();$('msg').textContent='هذا حساب طالب — ادخل من بوابة الطالب. لا يمكن استخدامه في بوابة المعلم.';lockRole();return}
+ if(session.user&&session.user.user_metadata&&session.user.user_metadata.role==='student'){try{localStorage.setItem('edu_role','student')}catch(e){}await sbClient.auth.signOut();$('amsg').textContent='هذا حساب طالب — ادخل من بوابة الطالب. لا يمكن استخدامه في بوابة المعلم.';lockRole();return}
  const{data,error:te}=await sbClient.from('teachers').select('*').eq('id',session.user.id).single();
- if(!data){$('msg').textContent=te?('تعذر تحميل حساب المعلم: '+te.message):'لا يوجد حساب معلم لهذا البريد (ربما هو حساب طالب). سجّل كمعلم جديد ببريد آخر.';return}me=data;try{localStorage.setItem('edu_role','teacher')}catch(e){}
+ if(!data){$('amsg').textContent=te?('تعذر تحميل حساب المعلم: '+te.message):'لا يوجد حساب معلم لهذا البريد (ربما هو حساب طالب). سجّل كمعلم جديد ببريد آخر.';return}me=data;try{localStorage.setItem('edu_role','teacher')}catch(e){}
  end=new Date(Math.max(+new Date(me.trial_ends_at),+new Date(me.subscription_ends_at||0)));active=end>new Date();
  $('auth').classList.add('hide');$('app').classList.remove('hide');$('hn').textContent=me.full_name;$('av').textContent=(me.full_name||'؟').trim()[0];
  const paid=me.subscription_ends_at&&new Date(me.subscription_ends_at)>new Date();
