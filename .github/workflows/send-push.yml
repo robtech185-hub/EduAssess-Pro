@@ -1,0 +1,26 @@
+name: send-push
+on:
+  schedule:
+    - cron: "*/5 * * * *"        # احتياطي: كل 5 دقائق
+  repository_dispatch:
+    types: [push-outbox]         # فوري: يطلقه Supabase عند كل إشعار جديد
+  workflow_dispatch: {}          # تشغيل يدوي للتجربة
+concurrency:
+  group: send-push
+  cancel-in-progress: false
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm install --no-save web-push@3 @supabase/supabase-js@2
+      - run: node scripts/send-push.js
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          VAPID_PUBLIC: ${{ secrets.VAPID_PUBLIC }}
+          VAPID_PRIVATE: ${{ secrets.VAPID_PRIVATE }}
+          VAPID_SUBJECT: ${{ secrets.VAPID_SUBJECT }}
