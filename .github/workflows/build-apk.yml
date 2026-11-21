@@ -14,9 +14,11 @@ jobs:
 
       - name: تجهيز ملفات التطبيق (www)
         run: |
-          [ -f native.js ] || { echo "ملف ناقص في المستودع: native.js"; exit 1; }
+          for f in native.js proctor.js android-native/ExamLockPlugin.java android-native/MainActivity.java; do
+            [ -f "$f" ] || { echo "ملف ناقص في المستودع: $f"; exit 1; }
+          done
           mkdir -p www
-          cp index.html exam.html teacher.html i18n.js i18n-dict.js push.js native.js sw.js ui.js ui.css manifest.webmanifest www/
+          cp index.html exam.html teacher.html i18n.js i18n-dict.js push.js native.js proctor.js sw.js ui.js ui.css manifest.webmanifest www/
           cp -r assets www/assets
           if [ -f supabase.js ]; then cp supabase.js www/; else echo "::warning::supabase.js غير موجود في المستودع — لن يتصل التطبيق بقاعدة البيانات"; fi
           for f in assets/edu.css assets/edu.js; do
@@ -54,17 +56,34 @@ jobs:
         run: |
           sed -i 's#<application#<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>\n    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>\n    <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>\n    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>\n    <application#' android/app/src/main/AndroidManifest.xml
 
+      - name: قفل الاختبار + الكاميرا (أندرويد)
+        run: |
+          D=android/app/src/main/java/com/eduassess/app
+          mkdir -p "$D"
+          cp android-native/ExamLockPlugin.java android-native/MainActivity.java "$D/"
+          sed -i 's#<application#<uses-permission android:name="android.permission.CAMERA"/>\n    <uses-feature android:name="android.hardware.camera" android:required="false"/>\n    <uses-feature android:name="android.hardware.camera.front" android:required="false"/>\n    <application#' android/app/src/main/AndroidManifest.xml
+          grep -q 'android.permission.CAMERA' android/app/src/main/AndroidManifest.xml || { echo "::error::فشل إضافة صلاحية الكاميرا"; exit 1; }
+          grep -q 'ExamLockPlugin' "$D/MainActivity.java"
+
       - name: Firebase (إشعارات تصل والتطبيق مغلق)
         env:
           GSJ: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: |
+          # Firebase اختياري: غيابه (أو خطؤه) لا يُفشل البناء، بل يُبنى التطبيق بدون إشعارات FCM (تبقى تنبيهات الجدولة المحلية تعمل)
+          FCM=0
           if [ -z "$GSJ" ]; then
-            echo "::error::السر GOOGLE_SERVICES_JSON غير موجود. بدونه لن تصل أي إشعارات والتطبيق مغلق. أضفه من Settings > Secrets and variables > Actions (محتوى ملف google-services.json بعد تحويله إلى base64)."
-            exit 1
+            echo "::warning::السر GOOGLE_SERVICES_JSON غير موجود — سيُبنى التطبيق بدون إشعارات FCM (الإشعارات الفورية والتطبيق مغلق). لتفعيلها أضف السر من Settings > Secrets and variables > Actions."
+          elif ! echo "$GSJ" | base64 -d > android/app/google-services.json 2>/dev/null; then
+            echo "::warning::قيمة GOOGLE_SERVICES_JSON ليست base64 صالحًا — سيُبنى التطبيق بدون FCM."
+            rm -f android/app/google-services.json
+          elif ! grep -q '"package_name": *"com.eduassess.app"' android/app/google-services.json; then
+            echo "::warning::package_name داخل google-services.json يجب أن يكون com.eduassess.app — سيُبنى التطبيق بدون FCM."
+            rm -f android/app/google-services.json
+          else
+            FCM=1; echo "تم وضع google-services.json"
           fi
-          echo "$GSJ" | base64 -d > android/app/google-services.json || { echo "::error::قيمة GOOGLE_SERVICES_JSON ليست base64 صالحًا"; exit 1; }
-          grep -q '"package_name": *"com.eduassess.app"' android/app/google-services.json || { echo "::error::يجب أن يكون package_name داخل google-services.json هو com.eduassess.app (سجّل تطبيق أندرويد بهذا الاسم في Firebase)"; exit 1; }
-          echo "تم وضع google-services.json"
+          # بدون FCM نعطّل تسجيل الإشعارات في الواجهة حتى لا ينهار التطبيق عند تشغيله
+          if [ "$FCM" = "0" ]; then sed -i '1i window.EDU_NO_FCM=true;' www/native.js; fi
 
       - run: npx cap sync android
 
