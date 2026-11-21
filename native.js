@@ -74,6 +74,47 @@
     return Object.keys(out).map(function (k) { return out[k]; }).sort(function (a, b) { return a.at - b.at; });
   }
 
+
+  /* ---------- Firebase (FCM): إشعارات فورية تصل والتطبيق مغلق ---------- */
+  var PS = C.Plugins && C.Plugins.PushNotifications, fcmDone = false;
+  async function saveToken(tok) {
+    try {
+      var s = await session(); if (!s || !tok) return;
+      await window.sbClient.rpc("save_push_subscription", { p_endpoint: "fcm:" + tok, p_p256dh: "fcm", p_auth: "fcm", p_ua: "android-app" });
+      var md = (s.user && s.user.user_metadata) || {}, lg = I.lang();
+      if (md.lang !== lg) window.sbClient.auth.updateUser({ data: { lang: lg } });
+    } catch (e) {}
+  }
+  async function fcm() {
+    if (!PS) return;
+    try {
+      if (!fcmDone) {
+        fcmDone = true;
+        PS.addListener("registration", function (t) { ls("edu_fcm", t.value); saveToken(t.value); });
+        PS.addListener("registrationError", function () { fcmDone = false; });
+        /* التطبيق مفتوح: أندرويد لا يعرض إشعار FCM بنفسه، فنعرضه كتنبيه محلي ونحدّث الجرس والعدّادات */
+        PS.addListener("pushNotificationReceived", function (n) {
+          try { window.dispatchEvent(new Event("edu-push")); } catch (e) {}
+          try {
+            if (typeof window.eduPushQuiet === "function" && window.eduPushQuiet()) return;
+            LN.schedule({ notifications: [{ id: Math.floor(Date.now() / 1000) % 2000000000, title: (n && n.title) || "EduAssess Pro", body: (n && n.body) || "", schedule: { at: new Date(Date.now() + 400) }, channelId: CH }] });
+          } catch (e) {}
+        });
+        /* الضغط على الإشعار والتطبيق مغلق/في الخلفية: افتح الصفحة المقصودة */
+        PS.addListener("pushNotificationActionPerformed", function (a) {
+          try { var u = a && a.notification && a.notification.data && a.notification.data.url; if (u && typeof window.eduPushOpen === "function") window.eduPushOpen(u); } catch (e) {}
+        });
+      }
+      var s = await session(); if (!s) return;
+      var p = await PS.checkPermissions();
+      if (p.receive !== "granted") p = await PS.requestPermissions();
+      if (p.receive !== "granted") return;
+      await channel();
+      var t = ls("edu_fcm"); if (t) saveToken(t);
+      await PS.register();
+    } catch (e) {}
+  }
+
   async function schedule() {
     if (busy) return;
     busy = true;
@@ -123,10 +164,10 @@
     try {
       window.sbClient.auth.onAuthStateChange(function (ev) {
         if (ev === "SIGNED_OUT") cancelAll();
-        else if (ev === "SIGNED_IN") setTimeout(function () { run(true); }, 800);
+        else if (ev === "SIGNED_IN") setTimeout(function () { run(true); fcm(); }, 800);
       });
     } catch (e) {}
-    run(true);
+    run(true); fcm();
   }, 1500);
   document.addEventListener("visibilitychange", function () { if (!document.hidden) run(false); });
   setInterval(function () { if (!document.hidden) run(false); }, 15 * 60 * 1000);

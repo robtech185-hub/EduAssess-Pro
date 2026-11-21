@@ -699,6 +699,8 @@ h1,h2,h3,h4,.brand h1,.sec-tx h2,.btn,.tab,.chip{font-family:'Readex Pro','IBM P
               <input id="s-email" class="ltr" type="email" autocomplete="email" placeholder="example@email.com" required></div>
           </div>
           <div class="hint">اكتب الهاتف مع رمز الدولة (يُقبل أي رقم دولي).</div>
+          <label for="s-country">الدولة</label>
+          <select id="s-country" required></select>
           <label for="s-pass">كلمة المرور</label>
           <div class="pw-wrap">
             <input id="s-pass" class="ltr" type="password" autocomplete="new-password" required>
@@ -967,6 +969,16 @@ $("s-pass").addEventListener("input",()=>{
   $("pw-hint").textContent = $("s-pass").value ? "القوة: "+txt[sc] : "8 أحرف على الأقل.";
 });
 
+/* ---------- الدولة: تُحفظ مع الحساب ويُعرض للطالب معلمو دولته فقط ---------- */
+const CC_LIST="AF AL DZ AD AO AG AR AM AU AT AZ BS BH BD BB BY BE BZ BJ BT BO BA BW BR BN BG BF BI KH CM CA CV CF TD CL CN CO KM CG CD CR CI HR CU CY CZ DK DJ DM DO EC EG SV GQ ER EE SZ ET FJ FI FR GA GM GE DE GH GR GD GT GN GW GY HT HN HU IS IN ID IR IQ IE IL IT JM JP JO KZ KE KI KW KG LA LV LB LS LR LY LI LT LU MG MW MY MV ML MT MH MR MU MX FM MD MC MN ME MA MZ MM NA NR NP NL NZ NI NE NG KP MK NO OM PK PW PS PA PG PY PE PH PL PT QA RO RU RW KN LC VC WS SM ST SA SN RS SC SL SG SK SI SB SO ZA KR SS ES LK SD SR SE CH SY TW TJ TZ TH TL TG TO TT TN TR TM TV UG UA AE GB US UY UZ VU VA VE VN YE ZM ZW XK".split(" ");
+const countryAr=c=>{try{return new Intl.DisplayNames(["ar"],{type:"region"}).of(c)||c}catch(e){return c}};
+const countryEn=c=>{try{return new Intl.DisplayNames(["en"],{type:"region"}).of(c)||c}catch(e){return c}};
+(function(){const sel=$("s-country");if(!sel)return;const L=(window.EduI18N&&EduI18N.countries)?EduI18N.countries(CC_LIST):CC_LIST.map(c=>[c,countryAr(c)]);
+  sel.add(new Option(window.EduI18N?EduI18N.t("اختر الدولة"):"اختر الدولة",""));L.forEach(x=>sel.add(new Option(x[1],x[0])));})();
+const myCountry=()=>{const m=(state.user&&state.user.user_metadata)||{};let c=m.country_code||"";try{c=c||localStorage.getItem("edu_country")||""}catch(e){}return c};
+const sameCountry=(tc,cc)=>{if(!cc||!tc)return true;const t=String(tc).trim().toLowerCase();return t===cc.toLowerCase()||t===countryAr(cc).toLowerCase()||t===countryEn(cc).toLowerCase()};
+async function teacherCountryMap(){try{const r=await sbClient.rpc("teacher_countries");return Object.fromEntries((r.data||[]).map(x=>[x.id,x.country]))}catch(e){return {}}}
+
 $("f-signup").addEventListener("submit", async (e)=>{
   e.preventDefault(); setMsg("signup-msg","");
   if(getRole()==="teacher") return setMsg("signup-msg","لا يمكن إنشاء حساب طالب — هويتك معلم.");
@@ -975,15 +987,16 @@ $("f-signup").addEventListener("submit", async (e)=>{
   if(!isValidFullName(name)) return setMsg("signup-msg","من فضلك أدخل الاسم الثلاثي كاملاً.");
   if(!isValidPhone(phone)) return setMsg("signup-msg","رقم الهاتف غير صحيح (7 إلى 15 رقمًا مع رمز الدولة).");
   if(!isValidEmail(email)) return setMsg("signup-msg","البريد الإلكتروني غير صحيح.");
+  const cc=$("s-country").value; if(!cc) return setMsg("signup-msg","اختر الدولة");
   if(p1.length<8) return setMsg("signup-msg","كلمة المرور يجب ألا تقل عن 8 أحرف.");
   if(p1!==p2) return setMsg("signup-msg","كلمتا المرور غير متطابقتين.");
   const btn=$("btn-signup"); setBusy(btn,true,"جارِ إنشاء الحساب...");
   const { data, error } = await sbClient.auth.signUp({
-    email, password:p1, options:{ data:{ role:'student', full_name:name, phone, whatsapp:phone } }
+    email, password:p1, options:{ data:{ role:'student', full_name:name, phone, whatsapp:phone, country_code:cc, country:countryAr(cc), lang:(window.EduI18N?EduI18N.lang():'ar') } }
   });
   setBusy(btn,false,"إنشاء الحساب");
   if(error) return setMsg("signup-msg", authError(error));
-  setRole("student");
+  setRole("student"); try{localStorage.setItem("edu_country",cc)}catch(_){}
   if(!data.session){
     setMsg("signup-msg","تم إنشاء الحساب! أرسلنا رسالة تفعيل إلى بريدك — فعّله ثم سجّل الدخول.","ok");
   }
@@ -1114,6 +1127,7 @@ async function fetchAttempts(force){
   state.attempts = rows.map(enrich);
   return state.attempts;
 }
+const _T=s=>(window.EduI18N?EduI18N.t(s):s);
 function gradeOf(p){
   if(p>=90) return {t:"ممتاز",c:"g-top",col:"#0E9F7E"};
   if(p>=80) return {t:"جيد جدًا",c:"g-good",col:"#3E6C8F"};
@@ -1242,7 +1256,8 @@ async function loadTeachers(){
   ]);
   if(error){box.innerHTML=emptyBox(ICO.x,"تعذر تحميل المعلمين","تأكد من الاتصال بالإنترنت أو من تنفيذ SQL الخاص بالجداول.");return;}
   const ids=new Set((subs||[]).map(x=>x.teacher_id));
-  const all=teachers||[];
+  const cmap=await teacherCountryMap(), mc=myCountry();
+  const all=(teachers||[]).filter(t=>ids.has(t.id)||sameCountry(cmap[t.id],mc));
   let filter="all", cat="";
   const cats=[...new Set(all.map(t=>(t.specialty||"").trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"ar"));
   const catBox=$("teacher-cats");
@@ -1790,7 +1805,7 @@ function renderStats(list){
 
   /* ---- الرسوم البيانية ---- */
   Chart.defaults.font.family="IBM Plex Sans Arabic, sans-serif"; Chart.defaults.color="#55627F";
-  const tip={rtl:true,textDirection:"rtl",titleFont:{family:"IBM Plex Sans Arabic",weight:"700"},bodyFont:{family:"IBM Plex Sans Arabic"},padding:10,cornerRadius:8,backgroundColor:"#0A2260"};
+  const tip={rtl:document.documentElement.dir==="rtl",textDirection:"rtl",titleFont:{family:"IBM Plex Sans Arabic",weight:"700"},bodyFont:{family:"IBM Plex Sans Arabic"},padding:10,cornerRadius:8,backgroundColor:"#0A2260"};
   const grid={color:"rgba(228,220,200,.7)"};
   const short=(s)=>s.length>16?s.slice(0,15)+"…":s;
   const labels=chrono.map(a=>short(a.examName));
@@ -1798,27 +1813,27 @@ function renderStats(list){
   const lc=$("ch-line").getContext("2d");
   const grad=lc.createLinearGradient(0,0,0,280); grad.addColorStop(0,"rgba(255,180,0,.35)"); grad.addColorStop(1,"rgba(255,180,0,0)");
   state.charts.push(new Chart(lc,{type:"line",data:{labels:chrono.map(a=>fmtDate(a.started_at)),datasets:[
-    {label:"نسبتك %",data:chrono.map(a=>round1(a.pct)),borderColor:"#FFB400",backgroundColor:grad,fill:true,tension:.35,borderWidth:3,pointRadius:5,pointBackgroundColor:"#0A2260",pointBorderColor:"#fff",pointBorderWidth:2},
-    {label:"حدّ النجاح 50%",data:chrono.map(()=>50),borderColor:"#D6453D",borderDash:[6,6],borderWidth:1.5,pointRadius:0,fill:false}
+    {label:_T("نسبتك %"),data:chrono.map(a=>round1(a.pct)),borderColor:"#FFB400",backgroundColor:grad,fill:true,tension:.35,borderWidth:3,pointRadius:5,pointBackgroundColor:"#0A2260",pointBorderColor:"#fff",pointBorderWidth:2},
+    {label:_T("حدّ النجاح 50%"),data:chrono.map(()=>50),borderColor:"#D6453D",borderDash:[6,6],borderWidth:1.5,pointRadius:0,fill:false}
   ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:"index",intersect:false},
-    plugins:{legend:{rtl:true,labels:{usePointStyle:true,font:{family:"IBM Plex Sans Arabic"}}},tooltip:{...tip,callbacks:{title:(i)=>chrono[i[0].dataIndex].examName,label:(c)=>c.dataset.label+": "+c.parsed.y+"%"}}},
+    plugins:{legend:{rtl:document.documentElement.dir==="rtl",labels:{usePointStyle:true,font:{family:"IBM Plex Sans Arabic"}}},tooltip:{...tip,callbacks:{title:(i)=>chrono[i[0].dataIndex].examName,label:(c)=>c.dataset.label+": "+c.parsed.y+"%"}}},
     scales:{y:{min:0,max:100,grid,ticks:{callback:v=>v+"%"}},x:{grid:{display:false}}}}}));
 
-  state.charts.push(new Chart($("ch-bar"),{type:"bar",data:{labels,datasets:[{label:"النسبة %",data:chrono.map(a=>round1(a.pct)),
+  state.charts.push(new Chart($("ch-bar"),{type:"bar",data:{labels,datasets:[{label:_T("النسبة %"),data:chrono.map(a=>round1(a.pct)),
     backgroundColor:chrono.map(a=>a.grade.col),borderRadius:8,maxBarThickness:46}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...tip,callbacks:{title:(i)=>chrono[i[0].dataIndex].examName,label:(c)=>c.parsed.y+"% — "+chrono[c.dataIndex].grade.t}}},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...tip,callbacks:{title:(i)=>chrono[i[0].dataIndex].examName,label:(c)=>c.parsed.y+"% — "+_T(chrono[c.dataIndex].grade.t)}}},
       scales:{y:{min:0,max:100,grid,ticks:{callback:v=>v+"%"}},x:{grid:{display:false}}}}}));
 
-  state.charts.push(new Chart($("ch-donut"),{type:"doughnut",data:{labels:["صحيحة","خاطئة","بلا إجابة"],datasets:[{data:[sOk,sBad,sBlank],
+  state.charts.push(new Chart($("ch-donut"),{type:"doughnut",data:{labels:[_T("صحيحة"),_T("خاطئة"),_T("بلا إجابة")],datasets:[{data:[sOk,sBad,sBlank],
     backgroundColor:["#0E9F7E","#D6453D","#CFC7AE"],borderWidth:3,borderColor:"#fff",hoverOffset:8}]},
-    options:{responsive:true,maintainAspectRatio:false,cutout:"66%",plugins:{legend:{position:"bottom",rtl:true,labels:{usePointStyle:true,font:{family:"IBM Plex Sans Arabic"}}},
+    options:{responsive:true,maintainAspectRatio:false,cutout:"66%",plugins:{legend:{position:"bottom",rtl:document.documentElement.dir==="rtl",labels:{usePointStyle:true,font:{family:"IBM Plex Sans Arabic"}}},
       tooltip:{...tip,callbacks:{label:(c)=>` ${c.label}: ${c.parsed} (${sAll?round1(c.parsed/sAll*100):0}%)`}}}}}));
 
   state.charts.push(new Chart($("ch-time"),{type:"bar",data:{labels,datasets:[
-    {label:"الوقت المستغرق",data:chrono.map(a=>round1(a.taken/60)),backgroundColor:"#123C9C",borderRadius:6,maxBarThickness:36},
-    {label:"الوقت المتاح",data:chrono.map(a=>round1(a.allowed/60)),backgroundColor:"#FFD15C",borderRadius:6,maxBarThickness:36}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{rtl:true,labels:{usePointStyle:true,font:{family:"IBM Plex Sans Arabic"}}},tooltip:{...tip,callbacks:{title:(i)=>chrono[i[0].dataIndex].examName,label:(c)=>` ${c.dataset.label}: ${c.parsed.y} د`}}},
-      scales:{y:{beginAtZero:true,grid,ticks:{callback:v=>v+" د"}},x:{grid:{display:false}}}}}));
+    {label:_T("الوقت المستغرق"),data:chrono.map(a=>round1(a.taken/60)),backgroundColor:"#123C9C",borderRadius:6,maxBarThickness:36},
+    {label:_T("الوقت المتاح"),data:chrono.map(a=>round1(a.allowed/60)),backgroundColor:"#FFD15C",borderRadius:6,maxBarThickness:36}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{rtl:document.documentElement.dir==="rtl",labels:{usePointStyle:true,font:{family:"IBM Plex Sans Arabic"}}},tooltip:{...tip,callbacks:{title:(i)=>chrono[i[0].dataIndex].examName,label:(c)=>` ${c.dataset.label}: ${_T(c.parsed.y+" د")}`}}},
+      scales:{y:{beginAtZero:true,grid,ticks:{callback:v=>_T(v+" د")}},x:{grid:{display:false}}}}}));
 }
 
 /* ===================== مراجعة محاولة ===================== */

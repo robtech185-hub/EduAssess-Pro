@@ -95,6 +95,12 @@
   /* عند تسجيل الخروج: فكّ ارتباط هذا الجهاز بالحساب الحالي */
   async function detach() {
     try {
+      /* تطبيق أندرويد: نفكّ ارتباط رمز FCM بهذا الحساب حتى لا تصل إشعاراته لمن يسجّل بعده على نفس الجهاز */
+      if (isNativeApp()) {
+        var tok = lsGet("edu_fcm");
+        if (sb && tok) await sb.rpc("remove_push_subscription", { p_endpoint: "fcm:" + tok });
+        return;
+      }
       if (!supported() || !sb) return;
       var reg = await navigator.serviceWorker.getRegistration();
       var sub = reg && await reg.pushManager.getSubscription();

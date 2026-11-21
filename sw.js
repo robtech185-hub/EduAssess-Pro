@@ -20,9 +20,11 @@ self.addEventListener("push", function (e) {
   try { d = e.data ? e.data.json() : {}; } catch (_) { d = { body: e.data ? e.data.text() : "" }; }
   var title = d.title || "EduAssess Pro";
   var body = d.body || "";
+  var lg = d.lang === "en" || d.lang === "fr" ? d.lang : "ar";
   if (d.starts_at) {
     try {
-      body += ({ en: " • Starts ", fr: " • Début " })[d.lang] || " • يبدأ "; body += new Date(d.starts_at).toLocaleString(({ en: "en-GB", fr: "fr-FR" })[d.lang] || "ar-EG-u-nu-latn", {
+      var loc = { ar: "ar-EG-u-nu-latn", en: "en-GB", fr: "fr-FR" }[lg], word = { ar: " • يبدأ ", en: " • starts ", fr: " • début " }[lg];
+      body += word + new Date(d.starts_at).toLocaleString(loc, {
         weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit"
       });
     } catch (_) {}
@@ -31,8 +33,8 @@ self.addEventListener("push", function (e) {
     body: body,
     icon: "assets/favicon.png",
     badge: "assets/badge.png",
-    lang: d.lang || "ar",
-    dir: d.lang === "en" || d.lang === "fr" ? "ltr" : "rtl",
+    lang: lg,
+    dir: lg === "ar" ? "rtl" : "ltr",
     tag: d.tag || undefined,
     renotify: !!d.tag,
     vibrate: [120, 60, 120],

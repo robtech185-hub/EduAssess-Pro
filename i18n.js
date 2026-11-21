@@ -37,7 +37,18 @@
     "انتهاء التجربة المجانية": ["Free trial ending", "Fin de l'essai gratuit"], "قرب انتهاء الاشتراك": ["Subscription ending soon", "Fin d'abonnement proche"],
     "مرحبًا": ["Welcome", "Bienvenue"]
   };
-  (window.EDU_DICT_TXT || "").split("\n").forEach(function (l) { var p = l.split("|"); if (p.length === 3 && p[0].trim()) D[p[0].trim()] = [p[1].trim(), p[2].trim()]; });
+  /* سطور القاموس: «عربي|English|Français». المفتاح الذي يحوي {1} {2}… يُعامل كقالب (نص متغيّر الأجزاء) */
+  var PAT = [];
+  function addPat(k, en, fr) {
+    var parts = k.split(/\{\d+\}/), src = "^" + parts.map(function (x) { return x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }).join("(.+?)") + "$";
+    try { PAT.push({ re: new RegExp(src), out: [en, fr], len: k.length }); } catch (e) {}
+  }
+  (window.EDU_DICT_TXT || "").split("\n").forEach(function (l) {
+    var p = l.split("|").map(function (x) { return x.replace(/¦/g, "|"); }); if (p.length !== 3 || !p[0].trim()) return;
+    var k = p[0].trim();
+    if (/\{\d+\}/.test(k)) addPat(k, p[1].trim(), p[2].trim()); else D[k] = [p[1].trim(), p[2].trim()];
+  });
+  PAT.sort(function (a, b) { return b.len - a.len; });
   /* رسائل التنبيهات (تُستخدم في native.js و sw.js) — {n}=الاسم، {t}=المعلم */
   var M = {
     h1: ["📝 «{n}» starts in 1 hour{t}", "📝 « {n} » commence dans 1 heure{t}", "📝 يبدأ اختبار «{n}» بعد ساعة{t}"],
@@ -50,9 +61,19 @@
     wait: ["A notification will arrive in 10 seconds. Close the app now.", "Une notification arrive dans 10 secondes. Fermez l'application.", "سيصلك تنبيه بعد 10 ثوانٍ، أغلق التطبيق الآن"]
   };
   function idx() { return lang === "en" ? 0 : lang === "fr" ? 1 : 2; }
-  function t(s) { if (lang === "ar" || !lang) return s; var e = D[(s || "").trim()]; return e ? e[idx()] : s; }
+  function t(s) { if (lang === "ar" || !lang || s == null) return s; return conv(String(s)); }
   function msg(k, v) { var s = M[k][idx()]; v = v || {}; return s.replace(/\{(\w+)\}/g, function (_, x) { return v[x] == null ? "" : v[x]; }); }
 
+  /* التواريخ والأرقام: أي طلب بلغة عربية يُحوَّل للغة المختارة (اليوم، الشهر، الساعة…) */
+  (function () {
+    function L(a) { if (!lang || lang === "ar") return a; var m = { en: "en-GB", fr: "fr-FR" }[lang]; if (a == null || (typeof a === "string" && /^ar/i.test(a))) return m; if (Array.isArray(a) && /^ar/i.test(a[0] || "")) return m; return a; }
+    ["toLocaleDateString", "toLocaleTimeString", "toLocaleString"].forEach(function (f) {
+      var o = Date.prototype[f]; Date.prototype[f] = function (a, b) { return o.call(this, L(a), b); };
+    });
+    var N = Number.prototype.toLocaleString; Number.prototype.toLocaleString = function (a, b) { return N.call(this, L(a), b); };
+    var DF = Intl.DateTimeFormat; Intl.DateTimeFormat = function (a, b) { return new DF(L(a), b); }; Intl.DateTimeFormat.prototype = DF.prototype; Intl.DateTimeFormat.supportedLocalesOf = DF.supportedLocalesOf;
+    var DN = Intl.DisplayNames; if (DN) { Intl.DisplayNames = function (a, b) { return new DN(L(a), b); }; Intl.DisplayNames.prototype = DN.prototype; }
+  })();
   /* ---------- ترجمة الصفحة: تطابق تام ثم استبدال العبارات داخل النص، وتحويل الأرقام العربية ---------- */
   var orig = new WeakMap(), ATTR = ["placeholder", "title", "aria-label", "alt"], RX = null, RXn = 0;
   var AL = "\u0600-\u06FF", DG = "٠١٢٣٤٥٦٧٨٩";
@@ -63,22 +84,45 @@
     RX = new RegExp("(?<![" + AL + "])(" + k.map(function (x) { return x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }).join("|") + ")(?![" + AL + "])", "g");
     return RX;
   }
+  function fillPat(tpl, m) { return tpl.replace(/\{(\d+)\}/g, function (_, n) { var g = m[+n]; if (g == null) return ""; var e = D[g.trim()]; return e ? e[idx()] : g; }); }
+  function pat(k) {
+    for (var i = 0; i < PAT.length; i++) { var m = PAT[i].re.exec(k); if (m) return fillPat(PAT[i].out[idx()], m); }
+    return null;
+  }
+  var DIG = function (x) { return x.replace(/[٠-٩]/g, function (d) { return DG.indexOf(d); }); };
   function conv(v) {
-    var k = v.trim(), e = D[k];
-    if (e) v = v.replace(k, e[idx()]);
-    else if (/[\u0600-\u06FF]/.test(v)) v = v.replace(rx(), function (m) { return D[m] ? D[m][idx()] : m; });
-    return v.replace(/[٠-٩]/g, function (d) { return DG.indexOf(d); });
+    var k = v.trim(), e = D[k], out = v;
+    if (e) out = v.replace(k, function () { return e[idx()]; });
+    else if (/[\u0621-\u064A]/.test(v)) {
+      var p = pat(k);
+      if (p != null) out = v.replace(k, function () { return p; });
+      else {
+        var rep = 0;
+        out = v.replace(rx(), function (m) { if (!D[m]) return m; rep += m.length; return D[m][idx()]; });
+        /* بقي عربي: إن كان أكثر مما تُرجم فهو نص كتبه مستخدم (سؤال/اسم) فنتركه كما هو بدل تشويهه */
+        var left = (out.match(/[\u0621-\u064A]/g) || []).length;
+        if (left && left > rep) return v;
+      }
+    }
+    return DIG(out);
+  }
+  var CTX = { OPTION: { "خطأ": ["False", "Faux"] } };
+  function trAttrs(node) {
+    ATTR.forEach(function (a) { var x = node.getAttribute && node.getAttribute(a); if (x && /[\u0600-\u06FF]/.test(x)) { var n = conv(x); if (n !== x) node.setAttribute(a, n); } });
   }
   function tr(node) {
     if (!lang || lang === "ar" || !node) return;
     if (node.nodeType === 3) {
       var v = node.nodeValue; if (!v || !/[\u0600-\u06FF٠-٩]/.test(v)) return;
-      var n = conv(v); if (n !== v) { if (!orig.has(node)) orig.set(node, v); node.nodeValue = n; }
+      var pn = node.parentNode, c = pn && CTX[pn.nodeName] && CTX[pn.nodeName][v.trim()];
+      var n = c ? v.replace(v.trim(), c[idx()]) : conv(v);
+      if (n !== v) { if (!orig.has(node)) orig.set(node, v); node.nodeValue = n; }
       return;
     }
     if (node.nodeType !== 1 || /^(SCRIPT|STYLE|TEXTAREA)$/.test(node.nodeName)) return;
-    ATTR.forEach(function (a) { var x = node.getAttribute && node.getAttribute(a); if (x && /[\u0600-\u06FF]/.test(x)) node.setAttribute(a, conv(x)); });
-    for (var c = node.firstChild; c; c = c.nextSibling) tr(c);
+    if (node.getAttribute && (node.getAttribute("translate") === "no" || node.classList.contains("notranslate"))) return;
+    trAttrs(node);
+    for (var ch = node.firstChild; ch; ch = ch.nextSibling) tr(ch);
   }
   /* نصوص لم تُترجم بعد (لتزويدي بها): EduI18N.missing() في وحدة التحكم */
   function missing() {
@@ -93,9 +137,20 @@
       tr(document.body); document.title = conv(document.title || "");
       var q = 0, pend = [];
       new MutationObserver(function (ms) {
-        ms.forEach(function (m) { pend.push(m.type === "characterData" ? m.target : null); m.addedNodes.forEach(function (x) { pend.push(x); }); });
-        if (!q) q = requestAnimationFrame(function () { q = 0; var l = pend; pend = []; l.forEach(function (x) { if (x && x.isConnected !== false) tr(x); }); });
-      }).observe(document.body, { childList: true, subtree: true, characterData: true });
+        ms.forEach(function (m) {
+          if (m.type === "attributes") { pend.push({ attrs: m.target }); return; }
+          pend.push(m.type === "characterData" ? m.target : null); m.addedNodes.forEach(function (x) { pend.push(x); });
+        });
+        if (!q) q = requestAnimationFrame(function () { q = 0; var l = pend; pend = []; l.forEach(function (x) { if (!x) return; if (x.attrs) trAttrs(x.attrs); else if (x.isConnected !== false) tr(x); }); });
+      }).observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ATTR });
+      /* عنوان الصفحة إن تغيّر لاحقًا */
+      var ti = document.querySelector("title");
+      if (ti) new MutationObserver(function () { var c = conv(document.title || ""); if (c !== document.title) document.title = c; }).observe(ti, { childList: true, characterData: true, subtree: true });
+      /* alert / confirm / prompt نصوص نظام لا تظهر في الصفحة فنترجمها هنا */
+      ["alert", "confirm", "prompt"].forEach(function (f) {
+        var o = window[f]; if (typeof o !== "function" || o.__edu) return;
+        window[f] = function (m, d) { return o.call(window, m == null ? m : conv(String(m)), d); }; window[f].__edu = 1;
+      });
     }
   }
   function set(l) { if (LANGS[l]) { lang = l; ls("edu_lang", l); } }
@@ -159,5 +214,5 @@
     apply();
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
-  window.EduI18N = { t: t, msg: msg, set: set, lang: function () { return lang || "ar"; }, apply: apply, dict: D, missing: missing };
+  window.EduI18N = { countries: function (codes) { var dn; try { dn = new Intl.DisplayNames([lang || "ar"], { type: "region" }); } catch (e) {} return codes.map(function (c) { return [c, (dn && dn.of(c)) || c]; }).sort(function (a, b) { return a[1].localeCompare(b[1], lang || "ar"); }); }, t: t, msg: msg, set: set, lang: function () { return lang || "ar"; }, apply: apply, dict: D, patterns: PAT, missing: missing, tr: tr };
 })();
