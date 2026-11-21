@@ -280,7 +280,7 @@ html.ld-done .hero .in,.noldr .hero .in{opacity:1;transform:none;transition:opac
 }
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}.hero .in{opacity:1;transform:none}}
 </style>
-<link rel="stylesheet" href="ui.css"><script src="ui.js"></script>
+<link rel="stylesheet" href="ui.css"><script src="i18n.js" data-gate="1"></script><script src="ui.js"></script>
 </head>
 <body>
 
@@ -632,5 +632,6 @@ function subscribe(m){
 drawPlans();
 })();
 </script>
+<script src="push.js"></script><script src="native.js"></script>
 </body>
 </html>

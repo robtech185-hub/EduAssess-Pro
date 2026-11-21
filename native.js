@@ -7,10 +7,12 @@
   var LN = C.Plugins && C.Plugins.LocalNotifications;
   if (!LN) return;
 
+  var I=window.EduI18N||{msg:function(k){return k},lang:function(){return "ar"}};
   var DAYS = 21, MAX = 60, CH = "edu", busy = false, lastRun = 0;
   function ls(k, v) {
     try { if (v === undefined) return localStorage.getItem(k); if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) { return null; }
   }
+  function role() { return ls("edu_role") === "teacher" || /teacher\.html/i.test(location.pathname) ? "teacher" : "student"; }
   async function session() {
     try { var r = await window.sbClient.auth.getSession(); return (r && r.data && r.data.session) || null; } catch (e) { return null; }
   }
@@ -20,7 +22,7 @@
     return p.display === "granted";
   }
   async function channel() {
-    try { await LN.createChannel({ id: CH, name: "تنبيهات الاختبارات", importance: 5, visibility: 1, vibration: true }); } catch (e) {}
+    try { await LN.createChannel({ id: CH, name: ({ en: "Exam alerts", fr: "Alertes d'examens" })[I.lang()] || "تنبيهات الاختبارات", importance: 5, visibility: 1, vibration: true }); } catch (e) {}
   }
   async function exact() {
     try {
@@ -36,7 +38,19 @@
   }
 
   /* مواعيد الاختبارات القادمة: تنبيهات المعلمين + تقويم المعلمين المشترك معهم */
+  async function collectTeacher(user) {
+    var sb = window.sbClient, now = new Date(), to = new Date(now.getTime() + DAYS * 864e5), out = [];
+    try {
+      var r = await sb.from("exams").select("exam_name,starts_at,ends_at").eq("teacher_id", user.id).gte("starts_at", now.toISOString()).lte("starts_at", to.toISOString()).order("starts_at").limit(40);
+      (r.data || []).forEach(function (x) { var t = new Date(x.starts_at); if (!isNaN(t) && t > now) out.push({ name: x.exam_name || "", at: t, teacher: "", end: x.ends_at ? new Date(x.ends_at) : null }); });
+    } catch (e) {}
+    return out;
+  }
+  async function teacherEnds(user) {
+    try { var r = await window.sbClient.from("teachers").select("trial_ends_at,subscription_ends_at").eq("id", user.id).single(); return r.data || null; } catch (e) { return null; }
+  }
   async function collect(user) {
+    if (role() === "teacher") return collectTeacher(user);
     var sb = window.sbClient, now = new Date(), to = new Date(now.getTime() + DAYS * 864e5), out = {};
     function add(name, start, teacher, end) {
       if (!start) return;
@@ -73,16 +87,24 @@
         if (at.getTime() > now + 2000 && notes.length < MAX)
           notes.push({ id: id++, title: "EduAssess Pro", body: body, schedule: { at: at, allowWhileIdle: true }, channelId: CH });
       };
-      var P = function (k) { try { return !window.EduPush || window.EduPush.pref(k, "student"); } catch (e) { return true; } };
+      var P = function (k) { try { return !window.EduPush || window.EduPush.pref(k, role()); } catch (e) { return true; } };
       list.forEach(function (x) {
-        var who = x.teacher ? " — " + x.teacher : "";
-        if (P("exam_start")) {
-          push(new Date(x.at - 60 * 6e4), "📝 يبدأ اختبار «" + x.name + "» بعد ساعة" + who);
-          push(new Date(x.at - 10 * 6e4), "📝 يبدأ اختبار «" + x.name + "» بعد ١٠ دقائق" + who);
-          push(x.at, "🚀 بدأ الآن اختبار «" + x.name + "»" + who);
+        var who = x.teacher ? " — " + x.teacher : "", v = { n: x.name, t: who };
+        if (P("exam_start") || P("exam_reminder")) {
+          push(new Date(x.at - 60 * 6e4), I.msg("h1", v));
+          push(new Date(x.at - 10 * 6e4), I.msg("m10", v));
+          push(x.at, I.msg("now", v));
         }
-        if (x.end && !isNaN(x.end) && P("exam_end")) push(new Date(x.end - 30 * 6e4), "⏳ يُغلق دخول اختبار «" + x.name + "» بعد 30 دقيقة" + who);
+        if (x.end && !isNaN(x.end) && role() === "student" && P("exam_end")) push(new Date(x.end - 30 * 6e4), I.msg("end", v));
       });
+      if (role() === "teacher") {
+        var tc = await teacherEnds(ses.user);
+        [["trial_ends_at", "trial", "trial_end"], ["subscription_ends_at", "sub", "sub_end"]].forEach(function (c) {
+          var d = tc && tc[c[0]] && new Date(tc[c[0]]);
+          if (!d || isNaN(d) || d <= new Date() || !P(c[2])) return;
+          [2, 1].forEach(function (n) { var at = new Date(d - n * 864e5); at.setHours(10, 0, 0, 0); push(at, I.msg(c[1], { n: n })); });
+        });
+      }
       await cancelAll();
       if (notes.length) await LN.schedule({ notifications: notes });
     } catch (e) {} finally { busy = false; }
@@ -113,8 +135,8 @@
     try {
       if (!(await perm())) { alert("فعّل إذن الإشعارات من إعدادات التطبيق"); return; }
       await channel(); await exact();
-      await LN.schedule({ notifications: [{ id: 999, title: "EduAssess Pro", body: "✅ التنبيهات تعمل بنجاح", schedule: { at: new Date(Date.now() + 10000), allowWhileIdle: true }, channelId: CH }] });
-      alert("سيصلك تنبيه بعد 10 ثوانٍ، أغلق التطبيق الآن");
+      await LN.schedule({ notifications: [{ id: 999, title: "EduAssess Pro", body: I.msg("ok"), schedule: { at: new Date(Date.now() + 10000), allowWhileIdle: true }, channelId: CH }] });
+      alert(I.msg("wait"));
     } catch (e) { alert("تعذر جدولة التجربة"); }
   };
 })();

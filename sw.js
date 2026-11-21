@@ -22,7 +22,7 @@ self.addEventListener("push", function (e) {
   var body = d.body || "";
   if (d.starts_at) {
     try {
-      body += " • يبدأ " + new Date(d.starts_at).toLocaleString("ar-EG-u-nu-latn", {
+      body += ({ en: " • Starts ", fr: " • Début " })[d.lang] || " • يبدأ "; body += new Date(d.starts_at).toLocaleString(({ en: "en-GB", fr: "fr-FR" })[d.lang] || "ar-EG-u-nu-latn", {
         weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit"
       });
     } catch (_) {}
@@ -31,8 +31,8 @@ self.addEventListener("push", function (e) {
     body: body,
     icon: "assets/favicon.png",
     badge: "assets/badge.png",
-    lang: "ar",
-    dir: "rtl",
+    lang: d.lang || "ar",
+    dir: d.lang === "en" || d.lang === "fr" ? "ltr" : "rtl",
     tag: d.tag || undefined,
     renotify: !!d.tag,
     vibrate: [120, 60, 120],
