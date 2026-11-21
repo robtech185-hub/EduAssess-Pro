@@ -381,6 +381,7 @@ h2,h3,h4,.brand b,.btn,.tabs button{font-family:'Readex Pro','IBM Plex Sans Arab
 <button data-p="stu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg><span>النتائج</span></button>
 <button data-p="sbs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>المشتركون</span></button>
 <button data-p="grp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l9 5-9 5-9-5 9-5z"/><path d="M3 12l9 5 9-5M3 17l9 5 9-5"/></svg><span>المجموعات</span></button>
+<button data-p="live"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg><span>مباشر</span></button>
 <button data-p="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg><span>حسابي</span></button></div>
 <div id="lock" class="card hide" style="border-color:var(--bad)"><b style="color:var(--bad)">انتهت فترتك. العمليات متوقفة مؤقتًا</b> — جدّد اشتراكك من صفحة «حسابي» لاستعادة بياناتك.</div>
 <div id="acc" class="pg"></div>
@@ -404,6 +405,7 @@ h2,h3,h4,.brand b,.btn,.tabs button{font-family:'Readex Pro','IBM Plex Sans Arab
 <button class="btn g" id="vsv" type="button">حفظ الفيديو</button> <button class="btn o hide" id="vcx" type="button">إلغاء التعديل</button><p id="vm" class="err"></p></div>
 <div class="card"><h3>فيديوهاتي</h3><div id="vl"></div></div></div>
 <div id="stu" class="pg hide"><div class="card"><h3>نتائج الطلاب</h3><label>اختر الاختبار</label><select id="xs"></select><div id="sr"></div><div id="px"></div></div></div>
+<div id="live" class="pg hide"><div class="card"><h3>👁 المراقبة المباشرة</h3><label>اختر الاختبار</label><select id="lvx"></select><p class="hint" id="lvh">يتحدّث تلقائيًا كل بضع ثوانٍ. شغّل ملف setup-live.sql في Supabase مرة واحدة.</p><div id="lvs"></div><div id="lvg" class="lvg"></div><h4 style="margin:18px 0 6px">آخر الأحداث</h4><div id="lve" style="font-size:13px;line-height:2"></div></div></div>
 <div id="sbs" class="pg hide"><div class="sec-head"><div class="sec-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="sec-tx"><h2>المشتركون</h2><p>الطلاب الذين اشتركوا معك ويصلهم تنبيه اختباراتك.</p></div><div class="pill"><b id="sbn">0</b><small>مشترك</small></div></div>
 <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input id="sbq" type="search" placeholder="ابحث باسم الطالب أو رقمه..." autocomplete="off"></div><div id="sblist" class="rows"></div></div>
 <div id="grp" class="pg hide"><div class="sec-head"><div class="sec-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l9 5-9 5-9-5 9-5z"/><path d="M3 12l9 5 9-5M3 17l9 5 9-5"/></svg></div><div class="sec-tx"><h2>المجموعات</h2><p>نظّم مشتركيك في مجموعات ووجّه الاختبار لكل مجموعة مباشرة.</p></div></div>
@@ -983,6 +985,48 @@ $('vsv').onclick=async()=>{
  }
  const xs=$('xs'),old=xs.onchange;
  xs.onchange=async function(){try{await old.apply(this,arguments)}catch(e){}load(xs.value)};
+})();
+</script>
+<script>
+/* ===== المراقبة المباشرة ===== */
+(function(){
+ const st=document.createElement('style');st.textContent=`.lvg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:10px}
+ .lvc{background:#fff;border:1.5px solid var(--line);border-radius:16px;overflow:hidden;font-size:12.5px}.lvc.bad{border-color:#D6453D}.lvc.off{opacity:.6}
+ .lvc .im{height:112px;background:#0b1633 center/cover no-repeat;position:relative;display:grid;place-items:center;color:#8aa0d6;font-size:12px}
+ .lvc .tg{position:absolute;top:6px;right:6px;padding:2px 8px;border-radius:12px;font-weight:800;font-size:11px;color:#fff}
+ .lvc .bd{padding:8px 10px;display:grid;gap:4px}.lvc b{font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .lvc .pb{height:6px;background:#E8EEFC;border-radius:6px;overflow:hidden}.lvc .pb i{display:block;height:100%;background:linear-gradient(90deg,#0E9F7E,#4FD1A8)}
+ .lvs{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.lvs span{background:#F1F5FF;border-radius:20px;padding:4px 12px;font-weight:700;font-size:13px}`;document.head.appendChild(st);
+ let tm=null,busy=false;
+ const KN={leave:'🚪 خرج من الاختبار',return:'↩ عاد للاختبار',force_end:'⛔ تسليم تلقائي',camera_off:'📷 الكاميرا متوقفة',camera_covered:'📷 الكاميرا مغطّاة',no_face:'🙈 لا يظهر وجه',multi_face:'👥 أكثر من شخص',pin_failed:'📌 لم يُثبَّت القفل',start:'▶ بدأ الاختبار'};
+ const mmss=n=>{n=Math.max(0,Math.round(n));return String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0')};
+ const clock=d=>new Date(d).toLocaleTimeString('ar-EG-u-nu-latn',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+ function fill(){const x=$('lvx'),v=x.value;x.innerHTML='<option value="">— اختر —</option>'+(EXAMS||[]).map(e=>`<option value="${e.id}">${esc(e.exam_name)}</option>`).join('');x.value=v}
+ async function tick(){
+  if(busy)return;const id=$('lvx').value;if(!id){$('lvg').innerHTML='';$('lvs').innerHTML='';$('lve').innerHTML='';return}
+  busy=true;try{
+   const since=new Date(Date.now()-6*3600e3).toISOString();
+   const [a,b]=await Promise.all([sbClient.from('exam_live').select('*').eq('exam_id',id).gte('updated_at',since).order('updated_at',{ascending:false}).limit(200),
+     sbClient.from('exam_proctor_events').select('full_name,kind,detail,created_at').eq('exam_id',id).in('kind',Object.keys(KN)).order('created_at',{ascending:false}).limit(25)]);
+   if(a.error){$('lvg').innerHTML='<p class="muted">لا تتوفر البيانات — شغّل ملف setup-live.sql في Supabase.</p>';return}
+   const now=Date.now(),rows=(a.data||[]).map(r=>{const age=(now-new Date(r.updated_at))/1e3;
+     const stt=r.status==='done'?'done':age>25?'off':r.away?'away':'on';return Object.assign(r,{age,stt})});
+   const ord={on:0,away:1,off:2,done:3};rows.sort((x,y)=>ord[x.stt]-ord[y.stt]);
+   const n=k=>rows.filter(r=>r.stt===k).length;
+   $('lvs').innerHTML=`<div class="lvs"><span>🟢 يختبرون الآن: ${n('on')}</span><span>🟠 خارج التطبيق: ${n('away')}</span><span>⚪ منقطعون: ${n('off')}</span><span>✅ سلّموا: ${n('done')}</span></div>`;
+   const T={on:['#0E9F7E','يختبر'],away:['#E08A00','خارج التطبيق'],off:['#6B7690','منقطع'],done:['#1F63E0','سلّم']};
+   $('lvg').innerHTML=rows.length?rows.map(r=>{const left=r.stt==='on'||r.stt==='away'?r.left_secs-r.age:0,pc=r.q_total?Math.round(r.answered/r.q_total*100):0;
+     return `<div class="lvc ${r.stt==='away'||r.leaves>=2?'bad':''} ${r.stt==='off'||r.stt==='done'?'off':''}"><div class="im" style="${r.thumb?`background-image:url(${r.thumb})`:''}">${r.thumb?'':'بلا صورة'}<span class="tg" style="background:${T[r.stt][0]}">${T[r.stt][1]}</span></div>
+      <div class="bd"><b>${esc(r.full_name||'طالب')}</b><div>سؤال ${r.q_index} من ${r.q_total} · أجاب ${r.answered}</div><div class="pb"><i style="width:${pc}%"></i></div>
+      <div>${r.stt==='done'?'انتهى':'⏱ '+mmss(left)}${r.leaves?` · <span style="color:#D6453D;font-weight:800">خروج ${r.leaves}</span>`:''}</div></div></div>`}).join(''):'<p class="muted">لا يوجد طلاب يختبرون الآن.</p>';
+   $('lve').innerHTML=(b.data||[]).map(e=>`<div>• ${clock(e.created_at)} — <b>${esc(e.full_name||'طالب')}</b> ${KN[e.kind]}${e.detail?` <small class="muted">(${esc(e.detail)})</small>`:''}</div>`).join('')||'<span class="muted">لا أحداث بعد.</span>';
+  }finally{busy=false}
+ }
+ function stop(){clearInterval(tm);tm=null}
+ function start(){fill();stop();tick();tm=setInterval(()=>{if($('live').classList.contains('hide'))return stop();tick()},4000)}
+ $('lvx').onchange=tick;
+ const _sp=showPg;showPg=function(p){_sp.apply(this,arguments);if(p==='live')start();else stop()};
+ document.querySelectorAll('#tabs button[data-p="live"]').forEach(b=>b.addEventListener('click',()=>{if($('live').classList.contains('hide'))showPg('live')}));
 })();
 </script>
 <script src="native.js"></script>

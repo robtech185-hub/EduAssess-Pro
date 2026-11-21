@@ -69,6 +69,19 @@
     } catch (e) {}
   }
 
+  /* نبضة حيّة للمعلم: السؤال الحالي، المتبقي، حالة الخروج، ومصغّرة من الكاميرا (جدول exam_live) */
+  async function beat(status) {
+    if (!S) return;
+    var o = S.o, st = {}, thumb = null;
+    try { st = o.getState ? o.getState() : {}; } catch (e) {}
+    if (status !== "done") { var c = shot(160); if (c) { try { thumb = c.toDataURL("image/jpeg", 0.4); } catch (e) {} } }
+    var row = { attempt_id: String(o.attemptId), exam_id: String(o.examId), user_id: o.userId, full_name: o.name || null,
+      q_index: st.q || 0, q_total: st.total || 0, answered: st.answered || 0, left_secs: st.left || 0,
+      leaves: S.leaves, away: !!S.away, status: status || "active", updated_at: new Date().toISOString() };
+    if (thumb) row.thumb = thumb;
+    try { await o.sb.from("exam_live").upsert(row, { onConflict: "attempt_id" }); } catch (e) {}
+  }
+
   /* ---------- واجهة التنبيه ---------- */
   function banner(html, danger, ms) {
     var el = $("ep-banner");
@@ -110,7 +123,7 @@
     if (!S || S.ended) return;
     var now = Date.now();
     if (now - S.lastLeave < 1500) return;      // منع العدّ المزدوج
-    S.lastLeave = now; S.leaves++;
+    S.lastLeave = now; S.leaves++; S.away = true; beat();
     var left = MAX_LEAVES - S.leaves;
     log("leave", source + (awayMs ? " away=" + Math.round(awayMs / 1000) + "s" : ""), true);
     if (left <= 0) { S.ended = true; var cb = S.o.onForceEnd; log("force_end", "leaves=" + S.leaves, true); if (cb) cb("left"); return; }
@@ -118,7 +131,10 @@
     if (S.o.onWarn) S.o.onWarn(S.leaves, MAX_LEAVES);
     await modal("لا تغادر الاختبار", msg);
   }
-  function onVis() { if (!NATIVE && document.visibilityState === "hidden") onLeave("visibility"); }
+  function onVis() {
+    if (NATIVE || !S) return;
+    if (document.visibilityState === "hidden") onLeave("visibility"); else { S.away = false; beat(); }
+  }
   function block(e) {
     if (!S || S.ended) return;
     var t = e.target && e.target.tagName;
@@ -169,6 +185,8 @@
     if (window.FaceDetector) { try { S.fd = new window.FaceDetector({ fastMode: true, maxDetectedFaces: 3 }); } catch (e) { S.fd = null; } }
     eye();
     S.timers.push(setInterval(check, CHECK_MS));
+    S.timers.push(setInterval(function () { beat(); }, 6000));
+    setTimeout(function () { beat(); }, 800);
     S.timers.push(setInterval(function () { log("snap", null, true); }, SNAP_MS));
     setTimeout(function () { log("start", NATIVE ? "native" : "web", true); }, 1500);
     document.addEventListener("visibilitychange", onVis);
@@ -177,7 +195,7 @@
     if (NATIVE) {
       try {
         var r = await LK.enable();
-        S.lkH = await LK.addListener("examLock", function (e) { if (e && e.type === "leave") onLeave("native"); else if (e && e.type === "return" && S) log("return", "away=" + Math.round((e.awayMs || 0) / 1000) + "s", false); });
+        S.lkH = await LK.addListener("examLock", function (e) { if (e && e.type === "leave") onLeave("native"); else if (e && e.type === "return" && S) { S.away = false; beat(); log("return", "away=" + Math.round((e.awayMs || 0) / 1000) + "s", false); }});
         if (r && !r.pinned) log("pin_failed", "screen pinning not active", false);
       } catch (e) {}
     } else {
@@ -186,6 +204,7 @@
   }
   function end() {
     if (!S) { release(); return; }
+    beat("done");
     var s = S; S = null; s.ended = true;
     s.timers.forEach(clearInterval);
     document.removeEventListener("visibilitychange", onVis);

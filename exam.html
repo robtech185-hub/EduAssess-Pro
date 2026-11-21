@@ -1606,6 +1606,7 @@ $("btn-start-exam").addEventListener("click", async ()=>{
   $("leave-warning").style.display="none";
   renderQuestion(); startTimer(); showView("exam");
   EduProctor.begin({ sb:sbClient, examId:state.exam.id, userId:state.user.id, attemptId:data.id, name:state.profile.name,
+    getState:()=>({q:state.currentIndex+1,total:state.questions.length,answered:Object.keys(state.answers).length,left:Math.max(0,Math.round((state.deadline-Date.now())/1000))}),
     onForceEnd:(why)=>finishExam(false,why) });
 });
 
