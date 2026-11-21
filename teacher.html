@@ -405,7 +405,7 @@ h2,h3,h4,.brand b,.btn,.tabs button{font-family:'Readex Pro','IBM Plex Sans Arab
 <button class="btn g" id="vsv" type="button">حفظ الفيديو</button> <button class="btn o hide" id="vcx" type="button">إلغاء التعديل</button><p id="vm" class="err"></p></div>
 <div class="card"><h3>فيديوهاتي</h3><div id="vl"></div></div></div>
 <div id="stu" class="pg hide"><div class="card"><h3>نتائج الطلاب</h3><label>اختر الاختبار</label><select id="xs"></select><div id="sr"></div><div id="px"></div></div></div>
-<div id="live" class="pg hide"><div class="card"><h3>👁 المراقبة المباشرة</h3><label>اختر الاختبار</label><select id="lvx"></select><p class="hint" id="lvh">يتحدّث تلقائيًا كل بضع ثوانٍ. شغّل ملف setup-live.sql في Supabase مرة واحدة.</p><div id="lvs"></div><div id="lvg" class="lvg"></div><h4 style="margin:18px 0 6px">آخر الأحداث</h4><div id="lve" style="font-size:13px;line-height:2"></div></div></div>
+<div id="live" class="pg hide"><div class="card"><h3>👁 المراقبة المباشرة</h3><label>اختر الاختبار</label><select id="lvx"></select><p class="hint" id="lvh">الصور تتجدد كل ثانية تقريبًا. اضغط على صورة أي طالب لبثّ مركّز أوضح وأسرع.</p><div id="lvs"></div><div id="lvf" style="display:none;margin:10px 0;padding:10px;border:2px solid #1F63E0;border-radius:18px;background:#0b1633;text-align:center"><div style="display:flex;justify-content:space-between;align-items:center;color:#fff;margin-bottom:8px"><b id="lvfn"></b><button id="lvfx" class="btn o" style="width:auto;padding:4px 12px">إغلاق ✕</button></div><img id="lvfi" style="width:100%;max-width:480px;border-radius:12px;background:#000;min-height:120px"><div style="color:#8aa0d6;font-size:12px;margin-top:6px">بثّ مركّز (≈4 صور/ثانية)</div></div><div id="lvs"></div><div id="lvg" class="lvg"></div><h4 style="margin:18px 0 6px">آخر الأحداث</h4><div id="lve" style="font-size:13px;line-height:2"></div></div></div>
 <div id="sbs" class="pg hide"><div class="sec-head"><div class="sec-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="sec-tx"><h2>المشتركون</h2><p>الطلاب الذين اشتركوا معك ويصلهم تنبيه اختباراتك.</p></div><div class="pill"><b id="sbn">0</b><small>مشترك</small></div></div>
 <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input id="sbq" type="search" placeholder="ابحث باسم الطالب أو رقمه..." autocomplete="off"></div><div id="sblist" class="rows"></div></div>
 <div id="grp" class="pg hide"><div class="sec-head"><div class="sec-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l9 5-9 5-9-5 9-5z"/><path d="M3 12l9 5 9-5M3 17l9 5 9-5"/></svg></div><div class="sec-tx"><h2>المجموعات</h2><p>نظّم مشتركيك في مجموعات ووجّه الاختبار لكل مجموعة مباشرة.</p></div></div>
@@ -997,8 +997,8 @@ $('vsv').onclick=async()=>{
  .lvc .bd{padding:8px 10px;display:grid;gap:4px}.lvc b{font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
  .lvc .pb{height:6px;background:#E8EEFC;border-radius:6px;overflow:hidden}.lvc .pb i{display:block;height:100%;background:linear-gradient(90deg,#0E9F7E,#4FD1A8)}
  .lvs{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.lvs span{background:#F1F5FF;border-radius:20px;padding:4px 12px;font-weight:700;font-size:13px}`;document.head.appendChild(st);
- let tm=null,busy=false;
- const KN={leave:'🚪 خرج من الاختبار',return:'↩ عاد للاختبار',force_end:'⛔ تسليم تلقائي',camera_off:'📷 الكاميرا متوقفة',camera_covered:'📷 الكاميرا مغطّاة',no_face:'🙈 لا يظهر وجه',multi_face:'👥 أكثر من شخص',pin_failed:'📌 لم يُثبَّت القفل',start:'▶ بدأ الاختبار'};
+ let tm=null,busy=false,ch=null,F={},FOCUS=null,wp=null;
+ const KN={leave:'🚪 خرج من الاختبار',return:'↩ عاد للاختبار',force_end:'⛔ تسليم تلقائي',camera_off:'📷 الكاميرا متوقفة',camera_covered:'📷 الكاميرا مغطّاة',no_face:'🙈 لا يظهر وجه',multi_face:'👥 أكثر من شخص',pin_failed:'📌 لم يُثبَّت القفل',live_error:'⚠ تعذّر إرسال النبض الحي',start:'▶ بدأ الاختبار'};
  const mmss=n=>{n=Math.max(0,Math.round(n));return String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0')};
  const clock=d=>new Date(d).toLocaleTimeString('ar-EG-u-nu-latn',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
  function fill(){const x=$('lvx'),v=x.value;x.innerHTML='<option value="">— اختر —</option>'+(EXAMS||[]).map(e=>`<option value="${e.id}">${esc(e.exam_name)}</option>`).join('');x.value=v}
@@ -1006,7 +1006,7 @@ $('vsv').onclick=async()=>{
   if(busy)return;const id=$('lvx').value;if(!id){$('lvg').innerHTML='';$('lvs').innerHTML='';$('lve').innerHTML='';return}
   busy=true;try{
    const since=new Date(Date.now()-6*3600e3).toISOString();
-   const [a,b]=await Promise.all([sbClient.from('exam_live').select('*').eq('exam_id',id).gte('updated_at',since).order('updated_at',{ascending:false}).limit(200),
+   const [a,b]=await Promise.all([sbClient.from('exam_live').select('attempt_id,user_id,full_name,q_index,q_total,answered,left_secs,leaves,away,status,updated_at').eq('exam_id',id).gte('updated_at',since).order('updated_at',{ascending:false}).limit(200),
      sbClient.from('exam_proctor_events').select('full_name,kind,detail,created_at').eq('exam_id',id).in('kind',Object.keys(KN)).order('created_at',{ascending:false}).limit(25)]);
    if(a.error){$('lvg').innerHTML='<p class="muted">لا تتوفر البيانات — شغّل ملف setup-live.sql في Supabase.</p>';return}
    const now=Date.now(),rows=(a.data||[]).map(r=>{const age=(now-new Date(r.updated_at))/1e3;
@@ -1016,15 +1016,30 @@ $('vsv').onclick=async()=>{
    $('lvs').innerHTML=`<div class="lvs"><span>🟢 يختبرون الآن: ${n('on')}</span><span>🟠 خارج التطبيق: ${n('away')}</span><span>⚪ منقطعون: ${n('off')}</span><span>✅ سلّموا: ${n('done')}</span></div>`;
    const T={on:['#0E9F7E','يختبر'],away:['#E08A00','خارج التطبيق'],off:['#6B7690','منقطع'],done:['#1F63E0','سلّم']};
    $('lvg').innerHTML=rows.length?rows.map(r=>{const left=r.stt==='on'||r.stt==='away'?r.left_secs-r.age:0,pc=r.q_total?Math.round(r.answered/r.q_total*100):0;
-     return `<div class="lvc ${r.stt==='away'||r.leaves>=2?'bad':''} ${r.stt==='off'||r.stt==='done'?'off':''}"><div class="im" style="${r.thumb?`background-image:url(${r.thumb})`:''}">${r.thumb?'':'بلا صورة'}<span class="tg" style="background:${T[r.stt][0]}">${T[r.stt][1]}</span></div>
+     return `<div class="lvc ${r.stt==='away'||r.leaves>=2?'bad':''} ${r.stt==='off'||r.stt==='done'?'off':''}"><div class="im" data-lf="${r.user_id}" data-u="${r.user_id}" data-n="${esc(r.full_name||'طالب')}" style="cursor:pointer">${F[r.user_id]?'':'جارِ الاتصال…'}<span class="tg" style="background:${T[r.stt][0]}">${T[r.stt][1]}</span></div>
       <div class="bd"><b>${esc(r.full_name||'طالب')}</b><div>سؤال ${r.q_index} من ${r.q_total} · أجاب ${r.answered}</div><div class="pb"><i style="width:${pc}%"></i></div>
       <div>${r.stt==='done'?'انتهى':'⏱ '+mmss(left)}${r.leaves?` · <span style="color:#D6453D;font-weight:800">خروج ${r.leaves}</span>`:''}</div></div></div>`}).join(''):'<p class="muted">لا يوجد طلاب يختبرون الآن.</p>';
+   applyFrames();
    $('lve').innerHTML=(b.data||[]).map(e=>`<div>• ${clock(e.created_at)} — <b>${esc(e.full_name||'طالب')}</b> ${KN[e.kind]}${e.detail?` <small class="muted">(${esc(e.detail)})</small>`:''}</div>`).join('')||'<span class="muted">لا أحداث بعد.</span>';
   }finally{busy=false}
  }
- function stop(){clearInterval(tm);tm=null}
- function start(){fill();stop();tick();tm=setInterval(()=>{if($('live').classList.contains('hide'))return stop();tick()},4000)}
- $('lvx').onchange=tick;
+ function paint(el,u){const f=F[u];if(!f)return;el.style.backgroundImage='url('+f+')';if(el.firstChild&&el.firstChild.nodeType===3)el.firstChild.nodeValue=''}
+ function applyFrames(){document.querySelectorAll('#lvg [data-lf]').forEach(el=>paint(el,el.dataset.lf))}
+ function ping(){if(ch)try{ch.send({type:'broadcast',event:'watch',payload:{focus:FOCUS}})}catch(e){}}
+ function join(id){leave();F={};FOCUS=null;$('lvf').style.display='none';
+  ch=sbClient.channel('live-'+id,{config:{broadcast:{self:false}}});
+  ch.on('broadcast',{event:'frame'},m=>{const p=(m&&m.payload)||{};if(!p.u||!p.t)return;F[p.u]=p.t;
+   const el=document.querySelector('#lvg [data-lf="'+p.u+'"]');if(el)paint(el,p.u);
+   if(FOCUS===p.u)$('lvfi').src=p.t}).subscribe(s=>{if(s==='SUBSCRIBED')ping()});
+  wp=setInterval(ping,4000)}
+ function leave(){clearInterval(wp);wp=null;if(ch){try{sbClient.removeChannel(ch)}catch(e){}ch=null}}
+ function setFocus(u,n){FOCUS=u;const b=$('lvf');if(!u){b.style.display='none';ping();return}
+  $('lvfn').textContent=n||'';$('lvfi').src=F[u]||'';b.style.display='block';ping();b.scrollIntoView({behavior:'smooth',block:'nearest'})}
+ $('lvfx').onclick=()=>setFocus(null);
+ $('lvg').addEventListener('click',e=>{const el=e.target.closest('[data-lf]');if(el)setFocus(el.dataset.u,el.dataset.n)});
+ function stop(){clearInterval(tm);tm=null;leave()}
+ function start(){fill();stop();if($('lvx').value)join($('lvx').value);tick();tm=setInterval(()=>{if($('live').classList.contains('hide'))return stop();tick()},4000)}
+ $('lvx').onchange=()=>{const v=$('lvx').value;if(v)join(v);else leave();tick()};
  const _sp=showPg;showPg=function(p){_sp.apply(this,arguments);if(p==='live')start();else stop()};
  document.querySelectorAll('#tabs button[data-p="live"]').forEach(b=>b.addEventListener('click',()=>{if($('live').classList.contains('hide'))showPg('live')}));
 })();

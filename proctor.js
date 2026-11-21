@@ -72,14 +72,26 @@
   /* نبضة حيّة للمعلم: السؤال الحالي، المتبقي، حالة الخروج، ومصغّرة من الكاميرا (جدول exam_live) */
   async function beat(status) {
     if (!S) return;
-    var o = S.o, st = {}, thumb = null;
+    var o = S.o, st = {};
     try { st = o.getState ? o.getState() : {}; } catch (e) {}
-    if (status !== "done") { var c = shot(160); if (c) { try { thumb = c.toDataURL("image/jpeg", 0.4); } catch (e) {} } }
     var row = { attempt_id: String(o.attemptId), exam_id: String(o.examId), user_id: o.userId, full_name: o.name || null,
       q_index: st.q || 0, q_total: st.total || 0, answered: st.answered || 0, left_secs: st.left || 0,
       leaves: S.leaves, away: !!S.away, status: status || "active", updated_at: new Date().toISOString() };
-    if (thumb) row.thumb = thumb;
-    try { await o.sb.from("exam_live").upsert(row, { onConflict: "attempt_id" }); } catch (e) {}
+    try {
+      var r = await o.sb.from("exam_live").upsert(row, { onConflict: "attempt_id" });
+      if (r && r.error && S && !S.liveErr) { S.liveErr = true; log("live_error", String(r.error.message || r.error.code || "").slice(0, 120), false); }
+    } catch (e) {}
+  }
+
+  /* بثّ الصور للمعلم عبر Realtime Broadcast (بلا تخزين): لقطة/ثانية للجميع، و4 لقطات/ثانية للطالب الذي يركّز عليه المعلم.
+     لا يُرسل شيء إلا إذا كان المعلم يشاهد الصفحة (يرسل "watch" كل 4 ثوانٍ). */
+  function stream() {
+    if (!S || S.ended || !S.ch || !S.cam) return;
+    var n = Date.now(); if (n > S.watchUntil) return;
+    var gap = S.focus ? 250 : 1000; if (n - S.lastFrame < gap) return;
+    S.lastFrame = n;
+    var c = shot(S.focus ? 360 : 140); if (!c) return;
+    try { S.ch.send({ type: "broadcast", event: "frame", payload: { u: S.o.userId, t: c.toDataURL("image/jpeg", S.focus ? 0.55 : 0.4) } }); } catch (e) {}
   }
 
   /* ---------- واجهة التنبيه ---------- */
@@ -184,6 +196,12 @@
     if (!S.cam && REQUIRE_CAMERA) { try { S.cam = await openCam(); } catch (e) {} }
     if (window.FaceDetector) { try { S.fd = new window.FaceDetector({ fastMode: true, maxDetectedFaces: 3 }); } catch (e) { S.fd = null; } }
     eye();
+    S.watchUntil = 0; S.lastFrame = 0; S.focus = false;
+    try {
+      S.ch = o.sb.channel("live-" + o.examId, { config: { broadcast: { self: false } } });
+      S.ch.on("broadcast", { event: "watch" }, function (m) { if (!S) return; var p = (m && m.payload) || {}; S.watchUntil = Date.now() + 12000; S.focus = p.focus === o.userId; }).subscribe();
+      S.timers.push(setInterval(stream, 250));
+    } catch (e) {}
     S.timers.push(setInterval(check, CHECK_MS));
     S.timers.push(setInterval(function () { beat(); }, 6000));
     setTimeout(function () { beat(); }, 800);
@@ -196,7 +214,8 @@
       try {
         var r = await LK.enable();
         S.lkH = await LK.addListener("examLock", function (e) { if (e && e.type === "leave") onLeave("native"); else if (e && e.type === "return" && S) { S.away = false; beat(); log("return", "away=" + Math.round((e.awayMs || 0) / 1000) + "s", false); }});
-        if (r && !r.pinned) log("pin_failed", "screen pinning not active", false);
+        /* نافذة "تثبيت الشاشة" تحتاج موافقة الطالب أولًا، فنفحص بعد 15 ثانية لا فورًا */
+        setTimeout(async function () { try { var st = await LK.status(); if (S && st && !st.pinned) log("pin_failed", "screen pinning not active", false); } catch (e) {} }, 15000);
       } catch (e) {}
     } else {
       try { var el = document.documentElement; if (el.requestFullscreen) await el.requestFullscreen(); } catch (e) {}
@@ -213,6 +232,7 @@
     try { if (s.lkH && s.lkH.remove) s.lkH.remove(); } catch (e) {}
     if (NATIVE) { try { LK.disable(); } catch (e) {} }
     else { try { if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen(); } catch (e) {} }
+    try { if (s.ch) s.o.sb.removeChannel(s.ch); } catch (e) {}
     try { s.cam && s.cam.stream.getTracks().forEach(function (t) { t.stop(); }); } catch (e) {}
     ["ep-eye", "ep-banner"].forEach(function (id) { var el = $(id); if (el) el.remove(); });
   }
