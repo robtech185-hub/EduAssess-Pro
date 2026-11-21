@@ -1407,7 +1407,10 @@ async function refreshBell(){
   if(error) return;
   const b=$("bell-badge"),n=count||0, was=+(b.dataset.n||0);
   b.dataset.n=n; b.textContent=n>9?"9+":n; b.style.display=n?"grid":"none";
-  if(n>was){ const bl=$("btn-bell"); bl.classList.remove("ring"); void bl.offsetWidth; bl.classList.add("ring"); }
+  const first=b.dataset.init!=="1"; b.dataset.init="1";
+  if(n>was){ const bl=$("btn-bell"); bl.classList.remove("ring"); void bl.offsetWidth; bl.classList.add("ring");
+    /* بدون Firebase: أظهر التنبيه الجديد كإشعار نظام أثناء فتح التطبيق */
+    if(!first && window.EDU_NO_FCM && window.nativePush){ try{ const {data:lt}=await sbClient.from("student_notifications").select("exam_name,teacher_name").eq("student_id",state.user.id).eq("read",false).order("created_at",{ascending:false}).limit(1); const x=lt&&lt[0]; if(x) nativePush("📝 "+(x.exam_name||"اختبار جديد")+(x.teacher_name?" — "+x.teacher_name:"")); }catch(e){} } }
 }
 function startNotifPoll(){ stopNotifPoll(); refreshBell(); refreshMsgBadge(); _nT=setInterval(()=>{refreshBell();refreshMsgBadge();},45000); }
 function stopNotifPoll(){ clearInterval(_nT); _nT=null; const b=$("bell-badge"); if(b){b.dataset.n=0;b.style.display="none";} const mb=$("msg-badge"); if(mb) mb.style.display="none"; }

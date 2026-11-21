@@ -8,7 +8,7 @@
   if (!LN) return;
 
   var I=window.EduI18N||{msg:function(k){return k},lang:function(){return "ar"}};
-  var DAYS = 21, MAX = 60, CH = "edu", busy = false, lastRun = 0;
+  var DAYS = 21, MAX = 60, CH = "edu", busy = false, lastRun = 0, fail = false;
   function ls(k, v) {
     try { if (v === undefined) return localStorage.getItem(k); if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) { return null; }
   }
@@ -33,7 +33,8 @@
   async function cancelAll() {
     try {
       var p = await LN.getPending();
-      if (p.notifications && p.notifications.length) await LN.cancel({ notifications: p.notifications.map(function (n) { return { id: n.id }; }) });
+      var ids = (p.notifications || []).filter(function (n) { return n.id !== 999; });
+      if (ids.length) await LN.cancel({ notifications: ids.map(function (n) { return { id: n.id }; }) });
     } catch (e) {}
   }
 
@@ -42,8 +43,9 @@
     var sb = window.sbClient, now = new Date(), to = new Date(now.getTime() + DAYS * 864e5), out = [];
     try {
       var r = await sb.from("exams").select("exam_name,starts_at,ends_at").eq("teacher_id", user.id).gte("starts_at", now.toISOString()).lte("starts_at", to.toISOString()).order("starts_at").limit(40);
+      if (r.error) fail = true;
       (r.data || []).forEach(function (x) { var t = new Date(x.starts_at); if (!isNaN(t) && t > now) out.push({ name: x.exam_name || "", at: t, teacher: "", end: x.ends_at ? new Date(x.ends_at) : null }); });
-    } catch (e) {}
+    } catch (e) { fail = true; }
     return out;
   }
   async function teacherEnds(user) {
@@ -60,17 +62,19 @@
     }
     try {
       var n = await sb.from("student_notifications").select("exam_name,teacher_name,starts_at,ends_at").eq("student_id", user.id).order("created_at", { ascending: false }).limit(100);
+      if (n.error) fail = true;
       (n.data || []).forEach(function (r) { add(r.exam_name, r.starts_at, r.teacher_name, r.ends_at); });
-    } catch (e) {}
+    } catch (e) { fail = true; }
     try {
       var s = await sb.from("student_teacher_subscriptions").select("teacher_id").eq("student_id", user.id);
       var ids = (s.data || []).map(function (r) { return r.teacher_id; });
       if (ids.length) {
         var r = await sb.rpc("my_calendar_exams", { p_from: now.toISOString(), p_to: to.toISOString() });
+        if (r.error) fail = true;
         (r.data || []).filter(function (e) { return !e.teacher_id || ids.indexOf(e.teacher_id) >= 0; })
           .forEach(function (e) { add(e.exam_name, e.starts_at, e.teacher_name); });
       }
-    } catch (e) {}
+    } catch (e) { fail = true; }
     return Object.keys(out).map(function (k) { return out[k]; }).sort(function (a, b) { return a.at - b.at; });
   }
 
@@ -123,7 +127,10 @@
       if (!ses || !ses.user) return;
       if (!(await perm())) return;
       await channel(); await exact();
+      fail = false;
       var list = await collect(ses.user), notes = [], id = 1000, now = Date.now();
+      /* لا نمسح التنبيهات المجدولة سابقًا إن فشل جلب البيانات (لا إنترنت مثلًا) */
+      if (fail) return;
       var push = function (at, body) {
         if (at.getTime() > now + 2000 && notes.length < MAX)
           notes.push({ id: id++, title: "EduAssess Pro", body: body, schedule: { at: at, allowWhileIdle: true }, channelId: CH });
@@ -148,6 +155,7 @@
       }
       await cancelAll();
       if (notes.length) await LN.schedule({ notifications: notes });
+      ls("edu_sched", JSON.stringify({ n: notes.length, at: Date.now() }));
     } catch (e) {} finally { busy = false; }
   }
 
@@ -171,13 +179,24 @@
   }, 1500);
   document.addEventListener("visibilitychange", function () { if (!document.hidden) run(false); });
   setInterval(function () { if (!document.hidden) run(false); }, 15 * 60 * 1000);
+  /* تغيير نوع الإشعار من الإعدادات يُعاد جدولته فورًا */
+  document.addEventListener("change", function (e) { if (e.target && e.target.dataset && e.target.dataset.k) setTimeout(function () { run(true); }, 400); });
+  /* إشعار فوري لحدث وصل والتطبيق مفتوح */
+  window.nativePush = async function (body) {
+    try {
+      if ((await LN.checkPermissions()).display !== "granted") return;
+      await LN.schedule({ notifications: [{ id: 3000 + (Date.now() / 1000 | 0) % 2000000000, title: "EduAssess Pro", body: body, schedule: { at: new Date(Date.now() + 1500), allowWhileIdle: true }, channelId: CH }] });
+    } catch (e) {}
+  };
 
   window.testNotif = async function () {
     try {
       if (!(await perm())) { alert("فعّل إذن الإشعارات من إعدادات التطبيق"); return; }
       await channel(); await exact();
+      run(true);
       await LN.schedule({ notifications: [{ id: 999, title: "EduAssess Pro", body: I.msg("ok"), schedule: { at: new Date(Date.now() + 10000), allowWhileIdle: true }, channelId: CH }] });
-      alert(I.msg("wait"));
+      var pn = 0; try { pn = (await LN.getPending()).notifications.length; } catch (e) {}
+      alert(I.msg("wait") + "\n\n(" + pn + " تنبيه مجدول)");
     } catch (e) { alert("تعذر جدولة التجربة"); }
   };
 })();
