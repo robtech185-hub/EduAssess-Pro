@@ -5,7 +5,7 @@
   "use strict";
 
   /* ضع هنا المفتاح العام VAPID (الناتج من: npx web-push generate-vapid-keys) */
-  var VAPID_PUBLIC = "BC_H8hom6IpMoHi7tTb6S03Bf-NeYOXBuyoa3yoXc6QNVU_wFlJkUbs71PJOc82lBoFe3zO62llLg-P6us_p0j8";
+  var VAPID_PUBLIC = "BOzjgnNNFhbPL4HX8lvxvN6oMB78QckDsb1sFoSxWzL5ezSJXHwecl9KkyRRNkAtUG1fZb1fxjSEHz071s4cVGM";
 
   var SW_URL = "sw.js", DISMISS_KEY = "eduassess_push_dismiss", OFF_KEY = "eduassess_push_off", DAY = 864e5;
   var sb = null, mounts = [], regP = null;
