@@ -2,6 +2,19 @@
 self.addEventListener("install", function () { self.skipWaiting(); });
 self.addEventListener("activate", function (e) { e.waitUntil(self.clients.claim()); });
 
+/* تفضيلات المستخدم تصل من الصفحة وتُحفظ هنا لتصفية الإشعارات بحسب نوعها (kind) */
+function savePrefs(p) {
+  return caches.open("edu-prefs").then(function (c) { return c.put("prefs", new Response(JSON.stringify(p || {}))); });
+}
+function loadPrefs() {
+  return caches.open("edu-prefs").then(function (c) { return c.match("prefs"); })
+    .then(function (r) { return r ? r.json() : {}; }).catch(function () { return {}; });
+}
+self.addEventListener("message", function (e) {
+  var d = e.data || {};
+  if (d.type === "edu-prefs") e.waitUntil(savePrefs(d.prefs));
+});
+
 self.addEventListener("push", function (e) {
   var d = {};
   try { d = e.data ? e.data.json() : {}; } catch (_) { d = { body: e.data ? e.data.text() : "" }; }
@@ -26,12 +39,15 @@ self.addEventListener("push", function (e) {
     data: { url: d.url || "./" },
     actions: (d.actions || []).slice(0, 2)
   };
-  e.waitUntil(Promise.all([
-    self.registration.showNotification(title, opts),
-    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(function (cs) {
-      cs.forEach(function (c) { c.postMessage({ type: "edu-push" }); });
-    })
-  ]));
+  e.waitUntil(loadPrefs().then(function (prefs) {
+    var muted = d.kind && prefs && prefs[d.kind] === false;
+    return Promise.all([
+      muted ? null : self.registration.showNotification(title, opts),
+      self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(function (cs) {
+        cs.forEach(function (c) { c.postMessage({ type: "edu-push" }); });
+      })
+    ]);
+  }));
 });
 
 self.addEventListener("notificationclick", function (e) {

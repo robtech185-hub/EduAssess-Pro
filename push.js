@@ -137,6 +137,91 @@
     document.head.appendChild(s);
   }
 
+
+  /* ---------------- تفضيلات الإشعارات (لكل دور أنواعه الخاصة) ---------------- */
+  var KINDS = {
+    student: [
+      ["exam_new", "clipboard", "اختبار جديد من معلمك", "حين يرسل لك المعلم اختبارًا برمز الدخول وموعده"],
+      ["exam_start", "clock", "موعد بدء الاختبار", "قبل البدء بساعة، وبعشر دقائق، وعند البدء"],
+      ["exam_end", "timer", "اقتراب انتهاء وقت الدخول", "تنبيه قبل إغلاق باب الدخول للاختبار"],
+      ["video", "video", "فيديو حل جديد", "عندما يرفع معلمك فيديو حل اختبار أنهيته"],
+      ["league", "trophy", "دوري الأبطال", "اقتراب بدء الدوري وتحديثات الترتيب"],
+      ["teacher_new", "userplus", "انضمام معلم جديد", "عندما ينضم معلم جديد للتطبيق"],
+      ["teacher_spec", "cap", "تخصص جديد لمعلميك", "عندما ينشئ معلم اشتركت معه تخصصه ونبذته"],
+      ["message", "chat", "رسائل المعلمين", "عند وصول رسالة جديدة من معلمك"]
+    ],
+    teacher: [
+      ["sub_new", "userplus", "مشترك جديد", "عندما يشترك طالب معك"],
+      ["exam_done", "check", "طالب أنهى اختبارًا", "عند تسليم طالب لاختبارك مع درجته"],
+      ["exam_reminder", "clock", "تذكير باختباراتك", "قبل موعد بدء اختبار أنشأته"],
+      ["message", "chat", "رسائل الطلاب", "عند وصول رسالة جديدة من طالب"],
+      ["league", "trophy", "دوري الأبطال", "تحديثات الدوريات التي أنشأتها"],
+      ["trial_end", "hourglass", "انتهاء التجربة المجانية", "قبل انتهاء الأيام المجانية"],
+      ["sub_end", "calendar", "قرب انتهاء الاشتراك", "قبل انتهاء اشتراكك بأيام"]
+    ]
+  };
+  function pkey(role) { return "eduassess_np_" + role; }
+  function getPrefs(role) { try { return JSON.parse(lsGet(pkey(role)) || "{}") || {}; } catch (e) { return {}; } }
+  function pref(kind, role) { role = role || curRole(); return getPrefs(role)[kind] !== false; }
+  function curRole() { return lsGet("edu_role") === "teacher" || /teacher\.html/i.test(location.pathname) ? "teacher" : "student"; }
+  var saveT = null;
+  function setPref(role, kind, on) {
+    var p = getPrefs(role); p[kind] = !!on; lsSet(pkey(role), JSON.stringify(p));
+    syncPrefs(role, p);
+  }
+  /* يُحفظ في الجهاز (يطبّقه عامل الإشعارات) وفي بيانات الحساب ليقرأها الخادم عند الإرسال */
+  function syncPrefs(role, p) {
+    try {
+      navigator.serviceWorker && navigator.serviceWorker.ready.then(function (r) { r.active && r.active.postMessage({ type: "edu-prefs", prefs: p }); });
+    } catch (e) {}
+    clearTimeout(saveT);
+    saveT = setTimeout(function () {
+      try { if (sb && sb.auth && sb.auth.updateUser) { var d = {}; d["notif_prefs_" + role] = p; sb.auth.updateUser({ data: d }); } } catch (e) {}
+    }, 900);
+  }
+
+  /* ---------------- تجربة الإشعارات ---------------- */
+  var steps = [], testing = false;
+  function setStep(i, label, st) { steps[i] = { l: label, s: st }; render(); }
+  async function test() {
+    if (testing) return;
+    testing = true; steps = []; render();
+    var ui = window.EduUI;
+    try {
+      if (isNativeApp()) {
+        if (typeof window.testNotif === "function") await window.testNotif();
+        return;
+      }
+      setStep(0, "دعم الجهاز للإشعارات", "run");
+      if (!supported()) { setStep(0, isIOS() && !standalone() ? "على الآيفون: أضف التطبيق للشاشة الرئيسية أولًا" : "هذا المتصفح لا يدعم الإشعارات", "bad"); return; }
+      setStep(0, "دعم الجهاز للإشعارات", "ok");
+      setStep(1, "إذن الإشعارات", "run");
+      var p = Notification.permission;
+      if (p === "default") p = await Notification.requestPermission();
+      if (p !== "granted") { setStep(1, p === "denied" ? "الإذن محظور — فعّله من إعدادات الموقع" : "لم يتم منح الإذن", "bad"); return; }
+      lsSet(OFF_KEY, null);
+      setStep(1, "إذن الإشعارات", "ok");
+      setStep(2, "خدمة الخلفية", "run");
+      var reg;
+      try { reg = await register(); } catch (e) { setStep(2, "تعذّر تشغيل خدمة الخلفية", "bad"); return; }
+      setStep(2, "خدمة الخلفية", "ok");
+      setStep(3, "ربط الجهاز بحسابك", "run");
+      var linked = false;
+      if (configured()) { try { var sub = await subscribe(); linked = await save(sub); } catch (e) {} }
+      setStep(3, linked ? "ربط الجهاز بحسابك" : "لم يُربط الجهاز بالخادم (ستعمل التجربة المحلية فقط)", linked ? "ok" : "bad");
+      setStep(4, "عرض إشعار تجريبي", "run");
+      await reg.showNotification("EduAssess Pro", {
+        body: "✅ الإشعارات تعمل بنجاح على هذا الجهاز", icon: "assets/favicon.png", badge: "assets/badge.png",
+        lang: "ar", dir: "rtl", tag: "edu-test", renotify: true, vibrate: [120, 60, 120], data: { url: "./" }
+      });
+      setStep(4, "عرض إشعار تجريبي — تحقّق من شريط الإشعارات", "ok");
+      ui && ui.toast("أُرسل إشعار تجريبي، تحقّق من شريط الإشعارات", "ok", { title: "التجربة ناجحة", icon: "bell" });
+    } catch (e) {
+      console.warn("[EduPush] test:", e);
+      ui && ui.toast("تعذّرت تجربة الإشعارات", "err");
+    } finally { testing = false; render(); getState().then(function () { hideBanner(); }); }
+  }
+
   function recentlyDismissed() { var v = +lsGet(DISMISS_KEY); return v && Date.now() - v < 3 * DAY; }
   function hideBanner() { var b = document.getElementById("edu-push-bn"); if (b) b.remove(); }
 
@@ -147,7 +232,7 @@
     d.id = "edu-push-bn";
     d.setAttribute("role", "dialog");
     d.innerHTML =
-      '<div class="ep-ic">🔔</div><div class="ep-tx"><b>' + (ios ? "ثبّت التطبيق لتصلك الإشعارات" : "فعّل الإشعارات") + "</b><span>" +
+      '<div class="ep-ic">' + ic("bell") + '</div><div class="ep-tx"><b>' + (ios ? "ثبّت التطبيق لتصلك الإشعارات" : "فعّل الإشعارات") + "</b><span>" +
       (ios ? "اضغط زر المشاركة ثم «إضافة إلى الشاشة الرئيسية» وافتح التطبيق من هناك."
            : "لتصلك الاختبارات الجديدة ومواعيدها وتنبيهات الاشتراك فورًا حتى لو كان التطبيق مغلقًا.") +
       '</span></div><div class="ep-ac">' + (ios ? "" : '<button class="ep-go" type="button">تفعيل</button>') + '<button class="ep-no" type="button">لاحقًا</button></div>';
@@ -165,26 +250,55 @@
     }
   }
 
+  function ic(n) { return window.EduUI ? window.EduUI.ico(n) : ""; }
+  function stepIcon(s) { return s === "ok" ? ic("check") : s === "bad" ? ic("x") : ""; }
+
   async function render() {
     if (!mounts.length || !configured()) return;
     css();
     var st = await getState();
-    mounts.forEach(function (el) {
+    mounts.forEach(function (m) {
+      var el = m.el, role = m.role;
       if (!el || !el.isConnected) return;
-      var warn = st === "denied" || st === "ios-install" || st === "unsupported", txt, btn = "";
-      if (st === "on") { txt = "🔔 الإشعارات مفعّلة على هذا الجهاز."; btn = '<button type="button" class="ep-btn off" data-a="off">إيقاف</button>'; }
-      else if (st === "off") { txt = "فعّل الإشعارات ليصلك كل جديد فورًا."; btn = '<button type="button" class="ep-btn" data-a="on">تفعيل</button>'; }
-      else if (st === "local") { txt = "🔔 تنبيهات التطبيق مفعّلة على هذا الجهاز (تصلك مواعيد الاختبارات قبل بدئها)."; btn = '<button type="button" class="ep-btn" data-a="test">تجربة</button>'; }
-      else if (st === "denied") txt = "الإشعارات محظورة من إعدادات المتصفح — اسمح بها من إعدادات الموقع ثم أعد تحميل الصفحة.";
-      else if (st === "ios-install") txt = "على الآيفون: اضغط «مشاركة» ثم «إضافة إلى الشاشة الرئيسية» وافتح التطبيق من هناك لتفعيل الإشعارات.";
-      else txt = "متصفحك لا يدعم الإشعارات.";
-      el.innerHTML = '<div class="ep-row' + (warn ? " warn" : "") + '"><span>' + txt + "</span>" + btn + "</div>";
-      var b = el.querySelector("[data-a]");
-      if (b) b.onclick = function () { if (b.dataset.a === "test") { if (typeof window.testNotif === "function") window.testNotif(); return; } (b.dataset.a === "on" ? enable : disable)(); };
+      var cls = st === "on" || st === "local" ? "on" : (st === "off" ? "" : "warn"), ttl, txt, act = "";
+      if (st === "on") { ttl = "الإشعارات مفعّلة"; txt = "تصلك التنبيهات على هذا الجهاز حتى والتطبيق مغلق."; act = '<button type="button" class="np-btn off" data-a="off">إيقاف</button>'; }
+      else if (st === "off") { ttl = "الإشعارات متوقفة"; txt = "فعّلها ليصلك كل جديد فورًا."; act = '<button type="button" class="np-btn gold" data-a="on">تفعيل</button>'; }
+      else if (st === "local") { ttl = "تنبيهات التطبيق مفعّلة"; txt = "تصلك مواعيد الاختبارات قبل بدئها."; }
+      else if (st === "denied") { ttl = "الإشعارات محظورة"; txt = "اسمح بها من إعدادات الموقع في المتصفح ثم أعد تحميل الصفحة."; }
+      else if (st === "ios-install") { ttl = "ثبّت التطبيق أولًا"; txt = "اضغط «مشاركة» ثم «إضافة إلى الشاشة الرئيسية» وافتح التطبيق من هناك."; }
+      else { ttl = "غير مدعومة"; txt = "هذا المتصفح لا يدعم الإشعارات."; }
+      var prefs = getPrefs(role);
+      var list = (KINDS[role] || []).map(function (k) {
+        return '<label class="np-it"><span class="np-ti">' + ic(k[1]) + '</span><span class="np-t"><b>' + k[2] + "</b><small>" + k[3] + '</small></span>' +
+          '<input type="checkbox" data-k="' + k[0] + '"' + (prefs[k[0]] === false ? "" : " checked") + '><span class="np-sw"></span></label>';
+      }).join("");
+      var stepsHtml = steps.map(function (s) { return '<li class="' + s.s + '"><i>' + stepIcon(s.s) + "</i><span>" + s.l + "</span></li>"; }).join("");
+      el.innerHTML = '<div class="np"><div class="np-st ' + cls + '"><span class="np-ic">' + ic(cls === "warn" ? "alert" : "bell") + '</span><div class="np-tx"><b>' + ttl + "</b><span>" + txt + "</span></div>" + act + "</div>" +
+        '<div class="np-test"><div class="np-test-h"><div><b>تجربة الإشعارات</b><small>تأكّد أن الإشعارات تصلك على هذا الجهاز الآن</small></div>' +
+        '<button type="button" class="np-btn" data-a="test"' + (testing ? " disabled" : "") + ">" + ic("send") + (testing ? "جارٍ الفحص…" : "تجربة") + '</button></div><ul class="np-steps">' + stepsHtml + "</ul></div>" +
+        '<div class="np-h">اختر الإشعارات التي تصلك</div><div class="np-list">' + list + '</div><div class="np-foot">تُحفظ اختياراتك تلقائيًا وتُطبَّق على كل أجهزتك.</div></div>';
+      el.querySelectorAll("[data-a]").forEach(function (b) {
+        b.onclick = function () {
+          var a = b.dataset.a;
+          if (a === "test") test(); else if (a === "on") enable(); else disable();
+        };
+      });
+      el.querySelectorAll("input[data-k]").forEach(function (c) {
+        c.onchange = function () {
+          setPref(role, c.dataset.k, c.checked);
+          if (window.EduUI) window.EduUI.toast(c.checked ? "ستصلك هذه الإشعارات" : "تم إيقاف هذا النوع", c.checked ? "ok" : "info", { icon: c.checked ? "bell" : "x" });
+        };
+      });
     });
   }
 
-  function mountSettings(el) { if (el && mounts.indexOf(el) < 0) mounts.push(el); render(); }
+  function mountSettings(el, role) {
+    if (!el) return;
+    role = role || curRole();
+    var ex = mounts.filter(function (m) { return m.el === el; })[0];
+    if (ex) ex.role = role; else mounts.push({ el: el, role: role });
+    render();
+  }
 
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.addEventListener("message", function (e) {
@@ -194,5 +308,5 @@
     });
   }
 
-  window.EduPush = { attach: attach, detach: detach, enable: enable, disable: disable, state: getState, mountSettings: mountSettings };
+  window.EduPush = { test: test, pref: pref, attach: attach, detach: detach, enable: enable, disable: disable, state: getState, mountSettings: mountSettings };
 })();

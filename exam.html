@@ -621,6 +621,7 @@ h1,h2,h3,h4,.brand h1,.sec-tx h2,.btn,.tab,.chip{font-family:'Readex Pro','IBM P
 .navb:active{transform:scale(.96)}
 @media(max-width:480px){.timer{font-size:23px;padding:9px 12px;letter-spacing:2px}.question-text{font-size:19px}.qpill{font-size:12.5px;padding:6px 10px}.withdraw{padding:6px 10px}.ex-head{top:64px}}
 </style>
+<link rel="stylesheet" href="ui.css"><script src="ui.js"></script>
 </head>
 <body>
 
@@ -997,6 +998,7 @@ $("f-login").addEventListener("submit", async (e)=>{
   const { error } = await sbClient.auth.signInWithPassword({ email, password:pass });
   setBusy(btn,false,"دخول");
   if(error) setMsg("login-msg", authError(error));
+  else EduUI.toast("أهلًا بك من جديد","ok",{title:"تم تسجيل الدخول",icon:"shield"});
 });
 
 $("btn-forgot").addEventListener("click", async ()=>{
@@ -1017,13 +1019,14 @@ $("f-reset").addEventListener("submit", async (e)=>{
 });
 
 $("btn-logout").addEventListener("click", async ()=>{
-  if(state.inExam && !state.finished && !confirm("الاختبار جارٍ! الخروج سينهي محاولتك دون حفظها. هل تريد الخروج؟")) return;
+  if(state.inExam && !state.finished && !await EduUI.confirm("الخروج الآن سينهي محاولتك دون حفظها.",{title:"الاختبار جارٍ!",ok:"خروج",cancel:"متابعة الاختبار",danger:true,icon:"alert"})) return;
   /* الخروج الافتراضي: العودة للصفحة الرئيسية مع بقاء الحساب مسجّلًا، فيدخل الطالب مباشرة عند الضغط على «بوابة الطالب».
      الخروج الكامل (تبديل الحساب) يتم بالتأكيد فقط. */
-  const full = confirm("هل تريد تسجيل الخروج الكامل من حسابك؟\n\nموافق = خروج كامل (ستحتاج لتسجيل الدخول لاحقًا)\nإلغاء = العودة للصفحة الرئيسية وسيبقى حسابك مفعّلًا للدخول المباشر");
+  const full = await EduUI.confirm("اختر «خروج كامل» لتبديل الحساب، أو «الصفحة الرئيسية» للبقاء مسجّلًا والدخول مباشرة لاحقًا.",{title:"تسجيل الخروج",ok:"خروج كامل",cancel:"الصفحة الرئيسية",icon:"logout"});
   if(!full){ location.href="index.html"; return; }
   try{await EduPush.detach()}catch(e){}
   await sbClient.auth.signOut();
+  EduUI.toast("نتطلع لرؤيتك قريبًا","ok",{title:"تم تسجيل الخروج",icon:"logout"});
 });
 
 /* ===================== تدفق الجلسة ===================== */
@@ -1203,9 +1206,7 @@ const ICO={plus:SV('<path d="M12 5v14M5 12h14"/>'),check:SV('<path d="M20 6L9 17
   cap:SV('<path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 2 9 2 12 0v-5"/>'),clock:SV('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
   users:SV('<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>'),
   book:SV('<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>')};
-let _toastT;
-function toast(msg,type){let t=$("toast");if(!t){t=document.createElement("div");t.id="toast";t.className="toast";document.body.appendChild(t);}
-  t.textContent=msg;t.className="toast "+(type||"")+" show";clearTimeout(_toastT);_toastT=setTimeout(()=>t.classList.remove("show"),2800);}
+function toast(msg,type,o){EduUI.toast(msg,type,o);}
 const skeletons=n=>Array.from({length:n},()=>'<div class="skel"></div>').join("");
 const goTab=name=>{const b=document.querySelector(`.tab[data-tab="${name}"]`);if(b)b.click();};
 
@@ -1279,7 +1280,7 @@ async function loadSubscriptions(){
   box.innerHTML=(teachers||[]).map((t,i)=>teacherCard(t,i,{sub:true,html:`<button class="t-btn out" data-unsub="${t.id}">${ICO.x}إلغاء</button>`},since[t.id]?`منذ ${fmtDate(since[t.id])}`:"")).join("");
   wireMore(box);
   box.querySelectorAll("[data-unsub]").forEach(b=>b.onclick=async()=>{
-    if(!confirm("هل تريد إلغاء اشتراكك مع هذا المعلم؟"))return;
+    if(!await EduUI.confirm("لن تصلك تنبيهات هذا المعلم بعد الآن.",{title:"إلغاء الاشتراك؟",ok:"إلغاء الاشتراك",cancel:"تراجع",danger:true}))return;
     b.disabled=true;
     const {error}=await sbClient.from("student_teacher_subscriptions").delete().eq("student_id",state.user.id).eq("teacher_id",b.dataset.unsub);
     if(error){toast("تعذر إلغاء الاشتراك","err");b.disabled=false;return;}
@@ -1379,7 +1380,7 @@ async function refreshBell(){
 function startNotifPoll(){ stopNotifPoll(); refreshBell(); refreshMsgBadge(); _nT=setInterval(()=>{refreshBell();refreshMsgBadge();},45000); }
 function stopNotifPoll(){ clearInterval(_nT); _nT=null; const b=$("bell-badge"); if(b){b.dataset.n=0;b.style.display="none";} const mb=$("msg-badge"); if(mb) mb.style.display="none"; }
 document.addEventListener("visibilitychange",()=>{ if(!document.hidden){ refreshBell(); refreshMsgBadge(); } });
-$("btn-bell").addEventListener("click",()=>{ if(state.inExam) return; showView("notifications"); loadNotifications(); try{EduPush.mountSettings($("push-set"))}catch(e){} });
+$("btn-bell").addEventListener("click",()=>{ if(state.inExam) return; showView("notifications"); loadNotifications(); try{EduPush.mountSettings($("push-set"),"student")}catch(e){} });
 
 /* ===== ربط الإشعارات (Web Push) ===== */
 function prefillCode(){try{var c=new URLSearchParams(location.search).get("code");if(c){$("code-input").value=c;history.replaceState(null,"",location.pathname);setTimeout(function(){$("code-input").scrollIntoView({block:"center",behavior:"smooth"})},150)}}catch(e){}}
@@ -1424,7 +1425,7 @@ async function loadNotifications(){
     card.classList.add("gone"); setTimeout(()=>{card.remove();paint();},320);
   });
   const clr=$("n-clear"); clr.innerHTML=ICO.trash+"مسح الكل";
-  clr.onclick=async()=>{ if(!confirm("حذف كل التنبيهات؟"))return;
+  clr.onclick=async()=>{ if(!await EduUI.confirm("سيتم مسح جميع التنبيهات من حسابك.",{title:"حذف كل التنبيهات؟",ok:"حذف الكل",danger:true}))return;
     const {error}=await sbClient.from("student_notifications").delete().eq("student_id",state.user.id);
     if(error){toast("تعذر المسح","err");return;} box.innerHTML=""; paint(); toast("تم مسح التنبيهات"); refreshBell(); };
   const unread=list.filter(n=>!n.read).map(n=>n.id);
@@ -1646,11 +1647,11 @@ function tick(){
   $("timer").textContent=fmtDur(rem); $("timer").classList.toggle("warn",rem<=60);
   if(rem<=0){ clearInterval(state.timerHandle); finishExam(false); }
 }
-$("btn-withdraw").addEventListener("click",()=>{ if(confirm("هل تريد الانسحاب؟ سيتم إنهاء الاختبار وتسليم إجاباتك الحالية.")) finishExam(true); });
-$("btn-finish").addEventListener("click",()=>{
+$("btn-withdraw").addEventListener("click",async()=>{ if(await EduUI.confirm("سيتم إنهاء الاختبار وتسليم إجاباتك الحالية.",{title:"هل تريد الانسحاب؟",ok:"انسحاب وتسليم",cancel:"متابعة",danger:true,icon:"alert"})) finishExam(true); });
+$("btn-finish").addEventListener("click",async()=>{
   const answered=Object.keys(state.answers).length, total=state.questions.length;
   const msg=answered<total?`لم تُجب على ${total-answered} سؤال/أسئلة. هل تريد إنهاء الاختبار الآن؟`:"هل أنت متأكد من إنهاء الاختبار؟";
-  if(confirm(msg)) finishExam(true);
+  if(await EduUI.confirm(msg,{title:"إنهاء الاختبار؟",ok:"إنهاء وتسليم",cancel:"مراجعة إجاباتي",kind:"ok",icon:"check"})) finishExam(true);
 });
 
 /* ===================== إنهاء الاختبار ===================== */

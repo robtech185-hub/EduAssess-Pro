@@ -364,7 +364,7 @@ h2,h3,h4,.brand b,.btn,.tabs button{font-family:'Readex Pro','IBM Plex Sans Arab
 .card{border-radius:26px}
 .lg-auth{width:110px}
 #auth .card{border-top:5px solid #FFB400;box-shadow:0 26px 60px rgba(10,34,96,.16)}
-</style></head><body>
+</style><link rel="stylesheet" href="ui.css"><script src="ui.js"></script></head><body>
 <div id="auth" class="w"><div class="card" style="text-align:center;border-top:5px solid var(--gold)"><img class="lg-auth" src="assets/icon-512.png" alt="EduAssess Pro" width="96" height="96"><div class="brand" style="color:var(--deep)"><b>EduAssess Pro</b><small style="color:var(--mut)">نظام الاختبارات الإلكترونية</small></div>
 <h3 id="atitle" style="margin-top:12px">تسجيل دخول المعلم</h3><div style="text-align:right">
 <div id="regf" class="hide"><label>الاسم الثلاثي</label><input id="fn"><label>رقم الواتساب (مع رمز الدولة)</label><input id="wa" type="tel" dir="ltr" placeholder="+201012345678"><label>الدولة</label><select id="co"></select></div>
@@ -373,7 +373,7 @@ h2,h3,h4,.brand b,.btn,.tabs button{font-family:'Readex Pro','IBM Plex Sans Arab
 <p style="margin-top:12px"><a href="#" id="sw" style="color:var(--deep);font-weight:700">ليس لديك حساب؟ سجّل وابدأ تجربة مجانية 3 أيام</a></p></div></div>
 
 <div id="app" class="hide"><div class="top"><div class="w"><div class="bm"><span class="lg"><img src="assets/icon-192.png" alt="" width="46" height="46"></span><div class="brand"><small>لوحة المعلم</small><b>EduAssess Pro</b></div></div>
-<div style="display:flex;align-items:center;gap:8px"><div class="who"><div class="av" id="av"></div><div><b id="hn"></b><span id="hb" class="badge"></span></div></div><button class="lo" id="tl" aria-label="دوري الأبطال" style="font-size:18px">🏆</button><button class="lo" id="tm" aria-label="الرسائل" style="position:relative"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span id="tm-b" style="display:none;position:absolute;top:-5px;left:-5px;min-width:19px;height:19px;border-radius:19px;background:#E5484D;color:#fff;font:800 11px sans-serif;place-items:center;padding:0 5px">0</span></button><button class="lo" id="lo" aria-label="تسجيل الخروج"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg></button></div></div></div>
+<div style="display:flex;align-items:center;gap:8px"><div class="who"><div class="av" id="av"></div><div><b id="hn"></b><span id="hb" class="badge"></span></div></div><button class="lo" id="tl" aria-label="دوري الأبطال" title="دوري الأبطال"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg></button><button class="lo" id="tm" aria-label="الرسائل" style="position:relative"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span id="tm-b" style="display:none;position:absolute;top:-5px;left:-5px;min-width:19px;height:19px;border-radius:19px;background:#E5484D;color:#fff;font:800 11px sans-serif;place-items:center;padding:0 5px">0</span></button><button class="lo" id="lo" aria-label="تسجيل الخروج"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg></button></div></div></div>
 <div class="w"><div class="tabs" id="tabs">
 <button data-p="acc" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg><span>الرئيسية</span></button>
 <button data-p="add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 14h6M12 11v6"/></svg><span>الاختبارات</span></button>
@@ -389,7 +389,7 @@ h2,h3,h4,.brand b,.btn,.tabs button{font-family:'Readex Pro','IBM Plex Sans Arab
 <label>📣 إرسال تنبيه الاختبار إلى (اختياري)</label><select id="etg"><option value="">— بدون إرسال تنبيه —</option></select><p class="hint">يصل التنبيه للطلاب برمز الدخول وموعد البداية والنهاية.</p>
 <label>🏆 ضمن دوري أبطال (اختياري)</label><select id="elg"><option value="">— بدون —</option></select>
 <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px"><h3 style="margin:0;font-size:19px">الأسئلة <small id="qc" style="font:600 13px IBM Plex Sans Arabic;color:var(--mut)"></small></h3></div>
-<div id="qs"></div><button class="btn o" id="aq">+ إضافة سؤال</button> <button class="btn o" id="qbk">📚 بنك الأسئلة</button> <button class="btn o" id="qsa">💾 حفظ الكل في البنك</button> <button class="btn g" id="sv">حفظ الاختبار</button><p id="am" class="err"></p></div>
+<div id="qs"></div><div class="act-bar"><button class="btn o" id="aq">+ إضافة سؤال</button><button class="btn o" id="qbk">📚 بنك الأسئلة</button><button class="btn o" id="qsa">💾 حفظ الكل في البنك</button><button class="btn g" id="sv">💾 حفظ الاختبار</button></div><div id="am"></div></div>
 
 <div class="card"><h3>اختباراتي <small id="exn" style="font:700 13px IBM Plex Sans Arabic;color:var(--mut)"></small></h3><div id="el"></div></div></div>
 <div id="vid" class="pg hide"><div class="sec-head"><div class="sec-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M10 9.5v5l4.5-2.5z"/></svg></div><div class="sec-tx"><h2>فيديوهات الحل</h2><p>ارفع رابط فيديو حل الاختبار؛ لا يفتحه إلا الطالب الذي أنهى الاختبار.</p></div><div class="pill"><b id="vn">0</b><small>فيديو</small></div></div>
@@ -417,7 +417,7 @@ h2,h3,h4,.brand b,.btn,.tabs button{font-family:'Readex Pro','IBM Plex Sans Arab
 <label>نبذة عنك <small id="bc" style="font-weight:600;color:var(--mut)"></small></label><textarea id="bio" rows="5" maxlength="500" placeholder="مثال: معلم قرآن وتجويد بخبرة 10 سنوات، أحفّظ الأطفال والكبار برواية حفص..."></textarea>
 <button class="btn g" id="bsv">حفظ النبذة</button><p id="bm" class="err"></p></div>
 <div class="card"><h3>كيف تظهر للطالب</h3><div id="bprev"></div></div>
-<div class="card"><h3>الإشعارات</h3><p class="hint">تصلك على هاتفك حتى والتطبيق مغلق: مشتركون جدد، وتنبيهات انتهاء التجربة المجانية والاشتراك.</p><div id="pushset"></div></div>
+<div class="card"><h3>مركز الإشعارات</h3><p class="hint">اختر ما يصلك على هاتفك حتى والتطبيق مغلق، وجرّب الإشعارات للتأكد أنها تعمل.</p><div id="pushset"></div></div>
 <div class="card"><h3>بيانات الحساب</h3><div class="sc" id="minfo"></div></div>
 <div class="card"><h3>باقات الاشتراك</h3><div class="g2" id="plans"></div><p style="color:var(--mut);margin-top:12px;font-size:13px">بعد الدفع يفعّل المبرمج اشتراكك فورًا ويُضاف إلى المدة المتبقية.</p></div></div>
 </div></div>
@@ -444,7 +444,7 @@ $('go').onclick=async()=>{$('msg').textContent='';if(reg&&getRole()==='student')
   if(!r.error){try{localStorage.setItem('edu_role','teacher')}catch(e){}}
   if(!r.error&&!r.data.session)return $('msg').textContent='تم التسجيل. أكّد بريدك من الرسالة المرسلة ثم سجّل دخولك.'}
  else r=await sbClient.auth.signInWithPassword({email,password});
- if(r.error)return $('msg').textContent='تعذر: '+r.error.message;boot()};
+ if(r.error)return $('msg').textContent='تعذر: '+r.error.message;try{sessionStorage.setItem('edu_hi','1')}catch(e){}boot()};
 async function boot(){const{data:{session}}=await sbClient.auth.getSession();if(!session)return;
  if(session.user&&session.user.user_metadata&&session.user.user_metadata.role==='student'){try{localStorage.setItem('edu_role','student')}catch(e){}await sbClient.auth.signOut();$('msg').textContent='هذا حساب طالب — ادخل من بوابة الطالب. لا يمكن استخدامه في بوابة المعلم.';lockRole();return}
  const{data,error:te}=await sbClient.from('teachers').select('*').eq('id',session.user.id).single();
@@ -453,8 +453,8 @@ async function boot(){const{data:{session}}=await sbClient.auth.getSession();if(
  $('auth').classList.add('hide');$('app').classList.remove('hide');$('hn').textContent=me.full_name;$('av').textContent=(me.full_name||'؟').trim()[0];
  const paid=me.subscription_ends_at&&new Date(me.subscription_ends_at)>new Date();
  $('hb').className='badge '+(!active?'bad':paid?'ok':'tr');$('hb').textContent=!active?'منتهي':paid?'مشترك':'تجربة مجانية';
- $('lock').classList.toggle('hide',active);acc();plans();exams();profileInit();welcomeCheck();
- try{EduPush.attach(sbClient);EduPush.mountSettings($('pushset'));var tb=new URLSearchParams(location.search).get('tab');if(tb&&['acc','add','vid','stu','sbs','grp','me','msg','lg'].includes(tb))showPg(tb)}catch(e){}}
+ $('lock').classList.toggle('hide',active);acc();plans();exams();profileInit();welcomeCheck();try{if(sessionStorage.getItem('edu_hi')){sessionStorage.removeItem('edu_hi');EduUI.toast('أهلًا بك '+((me.full_name||'').trim().split(/\s+/)[0]||''),'ok',{title:'تم تسجيل الدخول',icon:'shield'})}}catch(e){}
+ try{EduPush.attach(sbClient);EduPush.mountSettings($('pushset'),'teacher');var tb=new URLSearchParams(location.search).get('tab');if(tb&&['acc','add','vid','stu','sbs','grp','me','msg','lg'].includes(tb))showPg(tb)}catch(e){}}
 document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>showPg(b.dataset.p));
 async function acc(){const left=Math.max(0,Math.ceil((end-new Date())/864e5));let d='',t=new Date();t.setHours(0,0,0,0);
  for(let i=0;i<left&&i<120;i++){const x=new Date(t.getTime()+i*864e5);d+=`<div class="${i?'':'t'}">${x.getDate()}/${x.getMonth()+1}<br>${x.toLocaleDateString('ar',{weekday:'short'})}</div>`}
@@ -582,7 +582,7 @@ function drawBank(){const box=$('bkb');if(!box)return;
   $('bkc').textContent=BSEL.size?`${BSEL.size} محدد`:`${BANK.length} سؤال في البنك`;$('bkadd').disabled=!BSEL.size;$('bkadd').style.opacity=BSEL.size?1:.5;
   $('bkl').querySelectorAll('[data-id]').forEach(c=>c.onchange=()=>{c.checked?BSEL.add(c.dataset.id):BSEL.delete(c.dataset.id);c.closest('.bk-i').classList.toggle('on',c.checked);$('bkc').textContent=BSEL.size?`${BSEL.size} محدد`:`${BANK.length} سؤال في البنك`;$('bkadd').disabled=!BSEL.size;$('bkadd').style.opacity=BSEL.size?1:.5});
   $('bkl').querySelectorAll('[data-e]').forEach(b=>b.onclick=()=>bankEdit(BANK.find(x=>x.id===b.dataset.e)));
-  $('bkl').querySelectorAll('[data-d]').forEach(b=>b.onclick=async()=>{if(!confirm('حذف هذا السؤال من البنك؟ (لا يؤثر على الاختبارات الموجودة)'))return;
+  $('bkl').querySelectorAll('[data-d]').forEach(b=>b.onclick=async()=>{if(!await EduUI.confirm('لن يؤثر هذا على الاختبارات الموجودة.',{title:'حذف السؤال من البنك؟',ok:'حذف',danger:true}))return;
    const r=await sbClient.from('edu_question_bank').delete().eq('id',b.dataset.d);if(r.error)return bankErr(r.error);BANK=BANK.filter(x=>x.id!==b.dataset.d);BSEL.delete(b.dataset.d);list();toast('تم حذف السؤال من البنك')})};
  $('bkq').oninput=list;$('bkt').onchange=list;$('bkn').onclick=()=>bankEdit(null);
  $('bkadd').onclick=()=>{const picks=BANK.filter(x=>BSEL.has(x.id));
@@ -642,7 +642,7 @@ async function lgOpen(id){const box=$('lg');box.innerHTML=lgLoad;
  $('lgb').onclick=lgList;
  box.querySelectorAll('[data-rm]').forEach(b=>b.onclick=async()=>{const r=await sbClient.from('edu_league_exams').delete().eq('league_id',id).eq('exam_id',b.dataset.rm);if(r.error)return toast('تعذرت الإزالة','err');lgOpen(id)});
  $('lgad').onclick=async()=>{const v=$('lgex').value;if(!v)return;const r=await sbClient.from('edu_league_exams').insert({league_id:id,exam_id:v});if(r.error)return toast('تعذر الإضافة: '+r.error.message,'err');lgOpen(id)};
- $('lgdel').onclick=async()=>{if(!confirm('حذف هذا الدوري؟'))return;const r=await sbClient.from('edu_leagues').delete().eq('id',id);if(r.error)return toast('تعذر الحذف','err');toast('تم حذف الدوري');lgList()}}
+ $('lgdel').onclick=async()=>{if(!await EduUI.confirm('سيُحذف الدوري وترتيبه نهائيًا.',{title:'حذف هذا الدوري؟',ok:'حذف الدوري',danger:true}))return;const r=await sbClient.from('edu_leagues').delete().eq('id',id);if(r.error)return toast('تعذر الحذف','err');toast('تم حذف الدوري');lgList()}}
 function resetExamForm(){['en','ec','es','ee'].forEach(id=>$(id).value='');$('ed').value=30;$('etg').value='';$('elg').value='';
  $('qs').innerHTML='';addQ();$('en').focus({preventScroll:true})}
 $('sv').onclick=async()=>{const am=$('am');am.style.color='';am.textContent='';if(!active)return am.textContent='اشتراكك منتهٍ';
@@ -661,7 +661,7 @@ $('sv').onclick=async()=>{const am=$('am');am.style.color='';am.textContent='';i
   {const lgv=$('elg').value;if(lgv){const lr=await sbClient.from('edu_league_exams').insert({league_id:lgv,exam_id:ex.id});if(lr.error)toast('حُفظ الاختبار لكن تعذر ربطه بالدوري','err')}}
  let note='';const tg=$('etg').value;if(tg){const r2=await sbClient.rpc('send_exam_notification',{p_exam_id:String(ex.id),p_group_id:tg==='all'?null:tg});note=r2.error?`<div class="err">تم الحفظ لكن تعذر إرسال التنبيه: ${esc(r2.error.message)}</div>`:`<div class="okm" style="margin-top:8px;font-weight:700">📣 أُرسل التنبيه إلى ${r2.data} طالب.</div>`}
  resetExamForm();
- $('sv').disabled=false;am.innerHTML=`<span class="okm">تم الحفظ بنجاح.</span><div class="codebox">الرمز السري للاختبار: <span dir="ltr">${esc(code)}</span></div>${note}`;exams()};
+ $('sv').disabled=false;am.innerHTML=`<div class="okm">✓ تم الحفظ بنجاح</div><div class="codebox"><div>الرمز السري للاختبار<br><span dir="ltr">${esc(code)}</span></div><button class="btn o s" type="button" onclick="copyTxt('${esc(code)}')">نسخ الرمز</button></div>${note}`;toast('تم حفظ الاختبار — الرمز: '+code,'ok',{title:'تم الحفظ بنجاح'});exams()};
 async function exams(){const{data=[]}=await sbClient.from('exams').select('*').order('created_at',{ascending:false});EXAMS=data;$('exn').textContent=data.length?`(${data.length})`:'';
  $('el').innerHTML=data.length?data.map((e,i)=>`<div class="ex ${e.is_active?'':'off'}" style="animation-delay:${Math.min(i,8)*40}ms"><div class="ex-top"><div><h4>${esc(e.exam_name)}</h4><small>⏱ ${e.duration_minutes} دقيقة</small></div><span class="badge ${e.is_active?'ok':'bad'}">${e.is_active?'مفعّل':'موقوف'}</span></div>
  <div class="ex-body"><div class="ex-code"><div><small>الرمز السري</small><b>${esc(e.secret_code)}</b></div><button data-cp="${esc(e.secret_code)}" aria-label="نسخ">${IC.copy}</button></div><div class="ex-time"><div>يبدأ<b>${fmtDT(e.starts_at)}</b></div><div>ينتهي<b>${fmtDT(e.ends_at)}</b></div></div></div>
@@ -671,7 +671,7 @@ async function exams(){const{data=[]}=await sbClient.from('exams').select('*').o
  el.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>del(b.dataset.del));
  el.querySelectorAll('[data-cp]').forEach(b=>b.onclick=()=>copyTxt(b.dataset.cp))}
 window.tog=async(id,v)=>{await sbClient.from('exams').update({is_active:v}).eq('id',id);exams()};
-window.del=async id=>{if(confirm('حذف الاختبار وأسئلته ونتائج طلابه؟')){await sbClient.from('questions').delete().eq('exam_id',id);await sbClient.from('exam_students').delete().eq('exam_id',id);await sbClient.from('exams').delete().eq('id',id);exams()}};
+window.del=async id=>{if(await EduUI.confirm('ستُحذف أسئلته ونتائج طلابه نهائيًا ولا يمكن التراجع.',{title:'حذف الاختبار؟',ok:'نعم، احذف',danger:true})){await sbClient.from('questions').delete().eq('exam_id',id);await sbClient.from('exam_students').delete().eq('exam_id',id);await sbClient.from('exams').delete().eq('id',id);exams()}};
 // ---- الطلاب والنتائج
 async function stuList(){const{data=[]}=await sbClient.from('exams').select('id,exam_name');$('xs').innerHTML='<option value="">— اختر —</option>'+data.map(e=>`<option value="${e.id}">${esc(e.exam_name)}</option>`).join('')}
 const fmtDur=s=>{if(s==null||s<0||isNaN(s))return '—';const m=Math.floor(s/60),x=Math.round(s%60);return m?`${m} د ${x} ث`:`${x} ث`};
@@ -739,7 +739,7 @@ const fmtD=d=>d?new Date(d).toLocaleDateString(LOCN,{day:'numeric',month:'short'
 const SQLH='<div class="empty">تعذر تحميل البيانات — شغّل ملف <b>setup-teacher-features.sql</b> في Supabase ثم أعد المحاولة.</div>';
 const skels=n=>Array.from({length:n},()=>'<div class="skel"></div>').join('');
 let EXAMS=[],SUBS=[],GROUPS=[],MEM={},_tt;
-function toast(m,t){let e=$('toast');if(!e){e=document.createElement('div');e.id='toast';document.body.appendChild(e)}e.textContent=m;e.className='toast '+(t||'')+' show';clearTimeout(_tt);_tt=setTimeout(()=>e.classList.remove('show'),2800)}
+function toast(m,t,o){EduUI.toast(m,t,o)}
 async function copyTxt(v){try{await navigator.clipboard.writeText(v)}catch(e){const t=document.createElement('textarea');t.value=v;document.body.appendChild(t);t.select();try{document.execCommand('copy')}catch(_){}t.remove()}toast('تم النسخ ✓')}
 function showPg(p){document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x.dataset.p==p));document.querySelectorAll('.pg').forEach(x=>x.classList.toggle('hide',x.id!=p));window.scrollTo({top:0});
  if(p=='stu')stuList();else if(p=='sbs')subsPage();else if(p=='grp')grpPage();else if(p=='vid')vidPage();else if(p=='add')fillTargets();else if(p=='msg')tMsgPage();else if(p=='lg')lgPage();else if(p=='acc'&&me)acc()}
@@ -789,7 +789,7 @@ async function tThread(stick){const sid=TM.sid;if(!sid)return;
  th.innerHTML=rows.length?rows.map(m=>`<div class="m-b ${m.sender_role==='teacher'?'me':'th'}">${esc(m.body)}<small>${mAgo(m.created_at)}</small></div>`).join(''):'<div class="m-empty">لا توجد رسائل بعد</div>';
  if(near)th.scrollTop=th.scrollHeight;
  if(rows.some(m=>m.sender_role==='student'&&!m.read)){await sbClient.rpc('mark_edu_messages_read',{p_other:sid});tMsgBadge()}}
-$('lo').onclick=async()=>{try{await EduPush.detach()}catch(e){}await sbClient.auth.signOut();location.reload()};
+$('lo').onclick=async()=>{if(!await EduUI.confirm('ستحتاج لتسجيل الدخول مرة أخرى للوصول إلى لوحتك.',{title:'تسجيل الخروج؟',ok:'تسجيل الخروج',cancel:'البقاء',icon:'logout'}))return;try{await EduPush.detach()}catch(e){}await sbClient.auth.signOut();try{sessionStorage.setItem('edu_bye','1')}catch(e){}location.reload()};
 window.eduPushOpen=function(url){try{var t=new URL(url,location.href).searchParams.get('tab');if(t&&me&&['acc','add','vid','stu','sbs','grp','me','msg','lg'].includes(t))showPg(t)}catch(e){}};
 async function loadSubs(){const r=await sbClient.rpc('my_subscribers');if(r.error){SUBS=[];return r.error}SUBS=r.data||[];return null}
 async function loadGroups(){const[g,m]=await Promise.all([sbClient.from('teacher_groups').select('*').order('created_at'),sbClient.from('teacher_group_members').select('group_id,student_id')]);
@@ -816,7 +816,7 @@ function drawGroups(){const box=$('glist');
   `<div class="empty" style="grid-column:1/-1">لا توجد مجموعات بعد — أنشئ أول مجموعة من الأعلى.</div>`;
  box.querySelectorAll('[data-gs]').forEach(b=>b.onclick=()=>openSend(null,b.dataset.gs));
  box.querySelectorAll('[data-gm]').forEach(b=>b.onclick=()=>openMembers(b.dataset.gm));
- box.querySelectorAll('[data-gd]').forEach(b=>b.onclick=async()=>{const g=GROUPS.find(x=>x.id===b.dataset.gd);if(!g||!confirm(`حذف مجموعة «${g.name}»؟ (لن يُحذف الطلاب من اشتراكك)`))return;
+ box.querySelectorAll('[data-gd]').forEach(b=>b.onclick=async()=>{const g=GROUPS.find(x=>x.id===b.dataset.gd);if(!g||!await EduUI.confirm('لن يُحذف الطلاب من اشتراكك.',{title:`حذف مجموعة «${g.name}»؟`,ok:'حذف',danger:true}))return;
   const r=await sbClient.from('teacher_groups').delete().eq('id',g.id);if(r.error)return toast('تعذر الحذف','err');await loadGroups();drawGroups();toast('تم حذف المجموعة')})}
 $('gnew').onclick=async()=>{const m=$('gmsg');m.textContent='';const name=$('gname').value.trim();
  if(!active)return m.textContent='اشتراكك منتهٍ';if(!name)return m.textContent='اكتب اسم المجموعة أولًا';
@@ -939,7 +939,7 @@ async function vidLoad(){
   L.querySelectorAll('[data-ve]').forEach(b=>b.onclick=()=>{const v=VIDS.find(x=>String(x.id)===b.dataset.ve);if(!v)return;vidEditId=v.id;
     $('vx').value=String(v.exam_id);$('vt').value=v.title;$('vd').value=v.description||'';$('vu').value=v.video_url;$('vh').value=v.thumbnail_url||'';
     $('vft').textContent='تعديل الفيديو';$('vsv').textContent='حفظ التعديلات';$('vcx').classList.remove('hide');vidMsg('');vidPreview();$('vform').scrollIntoView({behavior:'smooth',block:'start'})});
-  L.querySelectorAll('[data-vx]').forEach(b=>b.onclick=async()=>{if(!confirm('حذف هذا الفيديو نهائيًا؟'))return;
+  L.querySelectorAll('[data-vx]').forEach(b=>b.onclick=async()=>{if(!await EduUI.confirm('سيُحذف الفيديو نهائيًا.',{title:'حذف الفيديو؟',ok:'حذف',danger:true}))return;
     const{error}=await sbClient.from('exam_videos').delete().eq('id',b.dataset.vx);if(error)return toast('تعذر الحذف: '+error.message,'err');
     if(String(vidEditId)===b.dataset.vx)vidReset();toast('تم حذف الفيديو');vidLoad()})}
 $('vsv').onclick=async()=>{

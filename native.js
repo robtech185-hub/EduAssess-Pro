@@ -38,15 +38,15 @@
   /* مواعيد الاختبارات القادمة: تنبيهات المعلمين + تقويم المعلمين المشترك معهم */
   async function collect(user) {
     var sb = window.sbClient, now = new Date(), to = new Date(now.getTime() + DAYS * 864e5), out = {};
-    function add(name, start, teacher) {
+    function add(name, start, teacher, end) {
       if (!start) return;
       var t = new Date(start);
       if (isNaN(t) || t <= now || t > to) return;
-      out[(name || "") + "|" + t.getTime()] = { name: name || "اختبار", at: t, teacher: teacher || "" };
+      out[(name || "") + "|" + t.getTime()] = { name: name || "اختبار", at: t, teacher: teacher || "", end: end ? new Date(end) : null };
     }
     try {
-      var n = await sb.from("student_notifications").select("exam_name,teacher_name,starts_at").eq("student_id", user.id).order("created_at", { ascending: false }).limit(100);
-      (n.data || []).forEach(function (r) { add(r.exam_name, r.starts_at, r.teacher_name); });
+      var n = await sb.from("student_notifications").select("exam_name,teacher_name,starts_at,ends_at").eq("student_id", user.id).order("created_at", { ascending: false }).limit(100);
+      (n.data || []).forEach(function (r) { add(r.exam_name, r.starts_at, r.teacher_name, r.ends_at); });
     } catch (e) {}
     try {
       var s = await sb.from("student_teacher_subscriptions").select("teacher_id").eq("student_id", user.id);
@@ -73,11 +73,15 @@
         if (at.getTime() > now + 2000 && notes.length < MAX)
           notes.push({ id: id++, title: "EduAssess Pro", body: body, schedule: { at: at, allowWhileIdle: true }, channelId: CH });
       };
+      var P = function (k) { try { return !window.EduPush || window.EduPush.pref(k, "student"); } catch (e) { return true; } };
       list.forEach(function (x) {
         var who = x.teacher ? " — " + x.teacher : "";
-        push(new Date(x.at - 60 * 6e4), "📝 يبدأ اختبار «" + x.name + "» بعد ساعة" + who);
-        push(new Date(x.at - 10 * 6e4), "📝 يبدأ اختبار «" + x.name + "» بعد ١٠ دقائق" + who);
-        push(x.at, "🚀 بدأ الآن اختبار «" + x.name + "»" + who);
+        if (P("exam_start")) {
+          push(new Date(x.at - 60 * 6e4), "📝 يبدأ اختبار «" + x.name + "» بعد ساعة" + who);
+          push(new Date(x.at - 10 * 6e4), "📝 يبدأ اختبار «" + x.name + "» بعد ١٠ دقائق" + who);
+          push(x.at, "🚀 بدأ الآن اختبار «" + x.name + "»" + who);
+        }
+        if (x.end && !isNaN(x.end) && P("exam_end")) push(new Date(x.end - 30 * 6e4), "⏳ يُغلق دخول اختبار «" + x.name + "» بعد 30 دقيقة" + who);
       });
       await cancelAll();
       if (notes.length) await LN.schedule({ notifications: notes });
