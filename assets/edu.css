@@ -1,0 +1,90 @@
+/* =====================================================================
+   EduAssess Pro — الطبقة المشتركة: شاشة التحميل + نافذة الترحيب + التأثيرات
+   تُستخدم في index.html و teacher.html و exam.html
+   ===================================================================== */
+:root{
+  --e-navy:#050F2B; --e-navy2:#0A2260; --e-blue:#1F63E0; --e-sky:#4C8DFF;
+  --e-amber:#FFB400; --e-amber2:#FFD15C; --e-teal:#13B59B; --e-ink:#0B1633; --e-mut:#5B6785;
+}
+
+/* ---------------------------- شاشة التحميل ---------------------------- */
+#edu-loader{
+  position:fixed; inset:0; z-index:2147483000; display:grid; place-items:center; overflow:hidden;
+  background:
+    radial-gradient(60% 50% at 80% 10%, rgba(31,99,224,.55), transparent 70%),
+    radial-gradient(50% 45% at 10% 95%, rgba(19,181,155,.35), transparent 70%),
+    radial-gradient(35% 30% at 90% 90%, rgba(255,180,0,.22), transparent 70%),
+    linear-gradient(160deg,#050F2B 0%,#07163F 55%,#0A2260 100%);
+  color:#fff; font-family:"Readex Pro","IBM Plex Sans Arabic","Cairo",Tahoma,sans-serif;
+  transition:opacity .7s ease, transform .9s cubic-bezier(.7,0,.2,1), visibility 0s linear .9s;
+}
+#edu-loader::before{ /* شبكة خفيفة */
+  content:""; position:absolute; inset:0; opacity:.5;
+  background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);
+  background-size:46px 46px; -webkit-mask:radial-gradient(circle at 50% 45%,#000 0,transparent 70%); mask:radial-gradient(circle at 50% 45%,#000 0,transparent 70%);
+}
+#edu-loader.out{opacity:0; transform:scale(1.06); visibility:hidden; pointer-events:none}
+.ld-wrap{position:relative; z-index:1; text-align:center; padding:24px; width:min(92vw,420px)}
+.ld-stage{position:relative; width:230px; height:230px; margin:0 auto 26px; display:grid; place-items:center}
+.ld-ring{position:absolute; border-radius:50%; border:1.5px solid rgba(255,255,255,.14)}
+.ld-ring.r1{inset:0; animation:ldspin 9s linear infinite}
+.ld-ring.r2{inset:22px; border-style:dashed; border-color:rgba(255,255,255,.18); animation:ldspin 14s linear infinite reverse}
+.ld-ring.r3{inset:46px; animation:ldspin 6s linear infinite}
+.ld-ring i{position:absolute; width:12px; height:12px; border-radius:50%; top:-6px; left:50%; margin-left:-6px; box-shadow:0 0 18px currentColor; background:currentColor}
+.ld-ring.r1 i{color:var(--e-amber)} .ld-ring.r2 i{color:var(--e-teal)} .ld-ring.r3 i{color:var(--e-sky)}
+.ld-badge{
+  position:relative; width:128px; height:128px; border-radius:36px; background:linear-gradient(180deg,#fff,#EEF3FF);
+  display:grid; place-items:center; box-shadow:0 0 0 8px rgba(255,255,255,.07),0 24px 60px rgba(0,0,0,.45),0 0 80px rgba(76,141,255,.45);
+  animation:ldfloat 3.2s ease-in-out infinite, ldpop .9s cubic-bezier(.2,1.3,.3,1) both; overflow:hidden;
+}
+.ld-badge img{width:92px; height:auto; display:block; position:relative; z-index:1}
+.ld-badge::after{content:""; position:absolute; inset:0; background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.95) 50%,transparent 65%); transform:translateX(-120%); animation:ldshine 2.6s ease-in-out .8s infinite; z-index:2}
+.ld-name{font-weight:700; font-size:30px; letter-spacing:.5px; line-height:1.2; margin-bottom:6px; direction:ltr}
+.ld-name span{display:inline-block; opacity:0; transform:translateY(14px); animation:ldletter .6s cubic-bezier(.2,.9,.3,1) forwards}
+.ld-name .g{background:linear-gradient(90deg,var(--e-amber2),var(--e-amber)); -webkit-background-clip:text; background-clip:text; color:transparent}
+.ld-sub{color:#B9C6EA; font-size:14.5px; min-height:24px; transition:opacity .35s}
+.ld-bar{height:6px; border-radius:99px; background:rgba(255,255,255,.12); margin:22px auto 0; width:min(78%,260px); overflow:hidden}
+.ld-bar b{display:block; height:100%; width:0; border-radius:99px; background:linear-gradient(90deg,var(--e-teal),var(--e-sky),var(--e-amber)); transition:width .35s ease; box-shadow:0 0 14px rgba(76,141,255,.8)}
+.ld-pct{margin-top:8px; font-size:12px; color:#8FA2D4; letter-spacing:1px; direction:ltr}
+body.ld-lock{overflow:hidden}
+@keyframes ldspin{to{transform:rotate(360deg)}}
+@keyframes ldfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes ldpop{from{transform:scale(.3) rotate(-12deg); opacity:0}to{transform:none; opacity:1}}
+@keyframes ldshine{0%{transform:translateX(-120%)}60%,100%{transform:translateX(120%)}}
+@keyframes ldletter{to{opacity:1; transform:none}}
+
+/* -------------------------- نافذة الترحيب -------------------------- */
+.wl-ov{position:fixed; inset:0; z-index:2147482000; display:grid; place-items:center; padding:16px; background:rgba(4,12,36,.72); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); animation:wlfade .3s ease both; font-family:"Readex Pro","IBM Plex Sans Arabic","Cairo",Tahoma,sans-serif; direction:rtl}
+.wl-card{position:relative; width:min(100%,520px); max-height:94vh; overflow:auto; border-radius:30px; background:#fff; color:var(--e-ink); box-shadow:0 40px 100px rgba(0,0,0,.55); animation:wlpop .55s cubic-bezier(.2,1.2,.3,1) both}
+.wl-hero{position:relative; padding:34px 24px 54px; text-align:center; color:#fff; overflow:hidden; background:linear-gradient(150deg,var(--wl-a,#0A2260),var(--wl-b,#1F63E0))}
+.wl-hero::before{content:""; position:absolute; width:300px; height:300px; border-radius:50%; background:radial-gradient(circle,rgba(255,255,255,.28),transparent 65%); top:-130px; inset-inline-start:-70px}
+.wl-hero::after{content:""; position:absolute; left:0; right:0; bottom:-1px; height:34px; background:#fff; border-radius:34px 34px 0 0}
+.wl-emoji{position:relative; width:86px; height:86px; margin:0 auto 12px; border-radius:28px; display:grid; place-items:center; font-size:44px; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35); box-shadow:0 14px 34px rgba(0,0,0,.25); animation:wlbounce 2.4s ease-in-out infinite}
+.wl-badge{position:relative; display:inline-block; background:rgba(255,255,255,.2); border:1px solid rgba(255,255,255,.4); padding:2px 14px; border-radius:99px; font-size:12.5px; font-weight:600; margin-bottom:8px}
+.wl-hero h2{position:relative; margin:0; font-size:clamp(21px,5.4vw,27px); line-height:1.5; font-weight:700}
+.wl-body{padding:6px 24px 24px; margin-top:-10px; position:relative}
+.wl-body>p{margin:0 0 14px; color:#38456B; line-height:2; font-size:15.5px; text-align:center}
+.wl-perks{list-style:none; margin:0 0 14px; padding:0; display:grid; gap:8px}
+.wl-perks li{display:flex; gap:10px; align-items:flex-start; background:#F3F7FF; border:1px solid #E1EAFB; border-radius:14px; padding:10px 14px; font-size:14.5px; line-height:1.7}
+.wl-perks li::before{content:"✓"; flex:none; width:22px; height:22px; border-radius:50%; background:linear-gradient(135deg,var(--e-teal),#0E8F7A); color:#fff; font-size:13px; font-weight:700; display:grid; place-items:center; margin-top:2px}
+.wl-quote{position:relative; background:linear-gradient(135deg,#FFF8E3,#FFF1C2); border:1px solid #FFE08A; border-radius:16px; padding:14px 16px 14px 16px; text-align:center; font-weight:600; color:#6B4A00; line-height:1.9; font-size:15px; margin-bottom:16px}
+.wl-quote::before{content:"❝"; display:block; font-size:22px; line-height:1; color:var(--e-amber)}
+.wl-act{display:grid; gap:10px}
+.wl-btn{display:flex; align-items:center; justify-content:center; gap:8px; padding:14px 18px; border-radius:15px; border:0; font:700 15.5px "Readex Pro","IBM Plex Sans Arabic","Cairo",sans-serif; cursor:pointer; text-decoration:none; transition:transform .15s, box-shadow .2s}
+.wl-btn:hover{transform:translateY(-2px)}
+.wl-btn.p{background:linear-gradient(135deg,#25D366,#13A84F); color:#fff; box-shadow:0 12px 26px rgba(37,211,102,.35)}
+.wl-btn.a{background:linear-gradient(135deg,var(--e-amber2),var(--e-amber)); color:#2B1D00; box-shadow:0 12px 26px rgba(255,180,0,.35)}
+.wl-btn.s{background:#EEF3FF; color:var(--e-navy2)}
+.wl-x{position:absolute; top:12px; inset-inline-end:12px; z-index:3; width:38px; height:38px; border-radius:50%; border:0; background:rgba(255,255,255,.2); color:#fff; font-size:18px; cursor:pointer; backdrop-filter:blur(4px)}
+.wl-x:hover{background:rgba(255,255,255,.35)}
+.wl-conf{position:fixed; inset:0; pointer-events:none; z-index:2147482500; overflow:hidden}
+.wl-conf i{position:absolute; top:-20px; width:10px; height:16px; border-radius:3px; opacity:.95; animation:wlfall linear forwards}
+@keyframes wlfade{from{opacity:0}to{opacity:1}}
+@keyframes wlpop{from{transform:translateY(40px) scale(.9); opacity:0}to{transform:none; opacity:1}}
+@keyframes wlbounce{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-8px) rotate(3deg)}}
+@keyframes wlfall{to{transform:translate3d(var(--dx,0),110vh,0) rotate(var(--rot,720deg)); opacity:.9}}
+
+@media (prefers-reduced-motion:reduce){
+  #edu-loader *,.wl-card,.wl-emoji{animation-duration:.01ms!important; animation-iteration-count:1!important}
+  .wl-conf{display:none}
+}
