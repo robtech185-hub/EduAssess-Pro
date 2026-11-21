@@ -29,20 +29,26 @@ jobs:
       - name: إنشاء مشروع أندرويد (Capacitor)
         run: |
           npm init -y
-          npm i @capacitor/core@7 @capacitor/cli@7 @capacitor/android@7 @capacitor/local-notifications@7
+          npm i @capacitor/core@7 @capacitor/cli@7 @capacitor/android@7 @capacitor/local-notifications@7 sharp@0.33
           npx cap init "EduAssess Pro" com.eduassess.app --web-dir www
           npx cap add android
 
       - name: أيقونة التطبيق
         run: |
-          R=android/app/src/main/res
-          rm -rf $R/mipmap-anydpi-v26
-          for pair in mdpi:48 hdpi:72 xhdpi:96 xxhdpi:144 xxxhdpi:192; do
-            d=${pair%%:*}; s=${pair##*:}
-            convert assets/icon-512.png -resize ${s}x${s} $R/mipmap-$d/ic_launcher.png
-            cp $R/mipmap-$d/ic_launcher.png $R/mipmap-$d/ic_launcher_round.png
-            cp $R/mipmap-$d/ic_launcher.png $R/mipmap-$d/ic_launcher_foreground.png
-          done
+          cat > icon.js <<'EOF'
+          const sharp = require("sharp");
+          const R = "android/app/src/main/res";
+          const sizes = { mdpi: 48, hdpi: 72, xhdpi: 96, xxhdpi: 144, xxxhdpi: 192 };
+          (async () => {
+            for (const [d, s] of Object.entries(sizes)) {
+              for (const n of ["ic_launcher", "ic_launcher_round", "ic_launcher_foreground"]) {
+                await sharp("assets/logo.png").resize(s, s, { fit: "contain", background: { r: 255, g: 255, b: 255, alpha: 0 } }).png().toFile(R + "/mipmap-" + d + "/" + n + ".png");
+              }
+            }
+          })().catch(e => { console.error(e); process.exit(1); });
+          EOF
+          rm -rf android/app/src/main/res/mipmap-anydpi-v26
+          node icon.js
 
       - name: صلاحيات الإشعارات
         run: |
