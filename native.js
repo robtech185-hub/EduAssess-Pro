@@ -86,7 +86,7 @@
     } catch (e) {}
   }
   async function fcm() {
-    if (!PS) return;
+    if (!PS || window.EDU_NO_FCM) return;
     try {
       if (!fcmDone) {
         fcmDone = true;

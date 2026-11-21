@@ -403,7 +403,7 @@ h2,h3,h4,.brand b,.btn,.tabs button{font-family:'Readex Pro','IBM Plex Sans Arab
 <div class="vd-pv" id="vpv">معاينة الصورة المصغرة</div>
 <button class="btn g" id="vsv" type="button">حفظ الفيديو</button> <button class="btn o hide" id="vcx" type="button">إلغاء التعديل</button><p id="vm" class="err"></p></div>
 <div class="card"><h3>فيديوهاتي</h3><div id="vl"></div></div></div>
-<div id="stu" class="pg hide"><div class="card"><h3>نتائج الطلاب</h3><label>اختر الاختبار</label><select id="xs"></select><div id="sr"></div></div></div>
+<div id="stu" class="pg hide"><div class="card"><h3>نتائج الطلاب</h3><label>اختر الاختبار</label><select id="xs"></select><div id="sr"></div><div id="px"></div></div></div>
 <div id="sbs" class="pg hide"><div class="sec-head"><div class="sec-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="sec-tx"><h2>المشتركون</h2><p>الطلاب الذين اشتركوا معك ويصلهم تنبيه اختباراتك.</p></div><div class="pill"><b id="sbn">0</b><small>مشترك</small></div></div>
 <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input id="sbq" type="search" placeholder="ابحث باسم الطالب أو رقمه..." autocomplete="off"></div><div id="sblist" class="rows"></div></div>
 <div id="grp" class="pg hide"><div class="sec-head"><div class="sec-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l9 5-9 5-9-5 9-5z"/><path d="M3 12l9 5 9-5M3 17l9 5 9-5"/></svg></div><div class="sec-tx"><h2>المجموعات</h2><p>نظّم مشتركيك في مجموعات ووجّه الاختبار لكل مجموعة مباشرة.</p></div></div>
@@ -955,6 +955,35 @@ $('vsv').onclick=async()=>{
   $('vsv').disabled=false;
   if(r.error)return vidMsg('تعذر الحفظ: '+esc(r.error.message));
   const edited=!!vidEditId;vidReset();vidMsg(edited?'تم حفظ التعديلات.':'تمت إضافة الفيديو بنجاح.',true);vidLoad()};
+</script>
+<script>
+/* ===== تقرير مراقبة الاختبار: مرات الخروج + لقطات الكاميرا لكل طالب ===== */
+(function(){
+ const KN={leave:'خروج من الاختبار',force_end:'تسليم تلقائي (تكرار الخروج)',camera_off:'الكاميرا متوقفة',camera_covered:'الكاميرا مغطّاة',no_face:'لا يظهر وجه',multi_face:'أكثر من شخص',pin_failed:'لم يُثبَّت قفل الشاشة'};
+ const BAD=Object.keys(KN),tm=d=>new Date(d).toLocaleTimeString('ar-EG-u-nu-latn',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+ async function load(id){
+  const box=$('px'); if(!id){box.innerHTML='';return}
+  box.innerHTML='<h4 style="margin:22px 0 8px">👁 تقرير المراقبة</h4><p class="muted">جارِ التحميل…</p>';
+  const r=await sbClient.from('exam_proctor_events').select('*').eq('exam_id',id).order('created_at',{ascending:true}).limit(2000);
+  if(r.error){box.innerHTML='<h4 style="margin:22px 0 8px">👁 تقرير المراقبة</h4><p class="muted">لا تتوفر بيانات مراقبة (شغّل ملف setup-proctoring.sql في Supabase).</p>';return}
+  const by={}; (r.data||[]).forEach(e=>{(by[e.user_id]=by[e.user_id]||{n:e.full_name||'طالب',ev:[]}).ev.push(e)});
+  const ids=Object.keys(by);
+  if(!ids.length){box.innerHTML='<h4 style="margin:22px 0 8px">👁 تقرير المراقبة</h4><p class="muted">لا توجد سجلات مراقبة لهذا الاختبار.</p>';return}
+  ids.sort((a,b)=>by[b].ev.filter(e=>BAD.includes(e.kind)).length-by[a].ev.filter(e=>BAD.includes(e.kind)).length);
+  box.innerHTML='<h4 style="margin:22px 0 8px">👁 تقرير المراقبة</h4>'+ids.map(u=>{const g=by[u],bad=g.ev.filter(e=>BAD.includes(e.kind)),lv=g.ev.filter(e=>e.kind==='leave').length;
+   return `<details class="card" style="margin:8px 0;padding:10px 14px"><summary style="cursor:pointer;font-weight:700">${esc(g.n)} — <span style="color:${bad.length?'#D6453D':'#0E9F7E'}">${bad.length?`⚠ ${lv} خروج، ${bad.length-lv} ملاحظة كاميرا`:'بلا مخالفات'}</span></summary>
+   <div style="margin-top:8px;font-size:13px;line-height:2">${bad.map(e=>`<div>• ${tm(e.created_at)} — ${KN[e.kind]}${e.detail?` <small class="muted">(${esc(e.detail)})</small>`:''}</div>`).join('')||'<span class="muted">لا شيء.</span>'}</div>
+   <button class="btn btn-outline" data-px="${u}" style="margin-top:8px;width:auto;padding:8px 14px">عرض لقطات الكاميرا</button><div class="pxg" id="pxg-${u}" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px"></div></details>`}).join('');
+  box.querySelectorAll('[data-px]').forEach(b=>b.onclick=async()=>{
+   const u=b.dataset.px,list=by[u].ev.filter(e=>e.snapshot_path);b.disabled=true;
+   if(!list.length){$('pxg-'+u).innerHTML='<span class="muted">لا لقطات.</span>';return}
+   const sg=await sbClient.storage.from('proctor').createSignedUrls(list.map(e=>e.snapshot_path),3600);
+   const m={};(sg.data||[]).forEach(x=>{if(x.path)m[x.path]=x.signedUrl});
+   $('pxg-'+u).innerHTML=list.map(e=>m[e.snapshot_path]?`<figure style="margin:0;text-align:center"><a href="${m[e.snapshot_path]}" target="_blank"><img src="${m[e.snapshot_path]}" loading="lazy" style="width:120px;height:90px;object-fit:cover;border-radius:10px;border:2px solid ${BAD.includes(e.kind)?'#D6453D':'#E1E8F6'}"></a><figcaption style="font-size:11px">${tm(e.created_at)}${BAD.includes(e.kind)?' ⚠':''}</figcaption></figure>`:'').join('')});
+ }
+ const xs=$('xs'),old=xs.onchange;
+ xs.onchange=async function(){try{await old.apply(this,arguments)}catch(e){}load(xs.value)};
+})();
 </script>
 <script src="native.js"></script>
 </body></html>

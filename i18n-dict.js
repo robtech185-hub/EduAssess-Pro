@@ -166,6 +166,15 @@ window.EDU_DICT_TXT = `
 ديسمبر|December|décembre
 دقيقة|minute|minute
 ساعة|hour|heure
+لا تغادر الاختبار|Do not leave the exam|Ne quittez pas l'examen
+فهمت، متابعة الاختبار|Understood, continue the exam|Compris, continuer l'examen
+تم رصد خروجك من الاختبار ({1} من {2}). عند الوصول إلى {3} يُسلَّم اختبارك تلقائيًا ويُبلَّغ المعلم.|Your leaving the exam was detected ({1} of {2}). At {3} your exam is submitted automatically and the teacher is notified.|Votre sortie de l'examen a été détectée ({1} sur {2}). À {3}, l'examen est remis automatiquement et l'enseignant est prévenu.
+تم تسليم الاختبار تلقائيًا بسبب تكرار الخروج منه، وتم إبلاغ المعلم.|The exam was submitted automatically because you left it repeatedly. The teacher has been notified.|L'examen a été remis automatiquement car vous l'avez quitté à plusieurs reprises. L'enseignant a été prévenu.
+الكاميرا متوقفة — أعد تفعيلها وإلا سيُبلَّغ المعلم|The camera is off — turn it back on or the teacher will be notified|La caméra est coupée — réactivez-la sinon l'enseignant sera prévenu
+الكاميرا مغطّاة أو مظلمة — اكشفها فورًا، تم تسجيل المخالفة|The camera is covered or dark — uncover it now, the violation was recorded|La caméra est couverte ou sombre — découvrez-la, l'infraction a été enregistrée
+لا يظهر وجهك أمام الكاميرا — ابقَ أمامها طوال الاختبار|Your face is not visible — stay in front of the camera during the exam|Votre visage n'est pas visible — restez devant la caméra pendant l'examen
+ظهر أكثر من شخص أمام الكاميرا — تم تسجيل المخالفة|More than one person appeared on camera — the violation was recorded|Plusieurs personnes sont apparues à la caméra — l'infraction a été enregistrée
+يجب السماح باستخدام الكاميرا الأمامية لبدء الاختبار (مراقبة الاختبار). فعّل إذن الكاميرا من إعدادات التطبيق ثم حاول مرة أخرى.|You must allow the front camera to start the exam (proctoring). Enable the camera permission in the app settings and try again.|Vous devez autoriser la caméra frontale pour démarrer l'examen (surveillance). Activez l'autorisation dans les paramètres puis réessayez.
 `;
 
 window.EDU_DICT_TXT += `
@@ -1006,4 +1015,13 @@ https://... (اتركه فارغًا لاستخدام صورة يوتيوب تل
 {1} · {2} من {3} · {4}% · {5}|{1} · {2} of {3} · {4}% · {5}|{1} · {2} sur {3} · {4} % · {5}
 ج.م|EGP|EGP
 ج.م.|EGP|EGP
+لا تغادر الاختبار|Do not leave the exam|Ne quittez pas l'examen
+فهمت، متابعة الاختبار|Understood, continue the exam|Compris, continuer l'examen
+تم رصد خروجك من الاختبار ({1} من {2}). عند الوصول إلى {3} يُسلَّم اختبارك تلقائيًا ويُبلَّغ المعلم.|Your leaving the exam was detected ({1} of {2}). At {3} your exam is submitted automatically and the teacher is notified.|Votre sortie de l'examen a été détectée ({1} sur {2}). À {3}, l'examen est remis automatiquement et l'enseignant est prévenu.
+تم تسليم الاختبار تلقائيًا بسبب تكرار الخروج منه، وتم إبلاغ المعلم.|The exam was submitted automatically because you left it repeatedly. The teacher has been notified.|L'examen a été remis automatiquement car vous l'avez quitté à plusieurs reprises. L'enseignant a été prévenu.
+الكاميرا متوقفة — أعد تفعيلها وإلا سيُبلَّغ المعلم|The camera is off — turn it back on or the teacher will be notified|La caméra est coupée — réactivez-la sinon l'enseignant sera prévenu
+الكاميرا مغطّاة أو مظلمة — اكشفها فورًا، تم تسجيل المخالفة|The camera is covered or dark — uncover it now, the violation was recorded|La caméra est couverte ou sombre — découvrez-la, l'infraction a été enregistrée
+لا يظهر وجهك أمام الكاميرا — ابقَ أمامها طوال الاختبار|Your face is not visible — stay in front of the camera during the exam|Votre visage n'est pas visible — restez devant la caméra pendant l'examen
+ظهر أكثر من شخص أمام الكاميرا — تم تسجيل المخالفة|More than one person appeared on camera — the violation was recorded|Plusieurs personnes sont apparues à la caméra — l'infraction a été enregistrée
+يجب السماح باستخدام الكاميرا الأمامية لبدء الاختبار (مراقبة الاختبار). فعّل إذن الكاميرا من إعدادات التطبيق ثم حاول مرة أخرى.|You must allow the front camera to start the exam (proctoring). Enable the camera permission in the app settings and try again.|Vous devez autoriser la caméra frontale pour démarrer l'examen (surveillance). Activez l'autorisation dans les paramètres puis réessayez.
 `;

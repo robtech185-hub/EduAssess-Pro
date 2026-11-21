@@ -1567,6 +1567,9 @@ $('cal-prev').onclick=()=>{calDate=new Date(calDate.getFullYear(),calDate.getMon
 /* ===================== بدء الاختبار ===================== */
 $("btn-start-exam").addEventListener("click", async ()=>{
   const btn=$("btn-start-exam"); setMsg("start-error",""); setBusy(btn,true,"جارِ التسجيل...");
+  /* الكاميرا شرط للدخول: نتحقق منها قبل تسجيل المحاولة (الاختبار مرة واحدة فقط) */
+  const cam=await EduProctor.prepare();
+  if(!cam.ok){ setBusy(btn,false,"ابدأ الاختبار الآن"); setMsg("start-error",cam.msg); return; }
   const { data, error } = await sbClient.from("exam_students").insert({
     exam_id: state.exam.id, user_id: state.user.id,
     full_name: state.profile.name, whatsapp: state.profile.phone, email: state.profile.email,
@@ -1574,6 +1577,7 @@ $("btn-start-exam").addEventListener("click", async ()=>{
   }).select().single();
   setBusy(btn,false,"ابدأ الاختبار الآن");
   if(error){
+    EduProctor.release();
     if(error.code==="23505") setMsg("start-error","لقد دخلت هذا الاختبار من قبل — الاختبار مرة واحدة فقط.");
     else setMsg("start-error","تعذر تسجيل بدء الاختبار، حاول مرة أخرى.");
     return;
@@ -1584,6 +1588,8 @@ $("btn-start-exam").addEventListener("click", async ()=>{
   $("q-total").textContent=state.questions.length;
   $("leave-warning").style.display="none";
   renderQuestion(); startTimer(); showView("exam");
+  EduProctor.begin({ sb:sbClient, examId:state.exam.id, userId:state.user.id, attemptId:data.id, name:state.profile.name,
+    onForceEnd:(why)=>finishExam(false,why) });
 });
 
 /* ===================== عرض الأسئلة ===================== */
@@ -1670,9 +1676,9 @@ $("btn-finish").addEventListener("click",async()=>{
 });
 
 /* ===================== إنهاء الاختبار ===================== */
-async function finishExam(manual){
+async function finishExam(manual,reason){
   if(state.finished) return;
-  state.finished=true; if(state.timerHandle) clearInterval(state.timerHandle);
+  state.finished=true; try{EduProctor.end()}catch(e){} if(state.timerHandle) clearInterval(state.timerHandle);
   let score=0,total=0,ok=0,bad=0,blank=0;
   state.questions.forEach(q=>{
     total+=(q.points||0);
@@ -1692,15 +1698,13 @@ async function finishExam(manual){
   $("result-score").textContent=score; $("result-total").textContent=total;
   const gp=$("result-grade"); gp.textContent=`${g.t} — ${round1(pct)}%`; gp.className="pill "+g.c;
   $("rs-ok").textContent=ok; $("rs-bad").textContent=bad; $("rs-blank").textContent=blank;
-  $("result-note").textContent = (manual?"تم إنهاء الاختبار.":"انتهى الوقت وتم إنهاء الاختبار تلقائيًا.") + (saved?"":" ⚠️ تعذر حفظ النتيجة على الخادم، التقط صورة لهذه الشاشة وتواصل مع الإدارة.");
+  $("result-note").textContent = (manual?"تم إنهاء الاختبار.":reason==="left"?"تم تسليم الاختبار تلقائيًا بسبب تكرار الخروج منه، وتم إبلاغ المعلم.":"انتهى الوقت وتم إنهاء الاختبار تلقائيًا.") + (saved?"":" ⚠️ تعذر حفظ النتيجة على الخادم، التقط صورة لهذه الشاشة وتواصل مع الإدارة.");
   showView("result");
 }
 
 /* ===================== منع الخروج أثناء الاختبار ===================== */
 window.addEventListener("beforeunload",(e)=>{ if(state.inExam && !state.finished){ e.preventDefault(); e.returnValue=""; } });
-document.addEventListener("visibilitychange",()=>{
-  if(document.visibilityState==="hidden" && state.inExam && !state.finished) $("leave-warning").style.display="block";
-});
+/* رصد الخروج (تنبيه + عدّاد + تسليم تلقائي) يتولاه proctor.js */
 
 /* ===================== صفحة الإحصائيات ===================== */
 function destroyCharts(){ state.charts.forEach(c=>{try{c.destroy()}catch(e){}}); state.charts=[]; }
@@ -1905,6 +1909,7 @@ function drawVideos(){
     if(!v.unlocked||!v.video_url)return toast('أنهِ اختبار «'+v.exam_name+'» أولًا لتتمكن من مشاهدة الحل','err');
     vdPlayer(v)})}
 </script>
+<script src="proctor.js"></script>
 <script src="native.js"></script>
 </body>
 </html>
