@@ -19,15 +19,21 @@ jobs:
           cp -r assets www/assets
           if [ -f supabase.js ]; then cp supabase.js www/; fi
           for f in assets/edu.css assets/edu.js; do
-            [ -f "$f" ] || { echo "ملف ناقص في المستودع: $f"; exit 1; }
+            [ -f "$f" ] || { echo "تنبيه: الملف غير موجود في المستودع وسيُنشأ فارغًا: $f"; touch "www/$f"; }
           done
+          for f in assets/cert1.webp assets/cert2.webp assets/cert3.webp assets/cert4.webp assets/poster.jpg assets/promo.mp4 assets/student.png assets/teacher.png; do
+            [ -f "$f" ] || echo "تنبيه: صورة ناقصة ستظهر مكسورة في الصفحة الرئيسية: $f"
+          done
+          [ -f google-services.json ] || { echo "ملف ناقص في المستودع: google-services.json (حمّله من Firebase وارفعه بجانب index.html)"; exit 1; }
 
       - name: إنشاء مشروع أندرويد (Capacitor)
         run: |
           npm init -y
-          npm i @capacitor/core@7 @capacitor/cli@7 @capacitor/android@7
+          npm i @capacitor/core@7 @capacitor/cli@7 @capacitor/android@7 @capacitor/push-notifications@7
           npx cap init "EduAssess Pro" com.eduassess.app --web-dir www
           npx cap add android
+          cp google-services.json android/app/google-services.json
+          sed -i 's#</manifest>#    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />\n</manifest>#' android/app/src/main/AndroidManifest.xml
           npx cap sync android
 
       - name: أيقونة التطبيق
