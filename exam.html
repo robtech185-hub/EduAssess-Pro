@@ -343,6 +343,15 @@ input:focus{border-color:var(--gold);box-shadow:0 0 0 4px rgba(255,180,0,.18);ba
 .chip i{font-style:normal;background:#F3EEDF;color:var(--deep);border-radius:20px;min-width:22px;padding:1px 7px;font-size:12px;text-align:center}
 .chip.active{background:var(--deep);border-color:var(--deep);color:#fff;box-shadow:0 8px 18px rgba(10,34,96,.25)}
 .chip.active i{background:rgba(255,255,255,.18);color:#fff}
+.t-ctry{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;color:#0A2260;background:#E8EEFC;padding:2px 10px;border-radius:20px}
+#s-country{width:100%;appearance:none;-webkit-appearance:none;padding:14px 16px 14px 44px;border-radius:15px;border:1.5px solid var(--line);font:600 16px 'IBM Plex Sans Arabic',sans-serif;color:var(--ink-soft,#55627F);background:#FEFDFA url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%230A2260' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat 14px center;transition:all .2s}
+html[dir=rtl] #s-country{background-position:14px center}html[dir=ltr] #s-country{padding:14px 44px 14px 16px;background-position:right 14px center}
+#s-country.has{color:#0A2260;border-color:#C9D6F3;background-color:#fff}
+#s-country:focus{outline:0;border-color:var(--gold);box-shadow:0 0 0 4px rgba(255,180,0,.18)}
+.ctry-pv{align-items:center;gap:12px;margin:10px 0 2px;padding:10px 14px;border-radius:16px;background:linear-gradient(135deg,#F4F8FF,#FFF8E6);border:1.5px solid #E6D9A8}
+.ctry-fl{font-size:34px;line-height:1}.ctry-tx{flex:1;display:flex;flex-direction:column}.ctry-tx b{color:#0A2260;font-size:15px}.ctry-tx small{color:#8A6A14;font-weight:700;letter-spacing:1px}
+.ctry-ok{width:26px;height:26px;border-radius:50%;background:#0E9F7E;color:#fff;display:grid;place-items:center;font-weight:800;font-size:14px}
+.ctry-pv.pop{animation:ctryPop .35s cubic-bezier(.2,1.3,.4,1)}@keyframes ctryPop{from{transform:scale(.92);opacity:0}to{transform:none;opacity:1}}
 
 /* بطاقات المعلمين */
 .t-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
@@ -763,7 +772,7 @@ h1,h2,h3,h4,.brand h1,.sec-tx h2,.btn,.tab,.chip{font-family:'Readex Pro','IBM P
   <section id="v-teachers" style="display:none">
     <div class="sec-head"><div class="sec-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="sec-tx"><h2>اكتشف المعلمين</h2><p>ابحث عن معلمك واشترك لتصلك مواعيد اختباراته في التقويم.</p></div></div>
     <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input id="teacher-search" type="search" placeholder="ابحث باسم المعلم..." autocomplete="off"></div>
-    <div class="chips"><button class="chip active" data-tf="all">الكل <i id="cnt-all">0</i></button><button class="chip" data-tf="sub">مشتركون <i id="cnt-sub">0</i></button></div>
+    <div class="chips"><button class="chip active" data-tf="all">الكل <i id="cnt-all">0</i></button><button class="chip" data-tf="sub">مشتركون <i id="cnt-sub">0</i></button><button class="chip" data-tf="country" id="chip-country" style="display:none"><span id="chip-flag"></span> معلمو دولتي <i id="cnt-country">0</i></button></div>
     <div class="cats" id="teacher-cats"></div>
     <div id="teacher-list" class="t-grid"></div>
   </section>
@@ -971,12 +980,18 @@ $("s-pass").addEventListener("input",()=>{
 
 /* ---------- الدولة: تُحفظ مع الحساب ويُعرض للطالب معلمو دولته فقط ---------- */
 const CC_LIST="AF AL DZ AD AO AG AR AM AU AT AZ BS BH BD BB BY BE BZ BJ BT BO BA BW BR BN BG BF BI KH CM CA CV CF TD CL CN CO KM CG CD CR CI HR CU CY CZ DK DJ DM DO EC EG SV GQ ER EE SZ ET FJ FI FR GA GM GE DE GH GR GD GT GN GW GY HT HN HU IS IN ID IR IQ IE IL IT JM JP JO KZ KE KI KW KG LA LV LB LS LR LY LI LT LU MG MW MY MV ML MT MH MR MU MX FM MD MC MN ME MA MZ MM NA NR NP NL NZ NI NE NG KP MK NO OM PK PW PS PA PG PY PE PH PL PT QA RO RU RW KN LC VC WS SM ST SA SN RS SC SL SG SK SI SB SO ZA KR SS ES LK SD SR SE CH SY TW TJ TZ TH TL TG TO TT TN TR TM TV UG UA AE GB US UY UZ VU VA VE VN YE ZM ZW XK".split(" ");
+const flagOf=c=>{try{return String.fromCodePoint(...[...String(c).toUpperCase()].map(x=>127397+x.charCodeAt(0)))}catch(e){return ""}};
 const countryAr=c=>{try{return new Intl.DisplayNames(["ar"],{type:"region"}).of(c)||c}catch(e){return c}};
 const countryEn=c=>{try{return new Intl.DisplayNames(["en"],{type:"region"}).of(c)||c}catch(e){return c}};
 (function(){const sel=$("s-country");if(!sel)return;const L=(window.EduI18N&&EduI18N.countries)?EduI18N.countries(CC_LIST):CC_LIST.map(c=>[c,countryAr(c)]);
-  sel.add(new Option(window.EduI18N?EduI18N.t("اختر الدولة"):"اختر الدولة",""));L.forEach(x=>sel.add(new Option(x[1],x[0])));})();
+  sel.add(new Option(window.EduI18N?EduI18N.t("اختر الدولة"):"اختر الدولة",""));L.forEach(x=>sel.add(new Option(flagOf(x[0])+"  "+x[1],x[0])));
+  const pv=document.createElement("div");pv.className="ctry-pv";pv.style.display="none";sel.parentNode.insertBefore(pv,sel.nextSibling);
+  sel.addEventListener("change",()=>{const c=sel.value;sel.classList.toggle("has",!!c);if(!c){pv.style.display="none";return}
+    const o=sel.options[sel.selectedIndex];pv.innerHTML='<span class="ctry-fl">'+flagOf(c)+'</span><span class="ctry-tx"><b>'+(o.text.replace(/^\S+\s+/,""))+'</b><small>'+c+'</small></span><span class="ctry-ok">✓</span>';pv.style.display="flex";pv.classList.remove("pop");void pv.offsetWidth;pv.classList.add("pop");});})();
 const myCountry=()=>{const m=(state.user&&state.user.user_metadata)||{};let c=m.country_code||"";try{c=c||localStorage.getItem("edu_country")||""}catch(e){}return c};
 const sameCountry=(tc,cc)=>{if(!cc||!tc)return true;const t=String(tc).trim().toLowerCase();return t===cc.toLowerCase()||t===countryAr(cc).toLowerCase()||t===countryEn(cc).toLowerCase()};
+const strictSame=(tc,cc)=>!!(cc&&tc&&sameCountry(tc,cc));
+const ccOfText=t=>{if(!t)return "";const u=String(t).trim();if(/^[A-Za-z]{2}$/.test(u))return u.toUpperCase();return CC_LIST.find(c=>sameCountry(u,c))||""};
 async function teacherCountryMap(){try{const r=await sbClient.rpc("teacher_countries");return Object.fromEntries((r.data||[]).map(x=>[x.id,x.country]))}catch(e){return {}}}
 
 $("f-signup").addEventListener("submit", async (e)=>{
@@ -1241,7 +1256,7 @@ const teacherCard=(t,i,right,sinceTxt)=>{
   const nm=t.full_name||"معلم", long=(t.bio||"").length>130;
   return `<article class="t-card ${right.sub?'is-sub':''}" style="animation-delay:${Math.min(i,8)*45}ms">
     <div class="t-av" style="background:${avGrad(t.id)}">${escHtml(nm.trim()[0]||"م")}</div>
-    <div class="t-info"><h4>${escHtml(nm)}</h4><span class="t-tag">${ICO.cap}معلم</span>${t.specialty?`<span class="t-spec">${escHtml(t.specialty)}</span>`:""}${sinceTxt?`<span class="t-since">${sinceTxt}</span>`:""}</div>
+    <div class="t-info"><h4>${escHtml(nm)}</h4><span class="t-tag">${ICO.cap}معلم</span>${t.specialty?`<span class="t-spec">${escHtml(t.specialty)}</span>`:""}${t._cc?`<span class="t-ctry">${flagOf(t._cc)} ${escHtml(countryAr(t._cc))}</span>`:""}${sinceTxt?`<span class="t-since">${sinceTxt}</span>`:""}</div>
     ${right.html}
     ${t.bio?`<p class="t-bio ${long?'clamp':''}">${escHtml(t.bio)}</p>${long?'<button class="t-more">عرض المزيد</button>':''}`:""}
   </article>`;
@@ -1257,7 +1272,9 @@ async function loadTeachers(){
   if(error){box.innerHTML=emptyBox(ICO.x,"تعذر تحميل المعلمين","تأكد من الاتصال بالإنترنت أو من تنفيذ SQL الخاص بالجداول.");return;}
   const ids=new Set((subs||[]).map(x=>x.teacher_id));
   const cmap=await teacherCountryMap(), mc=myCountry();
-  const all=(teachers||[]).filter(t=>ids.has(t.id)||sameCountry(cmap[t.id],mc));
+  const all=(teachers||[]).map(t=>Object.assign(t,{_cc:ccOfText(cmap[t.id])}));
+  const inMine=t=>strictSame(cmap[t.id],mc);
+  if(mc){$("chip-country").style.display="";$("chip-flag").textContent=flagOf(mc);$("chip-country").title=countryAr(mc);}
   let filter="all", cat="";
   const cats=[...new Set(all.map(t=>(t.specialty||"").trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"ar"));
   const catBox=$("teacher-cats");
@@ -1266,11 +1283,11 @@ async function loadTeachers(){
     catBox.querySelectorAll(".cat").forEach(b=>b.onclick=()=>{cat=b.dataset.c;drawCats();draw();}); };
   const draw=()=>{
     const q=$("teacher-search").value.trim().toLowerCase();
-    $("cnt-all").textContent=all.length; $("cnt-sub").textContent=all.filter(t=>ids.has(t.id)).length;
-    const list=all.filter(t=>((t.full_name||"")+" "+(t.specialty||"")+" "+(t.bio||"")).toLowerCase().includes(q)&&(filter==="all"||ids.has(t.id))&&(!cat||(t.specialty||"").trim()===cat));
+    $("cnt-all").textContent=all.length; $("cnt-sub").textContent=all.filter(t=>ids.has(t.id)).length; $("cnt-country").textContent=all.filter(inMine).length;
+    const list=all.filter(t=>((t.full_name||"")+" "+(t.specialty||"")+" "+(t.bio||"")).toLowerCase().includes(q)&&(filter==="all"||(filter==="sub"&&ids.has(t.id))||(filter==="country"&&inMine(t)))&&(!cat||(t.specialty||"").trim()===cat));
     box.innerHTML=list.length?list.map((t,i)=>{const sub=ids.has(t.id);
       return teacherCard(t,i,{sub,html:`<button class="t-btn ${sub?'on':''}" data-teacher="${t.id}" ${sub?'disabled':''}>${sub?ICO.check+'مشترك':ICO.plus+'اشترك'}</button>`});}).join(""):
-      emptyBox(ICO.users,filter==="sub"&&!q&&!cat?"لم تشترك مع أي معلم بعد":"لا توجد نتائج","جرّب اسمًا أو تخصصًا آخر.");
+      emptyBox(ICO.users,filter==="sub"&&!q&&!cat?"لم تشترك مع أي معلم بعد":filter==="country"&&!q&&!cat?"لا يوجد معلمون من دولتك بعد":"لا توجد نتائج","جرّب اسمًا أو تخصصًا آخر.");
     wireMore(box);
     box.querySelectorAll("[data-teacher]:not([disabled])").forEach(b=>b.onclick=async()=>{
       const id=b.dataset.teacher; b.disabled=true; b.innerHTML=ICO.clock+"جارٍ...";
