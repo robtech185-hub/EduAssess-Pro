@@ -13,6 +13,7 @@
   function supported() { return "serviceWorker" in navigator && "PushManager" in window && "Notification" in window; }
   function isIOS() { return /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1); }
   function standalone() { try { return matchMedia("(display-mode: standalone)").matches || navigator.standalone === true; } catch (e) { return false; } }
+  function isNativeApp() { try { return !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()); } catch (e) { return false; } }
   function configured() { return !!VAPID_PUBLIC && VAPID_PUBLIC.indexOf("PUT_") !== 0; }
   function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function lsSet(k, v) { try { if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} }
@@ -23,6 +24,7 @@
   }
 
   async function getState() {
+    if (isNativeApp()) return "local";
     if (!supported()) return isIOS() && !standalone() ? "ios-install" : "unsupported";
     if (Notification.permission === "denied") return "denied";
     if (Notification.permission === "granted" && !lsGet(OFF_KEY)) {
@@ -102,6 +104,7 @@
 
   async function attach(client) {
     sb = client || sb;
+    if (isNativeApp()) { render(); return; }
     if (!configured()) { console.warn("[EduPush] لم يتم ضبط VAPID_PUBLIC داخل push.js"); return; }
     if (!supported()) { if (isIOS() && !standalone()) setTimeout(maybeBanner, 2500); render(); return; }
     try { await register(); } catch (e) { console.warn("[EduPush] sw:", e); return; }
@@ -171,12 +174,13 @@
       var warn = st === "denied" || st === "ios-install" || st === "unsupported", txt, btn = "";
       if (st === "on") { txt = "🔔 الإشعارات مفعّلة على هذا الجهاز."; btn = '<button type="button" class="ep-btn off" data-a="off">إيقاف</button>'; }
       else if (st === "off") { txt = "فعّل الإشعارات ليصلك كل جديد فورًا."; btn = '<button type="button" class="ep-btn" data-a="on">تفعيل</button>'; }
+      else if (st === "local") { txt = "🔔 تنبيهات التطبيق مفعّلة على هذا الجهاز (تصلك مواعيد الاختبارات قبل بدئها)."; btn = '<button type="button" class="ep-btn" data-a="test">تجربة</button>'; }
       else if (st === "denied") txt = "الإشعارات محظورة من إعدادات المتصفح — اسمح بها من إعدادات الموقع ثم أعد تحميل الصفحة.";
       else if (st === "ios-install") txt = "على الآيفون: اضغط «مشاركة» ثم «إضافة إلى الشاشة الرئيسية» وافتح التطبيق من هناك لتفعيل الإشعارات.";
       else txt = "متصفحك لا يدعم الإشعارات.";
       el.innerHTML = '<div class="ep-row' + (warn ? " warn" : "") + '"><span>' + txt + "</span>" + btn + "</div>";
       var b = el.querySelector("[data-a]");
-      if (b) b.onclick = function () { (b.dataset.a === "on" ? enable : disable)(); };
+      if (b) b.onclick = function () { if (b.dataset.a === "test") { if (typeof window.testNotif === "function") window.testNotif(); return; } (b.dataset.a === "on" ? enable : disable)(); };
     });
   }
 
