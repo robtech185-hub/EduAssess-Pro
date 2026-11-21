@@ -28,7 +28,7 @@ const sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, { auth: { persistSes
     let sent = 0, failed = 0, dead = 0;
     for (const it of items) {
       const subs = subsBy[it.user_id] || [];
-      const payload = JSON.stringify({ title: it.title, body: it.body || "", url: it.url || "./", tag: it.tag || undefined, starts_at: it.starts_at || undefined });
+      const payload = JSON.stringify({ title: it.title, body: it.body || "", url: it.url || "./", kind: it.kind || undefined, tag: it.tag || undefined, starts_at: it.starts_at || undefined });
       let ok = 0, transient = 0;
       for (const s of subs) {
         try {
