@@ -16,7 +16,7 @@ jobs:
         run: |
           [ -f native.js ] || { echo "ملف ناقص في المستودع: native.js"; exit 1; }
           mkdir -p www
-          cp index.html exam.html teacher.html i18n.js push.js native.js sw.js ui.js ui.css manifest.webmanifest www/
+          cp index.html exam.html teacher.html i18n.js i18n-dict.js push.js native.js sw.js ui.js ui.css manifest.webmanifest www/
           cp -r assets www/assets
           if [ -f supabase.js ]; then cp supabase.js www/; fi
           for f in assets/edu.css assets/edu.js; do
