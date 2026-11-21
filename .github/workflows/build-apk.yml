@@ -5,6 +5,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -73,8 +75,8 @@ jobs:
           FCM=0
           if [ -z "$GSJ" ]; then
             echo "::warning::السر GOOGLE_SERVICES_JSON غير موجود — سيُبنى التطبيق بدون إشعارات FCM (الإشعارات الفورية والتطبيق مغلق). لتفعيلها أضف السر من Settings > Secrets and variables > Actions."
-          elif ! echo "$GSJ" | base64 -d > android/app/google-services.json 2>/dev/null; then
-            echo "::warning::قيمة GOOGLE_SERVICES_JSON ليست base64 صالحًا — سيُبنى التطبيق بدون FCM."
+          elif ! { case "$GSJ" in "{"*) printf '%s' "$GSJ" > android/app/google-services.json ;; *) echo "$GSJ" | base64 -d > android/app/google-services.json 2>/dev/null ;; esac; }; then
+            echo "::warning::قيمة GOOGLE_SERVICES_JSON غير صالحة (ضع محتوى الملف JSON كما هو، أو base64) — سيُبنى التطبيق بدون FCM."
             rm -f android/app/google-services.json
           elif ! grep -q '"package_name": *"com.eduassess.app"' android/app/google-services.json; then
             echo "::warning::package_name داخل google-services.json يجب أن يكون com.eduassess.app — سيُبنى التطبيق بدون FCM."
@@ -87,6 +89,16 @@ jobs:
 
       - run: npx cap sync android
 
+      - name: توقيع ثابت للتطبيق (ليُحدَّث فوق النسخة القديمة)
+        env:
+          KS: ${{ secrets.DEBUG_KEYSTORE }}
+        run: |
+          if [ -n "$KS" ]; then
+            mkdir -p ~/.android && echo "$KS" | base64 -d > ~/.android/debug.keystore && echo "تم استخدام المفتاح الثابت"
+          else
+            echo "::warning::السر DEBUG_KEYSTORE غير موجود — كل نسخة تُبنى بتوقيع جديد، وسيحتاج المستخدم لحذف التطبيق القديم قبل تثبيت الجديد."
+          fi
+
       - name: بناء ملف APK
         working-directory: android
         run: chmod +x gradlew && ./gradlew assembleDebug --no-daemon
@@ -95,3 +107,14 @@ jobs:
         with:
           name: EduAssess-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
+
+      - name: نشر الـ APK برابط مباشر (GitHub Release)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk EduAssess.apk
+          gh release delete apk-latest --cleanup-tag --yes --repo "$GITHUB_REPOSITORY" || true
+          gh release create apk-latest EduAssess.apk --repo "$GITHUB_REPOSITORY" --title "EduAssess Pro — آخر نسخة" --notes "تم البناء تلقائيًا" --latest
+          URL="https://github.com/$GITHUB_REPOSITORY/releases/download/apk-latest/EduAssess.apk"
+          echo "الرابط المباشر: $URL"
+          echo "### رابط التحميل المباشر\n$URL" >> "$GITHUB_STEP_SUMMARY"
