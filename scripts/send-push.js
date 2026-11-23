@@ -20,6 +20,7 @@ const T = {
   exam_new:   { t: { ar: "اختبار جديد من {n}", en: "New exam from {n}", fr: "Nouvel examen de {n}" }, b: { ar: "{e}", en: "{e}", fr: "{e}" } },
   exam_enter: { t: { ar: "طالب دخل اختبارك", en: "A student entered your exam", fr: "Un élève est entré dans votre examen" }, b: { ar: "{n} — {e}", en: "{n} — {e}", fr: "{n} — {e}" } },
   exam_done:  { t: { ar: "طالب أنهى اختبارك", en: "A student finished your exam", fr: "Un élève a terminé votre examen" }, b: { ar: "{n} — {e}", en: "{n} — {e}", fr: "{n} — {e}" } },
+  cert_new:   { t: { ar: "🏆 شهادة جديدة من {n}", en: "🏆 New certificate from {n}", fr: "🏆 Nouveau certificat de {n}" }, b: { ar: "{e}", en: "{e}", fr: "{e}" } },
   sub_new:    { t: { ar: "مشترك جديد", en: "New subscriber", fr: "Nouvel abonné" }, b: { ar: "اشترك {n} معك", en: "{n} subscribed to you", fr: "{n} s'est abonné à vous" } }
 };
 const fill = (s, m) => s.replace(/\{(\w+)\}/g, (_, k) => (m && m[k]) || "");
