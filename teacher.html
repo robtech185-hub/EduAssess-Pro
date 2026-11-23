@@ -706,7 +706,7 @@ html.ms-lock,html.ms-lock body{overflow:hidden}
 .lgx-add{display:flex;gap:8px;margin-top:12px}.lgx-add select{margin:0;flex:1;min-width:0}.lgx-add .btn{flex:none}.lgx-add .btn svg{width:17px;height:17px}
 .lgd-del{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:16px 4px 0}.lgd-del .btn svg{width:16px;height:16px}
 @media(max-width:380px){.lgp-av{width:46px;height:46px;font-size:18px}.lgp-i.g1 .lgp-av{width:60px;height:60px}.lgh-tx h2{font-size:26px}}
-</style><link rel="stylesheet" href="ui.css"><script src="i18n-dict.js"></script><script src="i18n.js"></script><script src="ui.js"></script><script src="certificates.js"></script></head><body>
+</style><link rel="stylesheet" href="ui.css"><script src="i18n-dict.js"></script><script src="i18n.js"></script><script src="ui.js"></script><script src="certificates.js" onerror="window.__cgLoad='fail'"></script><script>window.addEventListener("error",function(e){if(e&&e.filename&&/certificates\.js/.test(e.filename))window.__cgJsErr=(e.message||"")+" (سطر "+(e.lineno||"?")+")"});try{if(!window.EduCert&&typeof EduCert!=="undefined")window.EduCert=EduCert}catch(e){}</script></head><body>
 <div id="auth" class="w"><div class="card" style="text-align:center;border-top:5px solid var(--gold)"><img class="lg-auth" src="assets/icon-512.png" alt="EduAssess Pro" width="96" height="96"><div class="brand" style="color:var(--deep)"><b>EduAssess Pro</b><small style="color:var(--mut)">نظام الاختبارات الإلكترونية</small></div>
 <h3 id="atitle" style="margin-top:12px">تسجيل دخول المعلم</h3><div style="text-align:right">
 <div id="regf" class="hide"><label>الاسم الثلاثي</label><input id="fn"><label>رقم الواتساب (مع رمز الدولة)</label><input id="wa" type="tel" dir="ltr" placeholder="+201012345678"><label>الدولة</label><select id="co"></select></div>
@@ -1465,7 +1465,7 @@ async function cgLoad(){
    if(dr.error||!(dr.data&&dr.data.length))return toast('تعذر حذف الشهادة','err');toast('تم حذف الشهادة');cgLoad()}})}
 async function certPage(){
  const box=$('cert');
- if(!window.EduCert){box.innerHTML='<div class="card"><div class="empty">تعذر تحميل محرّك الشهادات — تأكد من وجود ملف certificates.js بجانب الصفحة.</div></div>';CG.ready=false;return}
+ if(!window.EduCert){var why=window.__cgLoad==='fail'?'الملف لم يُحمَّل: غير موجود بجانب teacher.html في نفس المجلد على الخادم، أو اسمه مختلف (مثل certificates.js.txt).':(window.__cgJsErr?'الملف حُمّل لكن فيه خطأ برمجي: '+window.__cgJsErr:'الملف حُمّل لكنه لم يعرّف EduCert.');box.innerHTML='<div class="card"><div class="empty">تعذر تحميل محرّك الشهادات — '+why+'</div></div>';CG.ready=false;return}
  if(!CG.ready)cgBuild();
  if(!SUBS.length)await loadSubs();
  cgFillStudents();cgPreview();cgLoad()}
