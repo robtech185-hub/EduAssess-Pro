@@ -1024,4 +1024,13 @@ https://... (اتركه فارغًا لاستخدام صورة يوتيوب تل
 لا يظهر وجهك أمام الكاميرا — ابقَ أمامها طوال الاختبار|Your face is not visible — stay in front of the camera during the exam|Votre visage n'est pas visible — restez devant la caméra pendant l'examen
 ظهر أكثر من شخص أمام الكاميرا — تم تسجيل المخالفة|More than one person appeared on camera — the violation was recorded|Plusieurs personnes sont apparues à la caméra — l'infraction a été enregistrée
 يجب السماح باستخدام الكاميرا الأمامية لبدء الاختبار (مراقبة الاختبار). فعّل إذن الكاميرا من إعدادات التطبيق ثم حاول مرة أخرى.|You must allow the front camera to start the exam (proctoring). Enable the camera permission in the app settings and try again.|Vous devez autoriser la caméra frontale pour démarrer l'examen (surveillance). Activez l'autorisation dans les paramètres puis réessayez.
+المزيد|More|Plus
+باقي أقسام لوحة المعلم|Other teacher dashboard sections|Autres sections du tableau de bord
+فيديوهات حلّ الاختبارات|Exam solution videos|Vidéos de correction des examens
+نظّم مشتركيك ووجّه الاختبارات|Organize your subscribers and target exams|Organisez vos abonnés et ciblez les examens
+مراقبة الطلاب أثناء الاختبار|Monitor students during the exam|Surveillez les élèves pendant l'examen
+النبذة والاشتراك والإشعارات|Bio, subscription and notifications|Présentation, abonnement et notifications
+اختبار جديد|New exam|Nouvel examen
+مباشر|Live|En direct
+إغلاق|Close|Fermer
 `;

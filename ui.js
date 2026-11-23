@@ -39,6 +39,7 @@
     medal: '<circle cx="12" cy="15" r="6"/><path d="M8.5 3L12 9l3.5-6"/>',
     flame: '<path d="M12 22c4 0 7-3 7-7 0-3-2-5-3-7-1 2-2 3-3 3 0-3-1-6-4-9 0 5-4 7-4 12 0 4 3 8 7 8z"/>',
     phone: '<rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/>',
+    copy: '<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/>',
     shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/>'
   };
   function ico(n) { return P[n] ? S + P[n] + "</svg>" : ""; }
@@ -105,7 +106,8 @@
     while (b.children.length > 2) b.firstChild.remove();
     b.appendChild(el);
     var gone = function () { if (!el.parentNode) return; el.classList.add("out"); setTimeout(function () { el.remove(); }, 320); };
-    el.querySelector(".eu-tc").onclick = gone;
+    el.querySelector(".eu-tc").onclick = function (e) { e.stopPropagation(); gone(); };
+    if (typeof o.onClick === "function") { el.setAttribute("data-click", "1"); el.addEventListener("click", function () { try { o.onClick(); } catch (e) {} gone(); }); }
     var tm = setTimeout(gone, ms);
     el.onmouseenter = function () { clearTimeout(tm); };
     el.onmouseleave = function () { tm = setTimeout(gone, 1400); };
@@ -139,10 +141,66 @@
   }
   function confirmMsg(msg, o) { return dialog(Object.assign({ msg: msg }, o || {})); }
 
+  /* ---------- قائمة خيارات سفلية (مثل واتساب) ---------- */
+  function sheet(o) {
+    return new Promise(function (res) {
+      var ov = document.createElement("div");
+      ov.className = "eu-ov eu-sh";
+      var h = '<div class="eu-sheet" role="dialog" aria-modal="true"><i class="eu-grab"></i>' + (o.title ? '<div class="eu-st"></div>' : "");
+      (o.actions || []).forEach(function (a, i) { h += '<button type="button" class="eu-sb' + (a.danger ? " bad" : "") + '" data-i="' + i + '"><span class="eu-sbi">' + ico(a.icon || "info") + '</span><span class="eu-sbt"></span></button>'; });
+      h += '<button type="button" class="eu-sb cancel" data-i="-1"><span class="eu-sbt"></span></button></div>';
+      ov.innerHTML = h;
+      if (o.title) ov.querySelector(".eu-st").textContent = o.title;
+      var bs = ov.querySelectorAll(".eu-sb");
+      (o.actions || []).forEach(function (a, i) { bs[i].querySelector(".eu-sbt").textContent = a.label; });
+      bs[bs.length - 1].querySelector(".eu-sbt").textContent = o.cancel || "إلغاء";
+      document.body.appendChild(ov);
+      requestAnimationFrame(function () { ov.classList.add("in"); });
+      function done(v) { document.removeEventListener("keydown", key); ov.classList.remove("in"); setTimeout(function () { ov.remove(); }, 260); res(v); }
+      function key(e) { if (e.key === "Escape") done(null); }
+      document.addEventListener("keydown", key);
+      ov.onclick = function (e) { if (e.target === ov) done(null); };
+      ov.querySelectorAll(".eu-sb").forEach(function (b) { b.onclick = function () { var i = +b.getAttribute("data-i"); done(i < 0 ? null : o.actions[i].k); }; });
+    });
+  }
+
+  /* ---------- رسائل المحادثة: فقاعة + قائمة حذف/نسخ (صفحتا الطالب والمعلم) ---------- */
+  function escH(t) { return String(t == null ? "" : t).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function bubble(m, mine, when) {
+    var del = !!m.deleted_for_all;
+    return '<div class="m-b ' + (mine ? "me" : "th") + (del ? " del" : "") + '" data-id="' + escH(m.id) + '">' +
+      (del ? '<span class="m-x">تم حذف هذه الرسالة</span>' : escH(m.body)) +
+      '<small><span>' + escH(when) + '</span><button type="button" class="m-dd" aria-label="خيارات الرسالة">\u22EE</button></small></div>';
+  }
+  function msgMenu(th, o) {
+    if (!th || th._eum) return; th._eum = 1;
+    var timer = null, last = 0;
+    function open(b) {
+      if (!b || Date.now() - last < 700) return; last = Date.now();
+      var id = b.getAttribute("data-id"), m = o.find(id); if (!m) return;
+      var acts = [];
+      if (!m.deleted_for_all) acts.push({ k: "copy", label: "نسخ الرسالة", icon: "copy" });
+      if (!m.deleted_for_all && o.mine(m)) acts.push({ k: "all", label: "حذف للجميع", icon: "trash", danger: true });
+      acts.push({ k: "me", label: "حذف لدي", icon: "x" });
+      sheet({ actions: acts }).then(async function (k) {
+        if (!k) return;
+        if (k === "copy") { try { await navigator.clipboard.writeText(m.body); toast("تم نسخ الرسالة", "ok"); } catch (e) { toast("تعذر النسخ", "warn"); } return; }
+        var all = k === "all";
+        var ok = await dialog({ danger: true, icon: "trash", title: all ? "حذف للجميع؟" : "حذف الرسالة لديك؟",
+          msg: all ? "ستُحذف الرسالة لدى الطرفين ويظهر مكانها «تم حذف هذه الرسالة»." : "ستُحذف من حسابك فقط، وتبقى نسخة الطرف الآخر كما هي.", ok: "حذف", cancel: "إلغاء" });
+        if (ok) o.del(id, k);
+      });
+    }
+    th.addEventListener("click", function (e) { var d = e.target.closest && e.target.closest(".m-dd"); if (d) { e.preventDefault(); open(d.closest(".m-b")); } });
+    th.addEventListener("contextmenu", function (e) { var b = e.target.closest && e.target.closest(".m-b[data-id]"); if (b) { e.preventDefault(); open(b); } });
+    th.addEventListener("touchstart", function (e) { var b = e.target.closest && e.target.closest(".m-b[data-id]"); if (!b) return; clearTimeout(timer); timer = setTimeout(function () { open(b); }, 550); }, { passive: true });
+    ["touchend", "touchmove", "touchcancel"].forEach(function (ev) { th.addEventListener(ev, function () { clearTimeout(timer); }, { passive: true }); });
+  }
+
   /* تحويل أي alert قديم إلى رسالة أنيقة */
   window.alert = function (m) { toast(m, /تعذر|خطأ|فعّل/.test(m) ? "warn" : "info"); };
 
-  window.EduUI = { toast: toast, dialog: dialog, confirm: confirmMsg, ico: ico, polish: polish };
+  window.EduUI = { toast: toast, dialog: dialog, confirm: confirmMsg, ico: ico, polish: polish, sheet: sheet, bubble: bubble, msgMenu: msgMenu };
 
   function start() {
     polish(document.body);
