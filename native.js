@@ -1,4 +1,4 @@
-/* جسر التنبيهات المحلية (Capacitor LocalNotifications) لتطبيق EduAssess Pro
+/* جسر التنبيهات المحلية (Capacitor LocalNotifications) لتطبيق Edu
    يعمل داخل تطبيق أندرويد فقط، بلا Firebase: يجدول مواعيد الاختبارات في منبّه النظام فتصل والتطبيق مغلق. */
 (function () {
   "use strict";
@@ -101,7 +101,7 @@
           try { window.dispatchEvent(new Event("edu-push")); } catch (e) {}
           try {
             if (typeof window.eduPushQuiet === "function" && window.eduPushQuiet()) return;
-            LN.schedule({ notifications: [{ id: Math.floor(Date.now() / 1000) % 2000000000, title: (n && n.title) || "EduAssess Pro", body: (n && n.body) || "", schedule: { at: new Date(Date.now() + 400) }, channelId: CH }] });
+            LN.schedule({ notifications: [{ id: Math.floor(Date.now() / 1000) % 2000000000, title: (n && n.title) || "Edu", body: (n && n.body) || "", schedule: { at: new Date(Date.now() + 400) }, channelId: CH }] });
           } catch (e) {}
         });
         /* الضغط على الإشعار والتطبيق مغلق/في الخلفية: افتح الصفحة المقصودة */
@@ -133,7 +133,7 @@
       if (fail) return;
       var push = function (at, body) {
         if (at.getTime() > now + 2000 && notes.length < MAX)
-          notes.push({ id: id++, title: "EduAssess Pro", body: body, schedule: { at: at, allowWhileIdle: true }, channelId: CH });
+          notes.push({ id: id++, title: "Edu", body: body, schedule: { at: at, allowWhileIdle: true }, channelId: CH });
       };
       var P = function (k) { try { return !window.EduPush || window.EduPush.pref(k, role()); } catch (e) { return true; } };
       list.forEach(function (x) {
@@ -185,7 +185,7 @@
   window.nativePush = async function (body) {
     try {
       if ((await LN.checkPermissions()).display !== "granted") return;
-      await LN.schedule({ notifications: [{ id: 3000 + (Date.now() / 1000 | 0) % 2000000000, title: "EduAssess Pro", body: body, schedule: { at: new Date(Date.now() + 1500), allowWhileIdle: true }, channelId: CH }] });
+      await LN.schedule({ notifications: [{ id: 3000 + (Date.now() / 1000 | 0) % 2000000000, title: "Edu", body: body, schedule: { at: new Date(Date.now() + 1500), allowWhileIdle: true }, channelId: CH }] });
     } catch (e) {}
   };
 
@@ -194,7 +194,7 @@
       if (!(await perm())) { alert("فعّل إذن الإشعارات من إعدادات التطبيق"); return; }
       await channel(); await exact();
       run(true);
-      await LN.schedule({ notifications: [{ id: 999, title: "EduAssess Pro", body: I.msg("ok"), schedule: { at: new Date(Date.now() + 10000), allowWhileIdle: true }, channelId: CH }] });
+      await LN.schedule({ notifications: [{ id: 999, title: "Edu", body: I.msg("ok"), schedule: { at: new Date(Date.now() + 10000), allowWhileIdle: true }, channelId: CH }] });
       var pn = 0; try { pn = (await LN.getPending()).notifications.length; } catch (e) {}
       alert(I.msg("wait") + "\n\n(" + pn + " تنبيه مجدول)");
     } catch (e) { alert("تعذر جدولة التجربة"); }

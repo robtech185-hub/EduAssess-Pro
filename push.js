@@ -1,4 +1,4 @@
-/* EduAssess Pro — عميل الإشعارات (Web Push)
+/* Edu — عميل الإشعارات (Web Push)
    الاستخدام: EduPush.attach(sbClient) بعد تسجيل الدخول، EduPush.detach() قبل الخروج،
    EduPush.mountSettings(element) لعرض زر التفعيل/الإيقاف. */
 (function () {
@@ -218,7 +218,7 @@
       if (configured()) { try { var sub = await subscribe(); linked = await save(sub); } catch (e) {} }
       setStep(3, linked ? "ربط الجهاز بحسابك" : "لم يُربط الجهاز بالخادم (ستعمل التجربة المحلية فقط)", linked ? "ok" : "bad");
       setStep(4, "عرض إشعار تجريبي", "run");
-      await reg.showNotification("EduAssess Pro", {
+      await reg.showNotification("Edu", {
         body: "✅ الإشعارات تعمل بنجاح على هذا الجهاز", icon: "assets/favicon.png", badge: "assets/badge.png",
         lang: "ar", dir: "rtl", tag: "edu-test", renotify: true, vibrate: [120, 60, 120], data: { url: "./" }
       });

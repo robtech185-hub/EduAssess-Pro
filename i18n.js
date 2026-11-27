@@ -1,4 +1,4 @@
-/* EduAssess Pro — اللغة (ar/en/fr) + شاشة البداية: اختيار اللغة ثم الدور (طالب/معلم) */
+/* Edu — اللغة (ar/en/fr) + شاشة البداية: اختيار اللغة ثم الدور (طالب/معلم) */
 (function () {
   "use strict";
   var GATE = document.currentScript && document.currentScript.getAttribute("data-gate") === "1";
@@ -188,7 +188,7 @@
   function screen(step, html) {
     var g = document.getElementById("edu-gate");
     if (!g) { g = document.createElement("div"); g.id = "edu-gate"; g.innerHTML = '<div class="grid"></div><div class="g"></div>'; document.body.appendChild(g); }
-    g.querySelector(".g").innerHTML = '<img class="lg" src="assets/logo-sm.png" alt="EduAssess Pro"><div class="st"><i class="' + (step === 1 ? "on" : "") + '"></i><i class="' + (step === 2 ? "on" : "") + '"></i></div>' + html + '<div class="ft">EduAssess Pro</div>';
+    g.querySelector(".g").innerHTML = '<img class="lg" src="assets/logo-sm.png" alt="Edu"><div class="st"><i class="' + (step === 1 ? "on" : "") + '"></i><i class="' + (step === 2 ? "on" : "") + '"></i></div>' + html + '<div class="ft">Edu</div>';
     return g;
   }
   function pickLang() {

@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Edu — لوحة الأدمن</title>
+<link rel="icon" href="assets/favicon.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--deep:#0A2260;--blue:#1F63E0;--gold:#FFB400;--ink:#0B1633;--mut:#55627F;--line:#E1E8F6;--bg:#F3F6FD;--ok:#0E9F7E;--bad:#D6453D;--warn:#E39B00}
+*{box-sizing:border-box}
+html,body{margin:0;max-width:100%;overflow-x:hidden}
+body{font-family:"IBM Plex Sans Arabic",Tahoma,sans-serif;background:var(--bg);color:var(--ink);font-size:14.5px;line-height:1.6}
+button,input,select,textarea{font-family:inherit;font-size:inherit}
+.hide{display:none!important}
+/* دخول */
+#auth{min-height:100vh;display:grid;place-items:center;padding:20px}
+.box{width:min(100%,400px);background:#fff;border-radius:26px;padding:26px 22px;box-shadow:0 20px 50px rgba(10,34,96,.15)}
+.box h1{margin:0 0 4px;font-size:22px}.box p{margin:0 0 16px;color:var(--mut)}
+label{display:block;font-weight:700;font-size:13px;margin:12px 0 5px}
+input,select,textarea{width:100%;padding:12px 13px;border-radius:13px;border:1.5px solid var(--line);background:#F8FAFE;color:var(--ink);outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--gold);background:#fff}
+textarea{min-height:90px;resize:vertical}
+.btn{border:0;border-radius:13px;padding:11px 16px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,var(--deep),var(--blue));color:#fff;transition:transform .15s}
+.btn:active{transform:scale(.96)}.btn:disabled{opacity:.5}
+.btn.gold{background:linear-gradient(180deg,#FFD15C,var(--gold));color:#2b2007}
+.btn.ghost{background:#EEF2FB;color:var(--mut)}
+.btn.bad{background:var(--bad)}.btn.ok{background:var(--ok)}
+.btn.sm{padding:6px 11px;font-size:12.5px;border-radius:10px}
+.btn.full{width:100%;margin-top:16px;padding:13px}
+.err{color:var(--bad);font-size:13px;margin-top:10px;min-height:18px}
+/* هيكل */
+header{position:sticky;top:0;z-index:30;background:linear-gradient(135deg,#050F2B,var(--deep));color:#fff;padding:calc(10px + env(safe-area-inset-top)) 14px 10px;display:flex;align-items:center;gap:10px}
+header img{width:36px;height:36px;border-radius:11px}
+header h1{margin:0;font-size:17px;flex:1}header h1 small{display:block;font-size:11.5px;font-weight:500;opacity:.7}
+.bk-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:0 0 12px}.bk-stats div{background:#F3F6FD;border-radius:12px;padding:10px 6px;text-align:center}.bk-stats b{display:block;font-size:18px;color:var(--deep)}.bk-stats span{font-size:11.5px;color:var(--mut)}
+.bk-c{display:flex;align-items:center;gap:10px;min-width:200px;white-space:normal}.bkc{position:relative;flex:none;width:40px;height:54px;border-radius:8px;overflow:hidden;background:linear-gradient(145deg,#0A2260,#1F63E0);display:grid;place-items:center;font-size:20px}.bkc img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.bk-tools{flex-wrap:wrap}.md .bk-tools .btn{flex:1 1 40%;padding:10px}
+.bk-d{display:flex;gap:12px;align-items:flex-start;margin:8px 0}.bk-d .bkc{width:64px;height:86px;font-size:30px}.bk-dg{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:8px}.bk-dg span{display:block;font-size:11.5px;color:var(--mut)}.bk-dg b{font-size:13.5px;word-break:break-word}
+@media(max-width:560px){.bk-stats{grid-template-columns:repeat(3,1fr)}.bk-dg{grid-template-columns:1fr}}
+nav{display:flex;gap:6px;overflow-x:auto;padding:10px 12px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:58px;z-index:20;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav button{flex:none;border:0;background:transparent;padding:9px 14px;border-radius:12px;font-weight:700;color:var(--mut);cursor:pointer;position:relative;white-space:nowrap}
+nav button.on{background:var(--deep);color:#fff}
+nav .nb{position:absolute;top:2px;inset-inline-end:2px;min-width:18px;height:18px;border-radius:9px;background:var(--bad);color:#fff;font-size:11px;display:grid;place-items:center;padding:0 4px}
+main{max-width:1100px;margin:0 auto;padding:14px 12px 60px}
+.card{background:#fff;border-radius:20px;border:1px solid var(--line);padding:14px;margin-bottom:14px;box-shadow:0 6px 18px rgba(10,34,96,.05)}
+.card h2{margin:0 0 10px;font-size:17px}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}.tools input,.tools select{flex:1;min-width:140px;width:auto}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px}.stat b{display:block;font-size:24px;color:var(--deep)}.stat span{color:var(--mut);font-size:13px}
+.stat.g{background:linear-gradient(135deg,#FFF8E3,#FFF1C2);border-color:#FFE08A}.stat.g b{color:#7A4A00}
+.tw{overflow-x:auto;border-radius:14px;border:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;background:#fff;min-width:560px}
+th,td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--line);vertical-align:middle}
+th{background:#F6F8FD;color:var(--mut);font-size:12.5px;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td.ac{white-space:nowrap}td.ac .btn{margin-inline-start:4px}
+.tag{display:inline-block;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:700;background:#EEF2FB;color:var(--mut)}
+.tag.ok{background:#DDF0E6;color:var(--ok)}.tag.bad{background:#FBEAE7;color:var(--bad)}.tag.warn{background:#FFF1C9;color:#8A5A00}
+.pos{color:var(--ok);font-weight:700}.neg{color:var(--bad);font-weight:700}
+.empty{text-align:center;color:var(--mut);padding:30px}
+.hint{color:var(--mut);font-size:12.5px;margin:6px 0 0}
+/* نافذة */
+.ov{position:fixed;inset:0;z-index:100;background:rgba(8,18,48,.55);backdrop-filter:blur(5px);display:grid;place-items:center;padding:16px}
+.md{width:min(100%,460px);max-height:92vh;overflow:auto;background:#fff;border-radius:24px;padding:20px}
+.md h3{margin:0 0 4px;font-size:18px}.md .sub{color:var(--mut);margin:0 0 6px}
+.md .row{display:flex;gap:8px;margin-top:16px}.md .row .btn{flex:1;padding:12px}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:200;display:grid;gap:8px}
+.t{background:#0B1633;color:#fff;padding:11px 16px;border-radius:14px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.3)}.t.err{background:var(--bad)}
+@media(max-width:600px){main{padding-inline:8px}.card{padding:10px}}
+</style>
+</head>
+<body>
+
+<div id="auth">
+  <div class="box">
+    <h1>لوحة الأدمن</h1><p>سجّل دخولك بحساب الأدمن لإدارة المنصة.</p>
+    <label>البريد الإلكتروني</label><input id="em" type="email" dir="ltr" autocomplete="username">
+    <label>كلمة المرور</label><input id="pw" type="password" dir="ltr" autocomplete="current-password">
+    <div class="err" id="aerr"></div>
+    <button class="btn full" id="go">دخول</button>
+  </div>
+</div>
+
+<div id="app" class="hide">
+  <header><img src="assets/icon-192.png" alt=""><h1>Edu — لوحة الأدمن<small id="who"></small></h1><button class="btn ghost sm" id="out">خروج</button></header>
+  <nav id="nav"></nav>
+  <main id="main"></main>
+</div>
+<div id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+var CFG=window.EDU_SB||{url:"https://mwyipgbvtiyefazcmofh.supabase.co",key:"sb_publishable_UfPdJwKpbKYyF92Z2YT50Q_A8P8Wsiz"};
+var sb=window.supabase.createClient(CFG.url,CFG.key);
+var $=function(i){return document.getElementById(i)};
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+var NF=new Intl.NumberFormat("en-US",{maximumFractionDigits:2});function money(n){return NF.format(Number(n)||0)}
+function dt(v,t){if(!v)return"—";var d=new Date(v);return d.toLocaleDateString("ar-EG-u-nu-latn",{day:"numeric",month:"short",year:"numeric"})+(t?" "+d.toLocaleTimeString("ar-EG-u-nu-latn",{hour:"2-digit",minute:"2-digit"}):"")}
+function toLocal(v){if(!v)return"";var d=new Date(v),p=function(n){return String(n).padStart(2,"0")};return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())+"T"+p(d.getHours())+":"+p(d.getMinutes())}
+function fromLocal(v){return v?new Date(v).toISOString():null}
+function toast(m,bad){var e=document.createElement("div");e.className="t"+(bad?" err":"");e.textContent=m;$("toast").appendChild(e);setTimeout(function(){e.remove()},3200)}
+function errMsg(e){var t=String(e&&e.message||e||"");return /edu_ads_body_check/i.test(t)?"نص الإعلان غير مقبول: اكتب 5 أحرف على الأقل ولا تتجاوز الحد المسموح":/admin only/i.test(t)?"هذا الحساب ليس أدمن":/insufficient/i.test(t)?"الرصيد غير كافٍ":/permission|policy|row-level/i.test(t)?"لا تملك صلاحية (شغّل admin-ads.sql وتأكد أنك مضاف كأدمن)":t||"حدث خطأ"}
+
+/* نافذة */
+function modal(html,mount){return new Promise(function(res){var o=document.createElement("div");o.className="ov";o.innerHTML='<div class="md">'+html+'</div>';document.body.appendChild(o);
+ function close(v){o.remove();res(v)}o.addEventListener("click",function(e){if(e.target===o)close(null)});mount&&mount(o.querySelector(".md"),close)})}
+function ask(title,msg,ok,danger){return modal('<h3>'+esc(title)+'</h3><p class="sub">'+esc(msg)+'</p><div class="row"><button class="btn '+(danger?"bad":"")+'" id="y">'+esc(ok||"تأكيد")+'</button><button class="btn ghost" id="n">إلغاء</button></div>',function(m,c){m.querySelector("#y").onclick=function(){c(true)};m.querySelector("#n").onclick=function(){c(false)}}).then(function(v){return!!v})}
+/* نموذج: fields=[{k,l,t,v,opts}] */
+function form(title,fields,okLabel,sub){var h='<h3>'+esc(title)+'</h3>'+(sub?'<p class="sub">'+sub+'</p>':'');
+ fields.forEach(function(f){h+='<label>'+esc(f.l)+'</label>';
+  if(f.t==="select")h+='<select data-k="'+f.k+'">'+f.opts.map(function(o){return'<option value="'+esc(o[0])+'"'+(String(o[0])===String(f.v)?" selected":"")+'>'+esc(o[1])+'</option>'}).join("")+'</select>';
+  else if(f.t==="textarea")h+='<textarea data-k="'+f.k+'">'+esc(f.v||"")+'</textarea>';
+  else h+='<input data-k="'+f.k+'" type="'+(f.t||"text")+'" value="'+esc(f.v==null?"":f.v)+'"'+(f.dir?' dir="ltr"':"")+(f.step?' step="'+f.step+'"':"")+'>'});
+ h+='<div class="err" id="fe"></div><div class="row"><button class="btn" id="y">'+esc(okLabel||"حفظ")+'</button><button class="btn ghost" id="n">إلغاء</button></div>';
+ return modal(h,function(m,c){m.querySelector("#n").onclick=function(){c(null)};m.querySelector("#y").onclick=function(){var o={};m.querySelectorAll("[data-k]").forEach(function(i){o[i.dataset.k]=i.value});c(o)}})}
+
+/* ---------------- بيانات مشتركة ---------------- */
+var T=[],S=[],NAME={};
+async function loadPeople(){
+ var a=await sb.from("teachers").select("*"),b=await sb.from("student_profiles").select("*");
+ T=a.data||[];S=b.data||[];NAME={};T.forEach(function(x){NAME[x.id]=x.full_name});S.forEach(function(x){NAME[x.user_id]=x.full_name});
+ return a.error||b.error}
+function nm(id){return NAME[id]||"—"}
+
+/* ---------------- الواجهة ---------------- */
+var TABS=[["dash","الرئيسية"],["teachers","المعلمون"],["students","الطلاب"],["ads","الإعلانات"],["courses","الكورسات"],["library","إدارة المكتبة"],["admins","الأدمن"]];
+var cur="dash",badges={};
+function drawNav(){$("nav").innerHTML=TABS.map(function(t){return'<button data-t="'+t[0]+'" class="'+(t[0]===cur?"on":"")+'">'+t[1]+(badges[t[0]]?'<span class="nb">'+badges[t[0]]+'</span>':"")+'</button>'}).join("");
+ $("nav").querySelectorAll("button").forEach(function(b){b.onclick=function(){go(b.dataset.t)}})}
+async function go(t){cur=t;drawNav();$("main").innerHTML='<div class="empty">جارٍ التحميل…</div>';
+ try{await VIEWS[t]($("main"))}catch(e){$("main").innerHTML='<div class="card empty">'+esc(errMsg(e))+'</div>'}}
+function table(cols,rows,empty){if(!rows.length)return'<div class="empty">'+esc(empty||"لا توجد بيانات")+'</div>';
+ return'<div class="tw"><table><thead><tr>'+cols.map(function(c){return'<th>'+c+'</th>'}).join("")+'</tr></thead><tbody>'+rows.join("")+'</tbody></table></div>'}
+function filterBox(ph,extra){return'<div class="tools"><input id="q" placeholder="'+esc(ph||"بحث…")+'">'+(extra||"")+'</div>'}
+function bindFilter(main,fn){var q=main.querySelector("#q");q.oninput=function(){fn(q.value.trim().toLowerCase())}}
+async function refreshBadges(){try{var pc=await sb.from("edu_books").select("id",{count:"exact",head:true}).eq("status","pending");if(!pc.error)badges.library=pc.count||0}catch(e){}
+ try{var r=await sb.rpc("edu_admin_stats");if(r.data){badges.reqs=r.data.pending_requests||0;badges.ads=r.data.pending_ads||0;drawNav();return r.data}}catch(e){}}
+
+var VIEWS={};
+
+/* الرئيسية */
+VIEWS.dash=async function(m){
+ var r=await sb.rpc("edu_admin_stats");if(r.error)throw r.error;var d=r.data||{};drawNav();
+ var c=function(n,l){return'<div class="stat"><b>'+n+'</b><span>'+l+'</span></div>'};
+ m.innerHTML='<div class="card"><h2>ملخص المنصة</h2><p class="hint">متابعة المستخدمين والمحتوى التعليمي والخدمات المجانية.</p><div class="stats">'+c(d.teachers||0,"معلم")+c(d.students||0,"طالب")+c(d.active_subs||0,"اشتراك معلم فعّال")+c(d.trial||0,"في التجربة المجانية")+c(d.courses||0,"كورس منشور")+'</div></div>'+
+ '<div class="card"><h2>الخدمات المجانية</h2><div class="stats">'+c("مجاني","الكورسات")+c("مجاني","الكتب والمكتبة")+c("مجاني","الشهادات الإلكترونية")+'</div></div>'+
+ '<div class="card"><h2>إدارة المنصة</h2><p class="hint">يمكنك إدارة حسابات المعلمين والطلاب، ومراجعة الإعلانات، ومتابعة الكورسات والكتب من الأقسام المخصصة.</p></div>';
+};
+
+/* المعلمون */
+VIEWS.teachers=async function(m){var e=await loadPeople();if(e)throw e;
+ function draw(f){var rows=T.filter(function(x){return!f||(x.full_name+" "+x.email+" "+x.whatsapp).toLowerCase().includes(f)}).map(function(x){
+  var sub=x.subscription_ends_at&&new Date(x.subscription_ends_at)>new Date(),tr=x.trial_ends_at&&new Date(x.trial_ends_at)>new Date();
+  return'<tr><td><b>'+esc(x.full_name)+'</b><div class="hint" dir="ltr" style="text-align:right">'+esc(x.email)+'</div></td><td dir="ltr" style="text-align:right">'+esc(x.whatsapp)+'</td><td>'+esc(x.country)+'</td>'+
+  '<td>'+(sub?'<span class="tag ok">مشترك حتى '+dt(x.subscription_ends_at)+'</span>':tr?'<span class="tag warn">تجربة حتى '+dt(x.trial_ends_at)+'</span>':'<span class="tag bad">منتهٍ</span>')+'</td>'+
+  '<td class="ac"><button class="btn sm" data-e="'+esc(x.id)+'">تعديل</button><button class="btn sm bad" data-d="'+esc(x.id)+'">حذف</button></td></tr>'});
+  m.querySelector("#list").innerHTML=table(["المعلم","واتساب","الدولة","الاشتراك",""],rows,"لا يوجد معلمون");bind()}
+ function bind(){var by=function(id){return T.find(function(x){return x.id===id})};
+  m.querySelectorAll("[data-e]").forEach(function(b){b.onclick=async function(){var x=by(b.dataset.e);
+   var o=await form("تعديل معلم",[{k:"full_name",l:"الاسم",v:x.full_name},{k:"whatsapp",l:"واتساب",v:x.whatsapp,dir:1},{k:"country",l:"الدولة",v:x.country},{k:"trial_ends_at",l:"انتهاء التجربة",t:"datetime-local",v:toLocal(x.trial_ends_at)},{k:"subscription_ends_at",l:"انتهاء الاشتراك",t:"datetime-local",v:toLocal(x.subscription_ends_at)}],"حفظ","يمكنك تمديد الاشتراك بتغيير تاريخ الانتهاء.");
+   if(!o)return;var u={full_name:o.full_name,whatsapp:o.whatsapp,country:o.country,trial_ends_at:fromLocal(o.trial_ends_at),subscription_ends_at:fromLocal(o.subscription_ends_at)};
+   var r=await sb.from("teachers").update(u).eq("id",x.id);r.error?toast(errMsg(r.error),1):(toast("تم الحفظ"),go("teachers"))}});
+
+  m.querySelectorAll("[data-d]").forEach(function(b){b.onclick=function(){delUser(b.dataset.d,"teachers")}})}
+ m.innerHTML='<div class="card"><h2>المعلمون ('+T.length+')</h2>'+filterBox("بحث بالاسم أو البريد أو الواتساب")+'<div id="list"></div><p class="hint">إنشاء حساب جديد يتم من صفحة تسجيل المعلم؛ هنا تدير الموجود (تعديل بيانات الحساب والاشتراك أو الحذف).</p></div>';
+ bindFilter(m,draw);draw("")};
+
+/* الطلاب */
+VIEWS.students=async function(m){var e=await loadPeople();if(e)throw e;
+ function draw(f){var rows=S.filter(function(x){return!f||(x.full_name+" "+x.email+" "+x.whatsapp).toLowerCase().includes(f)}).map(function(x){
+  return'<tr><td><b>'+esc(x.full_name)+'</b><div class="hint" dir="ltr" style="text-align:right">'+esc(x.email)+'</div></td><td dir="ltr" style="text-align:right">'+esc(x.whatsapp)+'</td>'+
+  '<td class="ac"><button class="btn sm" data-e="'+esc(x.user_id)+'">تعديل</button><button class="btn sm bad" data-d="'+esc(x.user_id)+'">حذف</button></td></tr>'});
+  m.querySelector("#list").innerHTML=table(["الطالب","واتساب",""],rows,"لا يوجد طلاب");bind()}
+ function bind(){m.querySelectorAll("[data-e]").forEach(function(b){b.onclick=async function(){var x=S.find(function(s){return s.user_id===b.dataset.e});
+   var o=await form("تعديل طالب",[{k:"full_name",l:"الاسم",v:x.full_name},{k:"whatsapp",l:"واتساب",v:x.whatsapp,dir:1}]);if(!o)return;
+   var r=await sb.from("student_profiles").update({full_name:o.full_name,whatsapp:o.whatsapp}).eq("user_id",x.user_id);r.error?toast(errMsg(r.error),1):(toast("تم الحفظ"),go("students"))}});
+
+  m.querySelectorAll("[data-d]").forEach(function(b){b.onclick=function(){delUser(b.dataset.d,"students")}})}
+ m.innerHTML='<div class="card"><h2>الطلاب ('+S.length+')</h2>'+filterBox("بحث بالاسم أو البريد أو الواتساب")+'<div id="list"></div></div>';
+ bindFilter(m,draw);draw("")};
+
+async function walletAdjust(id,role,back){
+ var o=await form("تعديل الرصيد — "+nm(id),[{k:"amount",l:"المبلغ بالجنيه (موجب للإضافة، سالب للخصم)",t:"number",step:"0.01",dir:1},{k:"title",l:"السبب",v:"تسوية من الإدارة"}],"تنفيذ","تُسجَّل العملية في جدول المعاملات.");
+ if(!o)return;var a=Number(o.amount);if(!a)return toast("اكتب مبلغًا صحيحًا",1);
+ var r=await sb.rpc("edu_admin_wallet",{p_user:id,p_role:role,p_amount:a,p_title:o.title});r.error?toast(errMsg(r.error),1):(toast("تم تحديث الرصيد"),go(back))}
+async function delUser(id,back){
+ if(!await ask("حذف نهائي","سيُحذف "+nm(id)+" وكل بياناته ولا يمكن التراجع.","حذف نهائي",1))return;
+ var r=await sb.rpc("edu_admin_delete_user",{p_user:id});r.error?toast(errMsg(r.error),1):(toast("تم الحذف"),go(back))}
+
+/* الطلبات المالية */
+VIEWS.reqs=async function(m){await loadPeople();
+ var r=await sb.from("edu_wallet_requests").select("*").order("created_at",{ascending:false}).limit(300);if(r.error)throw r.error;var L=r.data||[];
+ function draw(st){var rows=L.filter(function(x){return st==="all"||x.status===st}).map(function(x){
+  var tg={pending:["warn","معلّق"],done:["ok","مكتمل"],rejected:["bad","مرفوض"]}[x.status]||["","—"];
+  return'<tr><td><b>'+esc(x.user_name||nm(x.user_id))+'</b><div class="hint">'+(x.role==="teacher"?"معلم":"طالب")+'</div></td><td>'+(x.type==="topup"?'<span class="tag ok">إضافة رصيد</span>':'<span class="tag warn">سحب رصيد</span>')+'</td><td><b>'+money(x.amount)+' ج.م</b></td><td>'+dt(x.created_at,1)+'</td><td><span class="tag '+tg[0]+'">'+tg[1]+'</span></td><td class="ac">'+(x.status==="pending"?'<button class="btn sm ok" data-a="'+esc(x.id)+'">قبول</button><button class="btn sm bad" data-r="'+esc(x.id)+'">رفض</button>':"")+'</td></tr>'});
+  m.querySelector("#list").innerHTML=table(["المستخدم","النوع","المبلغ","التاريخ","الحالة",""],rows,"لا توجد طلبات");
+  m.querySelectorAll("[data-a],[data-r]").forEach(function(b){b.onclick=async function(){var ok=!!b.dataset.a,id=b.dataset.a||b.dataset.r;
+   if(!await ask(ok?"قبول الطلب":"رفض الطلب",ok?"سيُنفَّذ التغيير على الرصيد ويُسجَّل في المعاملات (تأكد من استلام التحويل أولًا).":"سيُرفض الطلب دون تغيير الرصيد.",ok?"قبول":"رفض",!ok))return;
+   var x=await sb.rpc("edu_admin_resolve_req",{p_req:id,p_ok:ok});x.error?toast(errMsg(x.error),1):(toast("تم"),go("reqs"))}})}
+ m.innerHTML='<div class="card"><h2>طلبات الشحن والسحب</h2><div class="tools"><select id="st"><option value="pending">المعلّقة</option><option value="all">الكل</option><option value="done">المكتملة</option><option value="rejected">المرفوضة</option></select></div><div id="list"></div></div>';
+ m.querySelector("#st").onchange=function(e){draw(e.target.value)};draw("pending")};
+
+/* المعاملات */
+var KN={topup:"إضافة رصيد",withdraw:"سحب رصيد",course_purchase:"شراء كورس",course_sale:"أرباح كورس",subscription:"اشتراك معلم",adjust:"تسوية إدارة",ad:"إعلان",refund:"استرداد",book_purchase:"شراء كتاب",book_sale:"أرباح كتاب"};
+VIEWS.tx=async function(m){await loadPeople();
+ var r=await sb.from("edu_wallet_transactions").select("*").order("created_at",{ascending:false}).limit(500);if(r.error)throw r.error;var L=r.data||[];
+ function draw(k,f){var rows=L.filter(function(x){return(k==="all"||x.kind===k)&&(!f||(nm(x.user_id)+" "+(x.title||"")).toLowerCase().includes(f))}).map(function(x){
+  return'<tr><td>'+dt(x.created_at,1)+'</td><td><b>'+esc(nm(x.user_id))+'</b><div class="hint">'+(x.role==="teacher"?"معلم":"طالب")+'</div></td><td><span class="tag">'+(KN[x.kind]||x.kind)+'</span></td><td class="'+(x.amount>=0?"pos":"neg")+'">'+(x.amount>=0?"+":"−")+money(Math.abs(x.amount))+'</td><td>'+money(x.balance_after)+'</td><td>'+esc(x.title)+'</td></tr>'});
+  m.querySelector("#list").innerHTML=table(["التاريخ","المستخدم","النوع","المبلغ","الرصيد بعدها","البيان"],rows,"لا توجد معاملات")}
+ m.innerHTML='<div class="card"><h2>سجل المعاملات المالية (آخر 500)</h2>'+filterBox("بحث بالاسم أو البيان",'<select id="k"><option value="all">كل الأنواع</option>'+Object.keys(KN).map(function(k){return'<option value="'+k+'">'+KN[k]+'</option>'}).join("")+'</select>')+'<div id="list"></div></div>';
+ var f=function(){draw(m.querySelector("#k").value,m.querySelector("#q").value.trim().toLowerCase())};m.querySelector("#k").onchange=f;m.querySelector("#q").oninput=f;f()};
+
+/* أرباح المنصة */
+var RN={course_commission:"عمولة كورس (30%)",subscription:"اشتراك معلم",ad:"إعلان",book_commission:"عمولة كتاب (50%)"};
+VIEWS.rev=async function(m){await loadPeople();
+ var r=await sb.from("edu_platform_revenue").select("*").order("created_at",{ascending:false}).limit(500);if(r.error)throw r.error;var L=r.data||[],tot={};L.forEach(function(x){tot[x.kind]=(tot[x.kind]||0)+Number(x.amount)});
+ var sum=L.reduce(function(a,x){return a+Number(x.amount)},0);
+ var rows=L.map(function(x){return'<tr><td>'+dt(x.created_at,1)+'</td><td><span class="tag">'+(RN[x.kind]||x.kind)+'</span></td><td>'+esc(nm(x.user_id))+'</td><td>'+esc(x.title)+'</td><td class="pos">+'+money(x.amount)+'</td></tr>'});
+ m.innerHTML='<div class="stats" style="margin-bottom:14px"><div class="stat g"><b>'+money(sum)+' ج.م</b><span>إجمالي الأرباح (آخر 500 عملية)</span></div>'+Object.keys(RN).map(function(k){return'<div class="stat"><b>'+money(tot[k]||0)+'</b><span>'+RN[k]+'</span></div>'}).join("")+'</div><div class="card"><h2>سجل أرباح المنصة</h2>'+table(["التاريخ","النوع","من","البيان","المبلغ"],rows,"لا توجد أرباح بعد")+'</div>'};
+
+/* الإعلانات */
+function hl(h){var p=h>=12?"م":"ص";return(h%12||12)+":00 "+p}
+VIEWS.ads=async function(m){
+ var r=await sb.from("edu_ads").select("*").order("created_at",{ascending:false}).limit(300);if(r.error)throw r.error;var L=r.data||[];
+ var TG={pending:["warn","بانتظار المراجعة"],approved:["ok","معتمد"],rejected:["bad","مرفوض"],cancelled:["","ملغى"]};
+ var rows=L.map(function(x){var tg=TG[x.status]||["",x.status];
+  return'<tr><td><b>'+esc(x.teacher_name||"Edu")+'</b><div class="hint">'+dt(x.created_at)+'</div></td><td style="min-width:220px;white-space:normal"><b>'+esc(x.title)+'</b><div>'+esc(x.body)+'</div></td><td>'+dt(x.start_date)+' • '+x.days+' يوم<div class="hint">الساعة '+hl(x.show_hour)+'</div></td><td>'+money(x.price)+' ج.م</td><td><span class="tag '+tg[0]+'">'+tg[1]+'</span>'+(x.note?'<div class="hint">'+esc(x.note)+'</div>':"")+'</td>'+
+  '<td class="ac">'+(x.status==="pending"?'<button class="btn sm ok" data-a="'+x.id+'">قبول</button><button class="btn sm bad" data-r="'+x.id+'">رفض</button>':"")+'<button class="btn sm" data-e="'+x.id+'">تعديل</button><button class="btn sm ghost" data-d="'+x.id+'">حذف</button></td></tr>'});
+ m.innerHTML='<div class="card"><div class="tools"><h2 style="margin:0;flex:1">الإعلانات</h2><button class="btn gold" id="new">إعلان رسمي جديد</button></div>'+table(["المعلم","الرسالة","الموعد","السعر","الحالة",""],rows,"لا توجد إعلانات")+'<p class="hint">الإعلان المعتمد يظهر لكل الطلاب من حساب «Edu» الرسمي في الساعة المحددة. الرفض يسترد المبلغ للمعلم تلقائيًا.</p></div>';
+ var by=function(id){return L.find(function(x){return x.id===id})};
+ m.querySelectorAll("[data-a]").forEach(function(b){b.onclick=async function(){if(!await ask("قبول الإعلان","سيظهر للطلاب في موعده، ويُسجَّل المبلغ ربحًا للمنصة.","قبول"))return;var x=await sb.rpc("edu_admin_review_ad",{p_ad:b.dataset.a,p_ok:true});x.error?toast(errMsg(x.error),1):(toast("تم القبول"),go("ads"))}});
+ m.querySelectorAll("[data-r]").forEach(function(b){b.onclick=async function(){var o=await form("رفض الإعلان",[{k:"note",l:"سبب الرفض (يراه المعلم)",v:""}],"رفض واسترداد المبلغ");if(!o)return;var x=await sb.rpc("edu_admin_review_ad",{p_ad:b.dataset.r,p_ok:false,p_note:o.note});x.error?toast(errMsg(x.error),1):(toast("تم الرفض والاسترداد"),go("ads"))}});
+ m.querySelectorAll("[data-e]").forEach(function(b){b.onclick=async function(){var x=by(b.dataset.e);var o=await form("تعديل الإعلان",[{k:"title",l:"العنوان",v:x.title},{k:"body",l:"النص",t:"textarea",v:x.body},{k:"start_date",l:"تاريخ البدء",t:"date",v:x.start_date},{k:"days",l:"الأيام",t:"number",v:x.days},{k:"show_hour",l:"الساعة (0–23 بتوقيت القاهرة)",t:"number",v:x.show_hour}]);if(!o)return;
+   if(String(o.body||"").trim().length<5)return toast("نص الرسالة قصير (5 أحرف على الأقل)",1);
+   var u=await sb.from("edu_ads").update({title:o.title,body:o.body,start_date:o.start_date,days:+o.days,show_hour:+o.show_hour}).eq("id",x.id);u.error?toast(errMsg(u.error),1):(toast("تم الحفظ"),go("ads"))}});
+ m.querySelectorAll("[data-d]").forEach(function(b){b.onclick=async function(){if(!await ask("حذف الإعلان","لن يظهر للطلاب بعد الآن. (لا يُسترد المبلغ تلقائيًا — استخدم الرفض للاسترداد.)","حذف",1))return;var x=await sb.from("edu_ads").delete().eq("id",b.dataset.d);x.error?toast(errMsg(x.error),1):(toast("تم الحذف"),go("ads"))}});
+ m.querySelector("#new").onclick=async function(){var t=new Date().toISOString().slice(0,10);
+  var o=await form("إعلان رسمي من Edu",[{k:"title",l:"العنوان (اختياري)"},{k:"body",l:"نص الرسالة",t:"textarea"},{k:"start_date",l:"تاريخ البدء",t:"date",v:t},{k:"days",l:"عدد الأيام",t:"number",v:1},{k:"show_hour",l:"الساعة (0–23 بتوقيت القاهرة)",t:"number",v:18}],"نشر الآن","يُعتمد فورًا ودون أي رسوم.");if(!o)return;
+  if(String(o.body||"").trim().length<5)return toast("اكتب نص الرسالة (5 أحرف على الأقل)",1);
+  var x=await sb.rpc("edu_admin_create_ad",{p_title:o.title,p_body:o.body,p_start:o.start_date,p_days:+o.days,p_hour:+o.show_hour});x.error?toast(errMsg(x.error),1):(toast("تم النشر"),go("ads"))}};
+
+/* الكورسات */
+VIEWS.courses=async function(m){
+ var r=await sb.from("edu_courses").select("*").order("created_at",{ascending:false}).limit(300);if(r.error)throw r.error;var L=r.data||[];
+ var rows=L.map(function(x){return'<tr><td><b>'+esc(x.title)+'</b><div class="hint">'+esc(x.subject)+' • '+esc(x.level)+'</div></td><td>'+esc(x.teacher_name)+'</td><td>'+(x.published?'<span class="tag ok">منشور</span>':'<span class="tag">مسودة</span>')+'</td><td class="ac"><button class="btn sm" data-p="'+x.id+'">'+(x.published?"إيقاف":"نشر")+'</button><button class="btn sm" data-e="'+x.id+'">تعديل</button><button class="btn sm bad" data-d="'+x.id+'">حذف</button></td></tr>'});
+ m.innerHTML='<div class="card"><h2>الكورسات ('+L.length+')</h2>'+table(["الكورس","المعلم","الحالة",""],rows,"لا توجد كورسات")+'</div>';
+ var by=function(id){return L.find(function(x){return x.id===id})};
+ m.querySelectorAll("[data-p]").forEach(function(b){b.onclick=async function(){var x=by(b.dataset.p),u=await sb.from("edu_courses").update({published:!x.published}).eq("id",x.id);u.error?toast(errMsg(u.error),1):go("courses")}});
+ m.querySelectorAll("[data-e]").forEach(function(b){b.onclick=async function(){var x=by(b.dataset.e),o=await form("تعديل كورس",[{k:"title",l:"العنوان",v:x.title},{k:"subject",l:"المادة",v:x.subject},{k:"level",l:"المرحلة",v:x.level}]);if(!o)return;
+   var u=await sb.from("edu_courses").update({title:o.title,price:0,subject:o.subject,level:o.level}).eq("id",x.id);u.error?toast(errMsg(u.error),1):(toast("تم الحفظ"),go("courses"))}});
+ m.querySelectorAll("[data-d]").forEach(function(b){b.onclick=async function(){if(!await ask("حذف الكورس","سيُحذف الكورس واشتراكات الطلاب فيه.","حذف",1))return;var u=await sb.from("edu_courses").delete().eq("id",b.dataset.d);u.error?toast(errMsg(u.error),1):(toast("تم الحذف"),go("courses"))}})};
+
+
+/* ---------- إدارة المكتبة (الخطوة 13: عرض كل الكتب وبياناتها وحالاتها) ---------- */
+var BK_CAT={};var BK_ST={pending:["warn","قيد المراجعة"],approved:["ok","منشور"],rejected:["bad","مرفوض"],hidden:["","مخفي"]};
+var BK_REASON=["reject_reason","rejection_reason","rejected_reason","review_note","admin_note","reject_note","review_reason","note"];
+function bkKey(b){var s=String(b.status||"").toLowerCase();return s==="approved"||s==="published"?"approved":s==="rejected"||s==="declined"?"rejected":s==="hidden"||s==="archived"||s==="unpublished"?"hidden":"pending"}
+function bkReason(b){for(var i=0;i<BK_REASON.length;i++){var v=b[BK_REASON[i]];if(v!=null&&String(v).trim())return String(v).trim()}return""}
+function bkTs(b){var d=b.created_at||b.submitted_at||b.updated_at;var t=d?new Date(d).getTime():0;return t||0}
+function bkCover(b){var u=String(b.cover_url||""),e=String(b.cover_icon||"").split("|")[0]||"📘";return'<div class="bkc"><span>'+esc(e)+'</span>'+(/^https:\/\//i.test(u)?'<img src="'+esc(u)+'" alt="" loading="lazy">':"")+'</div>'}
+function bkPrice(b){return "مجاني"}
+VIEWS.library=async function(m){await loadPeople();
+ var r=await sb.from("edu_books").select("*").limit(1000);if(r.error)throw r.error;
+ var L=(r.data||[]).slice().sort(function(x,y){return bkTs(y)-bkTs(x)});
+ var cr=await sb.from("edu_book_categories").select("id,name,icon"),CAT={};(cr.data||[]).forEach(function(c){CAT[String(c.id)]=(c.icon?c.icon+" ":"")+c.name});BK_CAT=CAT;
+ var n={all:L.length,pending:0,approved:0,rejected:0,hidden:0},sold=0;L.forEach(function(b){n[bkKey(b)]++;sold+=Number(b.sales_count)||0});
+ var catName=function(b){return CAT[String(b.category_id)]||"—"};
+ var catOpts='<option value="all">كل التخصصات</option>'+Object.keys(CAT).map(function(k){return'<option value="'+esc(k)+'">'+esc(CAT[k])+'</option>'}).join("");
+ m.innerHTML='<div class="card"><h2>إدارة المكتبة ('+L.length+')</h2>'+
+  '<div class="bk-stats"><div><b>'+n.pending+'</b><span>قيد المراجعة</span></div><div><b>'+n.approved+'</b><span>منشور</span></div><div><b>'+n.rejected+'</b><span>مرفوض</span></div><div><b>'+n.hidden+'</b><span>مخفي</span></div><div><b>'+sold+'</b><span>عمليات شراء</span></div></div>'+
+  '<div class="tools"><input id="q" placeholder="بحث باسم الكتاب أو الناشر أو المعلم…"><select id="st"><option value="all">كل الحالات</option><option value="pending">قيد المراجعة</option><option value="approved">منشور</option><option value="rejected">مرفوض</option><option value="hidden">مخفي</option></select><select id="cat">'+catOpts+'</select></div>'+
+  '<div id="list"></div></div>';
+ var by=function(id){return L.find(function(x){return String(x.id)===String(id)})};
+ function draw(){var q=m.querySelector("#q").value.trim().toLowerCase(),st=m.querySelector("#st").value,ct=m.querySelector("#cat").value;
+  var F=L.filter(function(b){return(st==="all"||bkKey(b)===st)&&(ct==="all"||String(b.category_id)===ct)&&(!q||(String(b.title||"")+" "+String(b.publisher||"")+" "+nm(b.teacher_id)).toLowerCase().indexOf(q)>=0)});
+  var rows=F.map(function(b){var k=bkKey(b),tg=BK_ST[k],rs=k==="rejected"?bkReason(b):"";
+   return'<tr><td><div class="bk-c">'+bkCover(b)+'<div><b>'+esc(b.title||"بدون عنوان")+'</b><div class="hint">'+esc(catName(b))+'</div></div></div></td><td>'+esc(nm(b.teacher_id))+'</td><td>'+esc(b.publisher||"—")+'</td><td>'+bkPrice(b)+'</td><td><span class="tag '+tg[0]+'">'+tg[1]+'</span>'+(rs?'<div class="hint">'+esc(rs)+'</div>':"")+'</td><td>'+(Number(b.sales_count)||0)+'</td><td>'+dt(bkTs(b)||null)+'</td><td class="ac"><button class="btn sm'+(k==="pending"?" gold":"")+'" data-v="'+esc(String(b.id))+'">'+(k==="pending"?"مراجعة":"إدارة")+'</button></td></tr>'});
+  m.querySelector("#list").innerHTML=table(["الكتاب","المعلم","الناشر","السعر","الحالة","المبيعات","التاريخ",""],rows,L.length?"لا توجد كتب مطابقة للبحث":"لا توجد كتب بعد. إن كنت متأكدًا من وجود كتب فتأكد من سياسة قراءة الأدمن (library-13-admin-read.sql).");
+  m.querySelectorAll("[data-v]").forEach(function(btn){btn.onclick=function(){bkDetails(by(btn.dataset.v),catName)}})}
+ m.querySelector("#q").oninput=draw;m.querySelector("#st").onchange=draw;m.querySelector("#cat").onchange=draw;
+ m.addEventListener("error",function(e){if(e.target&&e.target.tagName==="IMG")e.target.remove()},true);draw()};
+function bkDetails(b,catName){if(!b)return;var k=bkKey(b),tg=BK_ST[k],rs=bkReason(b),pdf=String(b.pdf_url||"");
+ var rows=[["المعلم",nm(b.teacher_id)],["التخصص",catName(b)],["الناشر",b.publisher||"—"],["السعر",bkPrice(b)],["الحالة",tg[1]],["عمليات الشراء",Number(b.sales_count)||0],["تاريخ الإرسال",dt(bkTs(b)||null,1)]];
+ if(rs)rows.push(["سبب الرفض",rs]);
+ var h='<h3>'+esc(b.title||"بدون عنوان")+'</h3><div class="bk-d">'+bkCover(b)+'<div class="bk-dg">'+rows.map(function(x){return'<div><span>'+esc(x[0])+'</span><b>'+esc(String(x[1]))+'</b></div>'}).join("")+'</div></div>'+
+  '<label>الوصف</label><p class="sub" style="white-space:pre-wrap">'+esc(b.description||"لا يوجد وصف")+'</p>'+
+  '<label>رابط الكتاب (PDF)</label>'+(/^https:\/\//i.test(pdf)?'<p class="sub" dir="ltr" style="text-align:right;word-break:break-all"><a href="'+esc(pdf)+'" target="_blank" rel="noopener noreferrer">'+esc(pdf)+'</a></p>':'<p class="sub">'+(pdf?"رابط غير صالح (لا يبدأ بـ https)":"لا يوجد رابط")+'</p>')+
+  '<label>إدارة الكتاب</label><div class="row bk-tools"><button class="btn sm" id="te">تعديل البيانات</button>'+(k==="approved"?'<button class="btn sm" id="th">إخفاء</button>':k==="hidden"?'<button class="btn sm" id="th">إظهار</button>':'')+'<button class="btn sm bad" id="td">حذف</button></div>'+
+  '<div class="row">'+(k==="pending"||k==="rejected"?'<button class="btn ok" id="ap">قبول ونشر</button>':'')+(k==="pending"?'<button class="btn bad" id="rj">رفض</button>':'')+'<button class="btn ghost" id="n">إغلاق</button></div>';
+ modal(h,function(m,c){m.querySelector("#n").onclick=function(){c(null)};
+  var ap=m.querySelector("#ap"),rj=m.querySelector("#rj");
+  if(ap)ap.onclick=function(){c(null);bkReview(b,true)};
+  if(rj)rj.onclick=function(){c(null);bkReview(b,false)};
+  var on=function(id,fn){var e=m.querySelector("#"+id);if(e)e.onclick=function(){c(null);fn(b)}};
+  on("te",bkEdit);on("th",bkToggle);on("td",bkDelete)})}
+/* الخطوة 15: أدوات إدارة الكتب (تعديل البيانات / السعر / إخفاء-إظهار / حذف) */
+function bkNum(v){return String(v==null?"":v).replace(/[\u0660-\u0669]/g,function(d){return d.charCodeAt(0)-0x660}).replace(/[\u06F0-\u06F9]/g,function(d){return d.charCodeAt(0)-0x6F0}).replace(/\u066B/g,".").trim()}
+function bkPriceErr(v){var n=v===""?NaN:Number(v);return!isFinite(n)||n<0?"اكتب سعرًا صحيحًا (0 للمجاني)":n>5000?"أقصى سعر 5000 ج.م":Math.round(n*100)!==n*100?"خانتان عشريتان كحد أقصى":""}
+function bkFail(e){var t=String(e&&e.message||"");return/foreign key|violates foreign/i.test(t)?"لا يمكن حذف كتاب له مشتريات أو سجلات مرتبطة. أخفِه بدلًا من ذلك.":/permission|policy|row-level/i.test(t)?"لا تملك صلاحية: شغّل library-15-admin-manage.sql":errMsg(e)}
+async function bkSave(b,p,msg){if("updated_at" in b)p.updated_at=new Date().toISOString();
+ var r=await sb.from("edu_books").update(p).eq("id",b.id).select("id");
+ if(r.error)return toast(bkFail(r.error),1);
+ if(!r.data||!r.data.length)return toast("لم يُحفظ التغيير: تحقق من صلاحية التحديث (library-15-admin-manage.sql)",1);
+ toast(msg);refreshBadges();go("library")}
+async function bkEdit(b){var v={title:b.title||"",description:b.description||"",publisher:b.publisher||"",category_id:b.category_id==null?"":String(b.category_id),price:0,pdf_url:b.pdf_url||""},ck=Object.keys(BK_CAT);
+ for(;;){var f=[{k:"title",l:"اسم الكتاب",v:v.title},{k:"description",l:"الوصف",t:"textarea",v:v.description},{k:"publisher",l:"الناشر",v:v.publisher}];
+  if(ck.length)f.push({k:"category_id",l:"التخصص",t:"select",opts:[["","— بدون —"]].concat(ck.map(function(k){return[k,BK_CAT[k]]})),v:v.category_id});
+  f.push({k:"pdf_url",l:"رابط PDF",v:v.pdf_url,dir:1});
+  var o=await form("تعديل بيانات الكتاب",f,"حفظ التعديلات");if(!o)return;
+  v={title:String(o.title||"").replace(/\s+/g," ").trim(),description:String(o.description||"").trim(),publisher:String(o.publisher||"").replace(/\s+/g," ").trim(),category_id:o.category_id==null?"":o.category_id,price:0,pdf_url:String(o.pdf_url||"").trim()};
+  var err=v.title.length<3?"اكتب اسم الكتاب (3 أحرف على الأقل)":!v.publisher?"اكتب اسم الناشر":(!/^https:\/\/\S+$/i.test(v.pdf_url)?"رابط PDF يجب أن يبدأ بـ https://":"");
+  if(!err)break;toast(err,1)}
+ var p={title:v.title,description:v.description,publisher:v.publisher,price:0,pdf_url:v.pdf_url};
+ if(ck.length)p.category_id=v.category_id||null;
+ bkSave(b,p,"تم حفظ بيانات الكتاب")}
+async function bkPrice2(b){var v=b.price==null?0:b.price;
+ for(;;){var o=await form("تغيير سعر الكتاب",[{k:"price",l:"الكتاب مجاني دائمًا",v:v,dir:1}],"حفظ السعر","السعر الحالي: "+bkPrice(b)+". التغيير يسري على المشتريات الجديدة فقط، ومن اشترى سابقًا يحتفظ بالوصول.");
+  if(!o)return;v=bkNum(o.price);var err=bkPriceErr(v);if(!err)break;toast(err,1)}
+ if(Number(v)===(Number(b.price)||0))return toast("السعر لم يتغيّر");
+ bkSave(b,{price:Number(v)},"تم تغيير السعر")}
+async function bkToggle(b){var hide=bkKey(b)==="approved";
+ if(!await ask(hide?"إخفاء الكتاب":"إظهار الكتاب",hide?"سيختفي «"+(b.title||"الكتاب")+"» من مكتبة الطلاب، ويحتفظ من اشتراه بحقه. يمكنك إظهاره لاحقًا.":"سيظهر الكتاب للطلاب في المكتبة من جديد.",hide?"إخفاء":"إظهار"))return;
+ bkSave(b,{status:hide?"hidden":"approved"},hide?"تم إخفاء الكتاب":"تم إظهار الكتاب")}
+async function bkDelete(b){var s=Number(b.sales_count)||0;
+ if(!await ask("حذف الكتاب نهائيًا","سيُحذف «"+(b.title||"الكتاب")+"» ولا يمكن التراجع."+(s?" تنبيه: للكتاب "+s+" عملية شراء، والأفضل إخفاؤه بدل حذفه.":""),"حذف نهائي",1))return;
+ var r=await sb.from("edu_books").delete().eq("id",b.id).select("id");
+ if(r.error)return toast(bkFail(r.error),1);
+ if(!r.data||!r.data.length)return toast("لم يُحذف الكتاب: تحقق من صلاحية الحذف (library-15-admin-manage.sql)",1);
+ toast("تم حذف الكتاب");refreshBadges();go("library")}
+/* الخطوة 14: مراجعة الكتاب — قبول ونشر / رفض بسبب */
+async function bkReview(b,ok){var note="";
+ if(ok){if(!await ask("قبول ونشر الكتاب","سيظهر «"+(b.title||"الكتاب")+"» للطلاب في المكتبة فورًا.","قبول ونشر"))return}
+ else{var v="";for(;;){var o=await form("رفض الكتاب",[{k:"note",l:"سبب الرفض (يراه المعلم)",t:"textarea",v:v}],"رفض الكتاب","سيصل السبب للمعلم ويمكنه تعديل الكتاب وإعادة إرساله.");if(!o)return;v=String(o.note||"").trim();if(v.length>=3)break;toast("اكتب سبب الرفض (3 أحرف على الأقل)",1)}note=v}
+ var key=BK_REASON.filter(function(k){return k in b})[0]||"reject_reason",now=new Date().toISOString(),p={status:ok?"approved":"rejected"};
+ if(!ok||key in b)p[key]=ok?null:note;
+ if(ok&&"published_at" in b)p.published_at=now;
+ if("reviewed_at" in b)p.reviewed_at=now;
+ if("updated_at" in b)p.updated_at=now;
+ var r=await sb.from("edu_books").update(p).eq("id",b.id).eq("status",b.status).select("id");
+ if(r.error)return toast(/column|schema cache/i.test(r.error.message||"")?"عمود سبب الرفض غير موجود: شغّل library-14-admin-review.sql":errMsg(r.error),1);
+ if(!r.data||!r.data.length)return toast("تعذر الحفظ: تغيّرت حالة الكتاب أو لا تملك صلاحية التحديث (شغّل library-14-admin-review.sql)",1);
+ toast(ok?"تم قبول الكتاب ونشره":"تم رفض الكتاب وإبلاغ المعلم بالسبب");refreshBadges();go("library")}
+
+/* الأدمن */
+VIEWS.admins=async function(m){
+ var r=await sb.rpc("edu_admin_list_admins");if(r.error)throw r.error;var L=r.data||[];
+ m.innerHTML='<div class="card"><div class="tools"><h2 style="margin:0;flex:1">حسابات الأدمن</h2><button class="btn gold" id="add">إضافة أدمن</button></div>'+
+ table(["البريد","منذ",""],L.map(function(x){return'<tr><td dir="ltr" style="text-align:right">'+esc(x.email)+'</td><td>'+dt(x.created_at)+'</td><td class="ac"><button class="btn sm bad" data-d="'+esc(x.email)+'">إزالة</button></td></tr>'}),"")+'<p class="hint">يجب أن يكون للمستخدم حساب مسجّل بهذا البريد أولًا.</p></div>';
+ m.querySelector("#add").onclick=async function(){var o=await form("إضافة أدمن",[{k:"email",l:"البريد الإلكتروني",t:"email",dir:1}],"إضافة");if(!o)return;var x=await sb.rpc("edu_admin_set_admin",{p_email:o.email,p_on:true});x.error?toast(/not found/i.test(x.error.message)?"لا يوجد مستخدم بهذا البريد":errMsg(x.error),1):(toast("تمت الإضافة"),go("admins"))};
+ m.querySelectorAll("[data-d]").forEach(function(b){b.onclick=async function(){if(!await ask("إزالة أدمن","سيفقد "+b.dataset.d+" صلاحية الأدمن.","إزالة",1))return;var x=await sb.rpc("edu_admin_set_admin",{p_email:b.dataset.d,p_on:false});x.error?toast(errMsg(x.error),1):(toast("تمت الإزالة"),go("admins"))}})};
+
+/* ---------------- الدخول ---------------- */
+async function enter(session){
+ var r=await sb.rpc("edu_is_admin");
+ if(r.error||!r.data){await sb.auth.signOut();$("aerr").textContent=r.error?"لم يتم تفعيل الأدمن بعد (شغّل admin-ads.sql)":"هذا الحساب ليس أدمن";$("auth").classList.remove("hide");$("app").classList.add("hide");return}
+ $("who").textContent=session.user.email;$("auth").classList.add("hide");$("app").classList.remove("hide");drawNav();go("dash")}
+$("go").onclick=async function(){var b=$("go");$("aerr").textContent="";b.disabled=true;
+ var r=await sb.auth.signInWithPassword({email:$("em").value.trim(),password:$("pw").value});b.disabled=false;
+ if(r.error)return $("aerr").textContent="بيانات الدخول غير صحيحة";enter(r.data.session)};
+$("pw").onkeydown=function(e){if(e.key==="Enter")$("go").click()};
+$("out").onclick=async function(){await sb.auth.signOut();location.reload()};
+sb.auth.getSession().then(function(r){if(r.data&&r.data.session)enter(r.data.session)});
+})();
+</script>
+</body>
+</html>

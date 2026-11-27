@@ -1,4 +1,4 @@
-/* EduAssess Pro — Service Worker للإشعارات (Web Push) */
+/* Edu — Service Worker للإشعارات (Web Push) */
 self.addEventListener("install", function () { self.skipWaiting(); });
 self.addEventListener("activate", function (e) { e.waitUntil(self.clients.claim()); });
 
@@ -18,7 +18,7 @@ self.addEventListener("message", function (e) {
 self.addEventListener("push", function (e) {
   var d = {};
   try { d = e.data ? e.data.json() : {}; } catch (_) { d = { body: e.data ? e.data.text() : "" }; }
-  var title = d.title || "EduAssess Pro";
+  var title = d.title || "Edu";
   var body = d.body || "";
   var lg = d.lang === "en" || d.lang === "fr" ? d.lang : "ar";
   if (d.starts_at) {

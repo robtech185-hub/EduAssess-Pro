@@ -1,4 +1,4 @@
-/* EduAssess Pro — طبقة الواجهة المشتركة: رسائل منبثقة أنيقة + نوافذ تأكيد + أيقونات حديثة */
+/* Edu — طبقة الواجهة المشتركة: رسائل منبثقة أنيقة + نوافذ تأكيد + أيقونات حديثة */
 (function () {
   "use strict";
   var S = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">';

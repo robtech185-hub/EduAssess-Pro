@@ -1,4 +1,4 @@
-/* EduAssess Pro — محرّك الشهادات الإلكترونية (مشترك بين صفحة المعلم وصفحة الطالب)
+/* Edu — محرّك الشهادات الإلكترونية (مشترك بين صفحة المعلم وصفحة الطالب)
    - رسم الشهادة بالكامل على Canvas (بدون مكتبات خارجية) بـ 6 قوالب قابلة للاختيار.
    - تصدير PNG عالي الدقة و PDF (ملف PDF يُبنى داخل المتصفح).
    - عارض الشهادة بملء الشاشة (عرض / تنزيل / مشاركة / تكبير). */
@@ -181,7 +181,7 @@
     var cx = bx + bw / 2;
     drawLogo(x, cx, 400, 140, T, logo);
     x.textAlign = "center"; x.direction = "rtl";
-    text(x, "EduAssess Pro", cx, 640, "700 46px " + FF.body, T.dark ? "#2B1D00" : "#fff");
+    text(x, "Edu", cx, 640, "700 46px " + FF.body, T.dark ? "#2B1D00" : "#fff");
     x.globalAlpha = .55; x.fillStyle = T.dark ? "#2B1D00" : "#fff"; x.fillRect(cx - 70, 676, 140, 3); x.globalAlpha = 1;
     x.restore();
     return { l: 190, r: bx - 110 };
@@ -231,7 +231,7 @@
     text(x, sg, sx, fy - 4, "700 " + sp + "px " + FF.sig, T.accent);
     x.fillStyle = T.accent2; x.fillRect(sx - 240, fy + 24, 480, 4);
     text(x, "توقيع المعلم", sx, fy + 78, "500 38px " + FF.body, T.muted);
-    text(x, "رقم الشهادة: " + codeOf(d.id) + "  •  صادرة عبر EduAssess Pro", cx, 1612, "500 30px " + FF.body, T.muted);
+    text(x, "رقم الشهادة: " + codeOf(d.id) + "  •  صادرة عبر Edu", cx, 1612, "500 30px " + FF.body, T.muted);
     x.restore();
   }
 

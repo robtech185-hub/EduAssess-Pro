@@ -254,7 +254,7 @@ window.EDU_DICT_TXT += `
 + إضافة سؤال|+ Add question|+ Ajouter une question
 + إنشاء|+ Create|+ Créer
 8 أحرف على الأقل.|At least 8 characters.|Au moins 8 caractères.
-EduAssess Pro © نظام الاختبارات الإلكترونية|EduAssess Pro © Online examination system|EduAssess Pro © Système d'examens en ligne
+Edu © نظام الاختبارات الإلكترونية|Edu © Online examination system|Edu © Système d'examens en ligne
 آلاف الطلاب في وقت واحد|Thousands of students at the same time|Des milliers d'élèves en même temps
 أرقام من كل دول العالم|Phone numbers from every country|Numéros de tous les pays
 أنشئ اختباراتك، نظّم طلابك في مجموعات، وتابع النتائج والرسوم البيانية وترتيب الأوائل من لوحة واحدة.|Create your exams, organise students into groups, and follow results, charts and the top-ranked from a single dashboard.|Créez vos examens, organisez vos élèves en groupes et suivez les résultats, les graphiques et le classement depuis un seul tableau de bord.
@@ -343,7 +343,7 @@ EduAssess Pro © نظام الاختبارات الإلكترونية|EduAssess 
 شروحات حلول الاختبارات — تُفتح لك بعد إنهاء الاختبار المرتبط بها.|Exam solution explanations — unlocked once you finish the related exam.|Corrections des examens — débloquées après avoir terminé l'examen concerné.
 شهادات التقدير والتحفيز|Appreciation and motivation certificates|Certificats de reconnaissance et d'encouragement
 شهادات تقدير بتصاميم راقية للأوائل.|Elegantly designed certificates for the top performers.|Certificats élégants pour les meilleurs élèves.
-شهادة ٥ ج.م|Certificate 5 EGP|Certificat 5 EGP
+شهادات مجانية|Free certificates|Certificats gratuits
 عرض إحصائياتي|View my statistics|Voir mes statistiques
 عنوان الفيديو|Video title|Titre de la vidéo
 فقط|only|seulement
@@ -359,7 +359,7 @@ EduAssess Pro © نظام الاختبارات الإلكترونية|EduAssess 
 لا حاجة لإعادة كتابة بياناتك في كل اختبار. سجّل مرة واحدة وتابع كل نتائجك وتقدّمك في مكان واحد.|No need to retype your details for every exam. Register once and follow all your results and progress in one place.|Inutile de ressaisir vos données à chaque examen. Inscrivez-vous une fois et suivez tous vos résultats et progrès au même endroit.
 لا يدخل الطالب الاختبار إلا مرة واحدة، فتبقى النتائج عادلة.|A student can enter the exam only once, so results stay fair.|L'élève ne peut passer l'examen qu'une seule fois, les résultats restent donc équitables.
 لكل اختبار رمز فريد. يدخل به الطالب من هاتفه ويبدأ فورًا.|Every exam has a unique code. The student enters it from their phone and starts immediately.|Chaque examen a un code unique. L'élève le saisit depuis son téléphone et commence aussitôt.
-لماذا EduAssess Pro؟|Why EduAssess Pro?|Pourquoi EduAssess Pro ?
+لماذا Edu؟|Why Edu?|Pourquoi Edu ?
 لن يستطيع الطالب دخول الاختبار قبل وقت البداية أو بعد وقت الانتهاء.|Students cannot enter the exam before the start time or after the end time.|L'élève ne pourra pas entrer dans l'examen avant l'heure de début ni après l'heure de fin.
 ليس لديك حساب؟ سجّل وابدأ تجربة مجانية 3 أيام|No account? Sign up and start a 3-day free trial|Pas de compte ? Inscrivez-vous et commencez un essai gratuit de 3 jours
 محاولة واحدة للطالب|One attempt per student|Une seule tentative par élève
@@ -412,7 +412,7 @@ https://... (اتركه فارغًا لاستخدام صورة يوتيوب تل
 شهادة العلوم|Science certificate|Certificat de sciences
 شهادة اللغات|Languages certificate|Certificat de langues
 صورة السؤال|Question image|Image de la question
-فيديو تعريفي بمنصة EduAssess Pro|EduAssess Pro platform intro video|Vidéo de présentation de la plateforme EduAssess Pro
+فيديو تعريفي بمنصة Edu|Edu platform intro video|Vidéo de présentation de la plateforme Edu
 مثال: أحمد محمد علي|Example: John Smith|Exemple : Jean Dupont
 مثال: اختبار أحكام التجويد|Example: Tajweed rules exam|Exemple : examen des règles du tajwid
 مثال: حل اختبار أحكام التجويد|Example: Solution of the Tajweed rules exam|Exemple : correction de l'examen des règles du tajwid
@@ -431,7 +431,7 @@ https://... (اتركه فارغًا لاستخدام صورة يوتيوب تل
 أضف اختبارًا أولًا|Add an exam first|Ajoutez d'abord un examen
 (أنت)|(you)|(vous)
 (رمز|(code|(code
-في EduAssess Pro|in EduAssess Pro|sur EduAssess Pro
+في Edu|in Edu|sur Edu
 — بوابتك جاهزة.|— your portal is ready.|— votre espace est prêt.
 — تخطي {1} (مكرر أو غير مكتمل)|— skipped {1} (duplicate or incomplete)|— {1} ignoré(s) (doublon ou incomplet)
 يبدأ|starts|commence
@@ -579,7 +579,7 @@ https://... (اتركه فارغًا لاستخدام صورة يوتيوب تل
 أنشئ حساب المعلم أو سجّل دخولك|Create a teacher account or log in|Créez un compte enseignant ou connectez-vous
 أهلًا بك|Welcome|Bienvenue
 أهلًا بك في باقة الشهر الواحد!|Welcome to the one-month plan!|Bienvenue dans la formule d'un mois !
-أهلًا بك في عائلة EduAssess Pro|Welcome to the EduAssess Pro family|Bienvenue dans la famille EduAssess Pro
+أهلًا بك في عائلة Edu|Welcome to the Edu family|Bienvenue dans la famille Edu
 أهلًا بك في نخبة المعلمين!|Welcome to the elite of teachers!|Bienvenue parmi l'élite des enseignants !
 أُرسل إشعار تجريبي، تحقّق من شريط الإشعارات|A test notification was sent, check your notification bar|Une notification de test a été envoyée, vérifiez votre barre de notifications
 أُضيف {1} فقط — الحد الأقصى {2} أسئلة للاختبار|Only {1} added — the maximum is {2} questions per exam|Seulement {1} ajoutée(s) — le maximum est de {2} questions par examen
@@ -1033,4 +1033,61 @@ https://... (اتركه فارغًا لاستخدام صورة يوتيوب تل
 اختبار جديد|New exam|Nouvel examen
 مباشر|Live|En direct
 إغلاق|Close|Fermer
+المكتبة|Library|Bibliothèque
+كتب ومراجع اقرأها داخل التطبيق|Books and references to read inside the app|Livres et références à lire dans l'application
+كتب ومراجع من معلميك، اقرأها داخل التطبيق في أي وقت|Books and references from your teachers, read them in the app anytime|Livres et références de vos enseignants, à lire dans l'application à tout moment
+كتاب|Books|Livres
+تخصص|Categories|Catégories
+جديد|New|Nouveau
+لا توجد كتب منشورة بعد|No books published yet|Aucun livre publié pour le moment
+ستظهر هنا الكتب فور موافقة الإدارة عليها. عُد قريبًا لتجد جديد المعلمين.|Books appear here once approved by the admin. Come back soon for new teacher titles.|Les livres apparaissent ici dès leur approbation. Revenez bientôt pour les nouveautés.
+تعذر فتح المكتبة|Couldn't open the library|Impossible d'ouvrir la bibliothèque
+إعادة المحاولة|Try again|Réessayer
+نشر كتبي|Publish my books|Publier mes livres
+انشر كتبك واربح 50% من مبيعاتها|Publish your books and earn 50% of sales|Publiez vos livres et gagnez 50 % des ventes
+انشر كتبك ومراجعك للطلاب، وتحصل على 50% من قيمة كل كتاب يُباع|Publish your books and references for students and earn 50% of every book sold|Publiez vos livres et références pour les élèves et gagnez 50 % de chaque vente
+إضافة كتاب جديد|Add a new book|Ajouter un nouveau livre
+أضف بيانات الكتاب ورابط ملف PDF، وسنراجعه قبل نشره للطلاب.|Add the book details and PDF link; we'll review it before publishing to students.|Ajoutez les infos du livre et le lien PDF ; nous le vérifierons avant publication.
+إضافة كتاب|Add book|Ajouter un livre
+أضف كتابك|Add your book|Ajoutez votre livre
+البيانات والغلاف ورابط PDF|Details, cover and PDF link|Infos, couverture et lien PDF
+مراجعة الإدارة|Admin review|Vérification par l'administration
+نتحقق منه ونُبلغك بالنتيجة|We check it and notify you of the result|Nous le vérifions et vous informons du résultat
+يُنشر وتربح|Published and you earn|Publié et vous gagnez
+50% من كل عملية شراء|50% of every purchase|50 % de chaque achat
+لم تنشر أي كتاب بعد|You haven't published any books yet|Vous n'avez publié aucun livre
+ابدأ بإضافة أول كتاب لك، وسيظهر هنا مع حالته بعد الإرسال.|Start by adding your first book; it will appear here with its status after you submit.|Ajoutez votre premier livre ; il apparaîtra ici avec son statut après l'envoi.
+إضافة أول كتاب|Add your first book|Ajouter mon premier livre
+كتبي|My books|Mes livres
+منشور|Published|Publié
+قيد المراجعة|Under review|En cours de vérification
+مرفوض|Rejected|Refusé
+مخفي|Hidden|Masqué
+املأ بيانات كتابك ثم أرسله للمراجعة|Fill in your book details then submit for review|Remplissez les infos du livre puis envoyez pour vérification
+ما الذي ستحتاجه؟|What you'll need|De quoi avez-vous besoin ?
+اسم الكتاب ووصف مختصر يوضح محتواه|Book title and a short description of its content|Titre du livre et courte description de son contenu
+التخصص (التصنيف) واسم الناشر|Subject (category) and publisher name|Matière (catégorie) et nom de l'éditeur
+السعر بالجنيه المصري (اجعله 0 ليكون الكتاب مجانيًا)|Price in Egyptian pounds (set 0 for a free book)|Prix en livres égyptiennes (0 pour un livre gratuit)
+رابط ملف PDF من Google Drive أو غيره، بصلاحية الوصول عبر الرابط|PDF link from Google Drive or elsewhere, with link-access permission|Lien PDF depuis Google Drive ou autre, accessible via le lien
+غلاف الكتاب (اختياري) — أو اختر أيقونة جاهزة بدلًا منه|Book cover (optional) — or pick a ready-made icon instead|Couverture (facultative) — ou choisissez une icône prête à l'emploi
+نموذج إدخال بيانات الكتاب قيد التفعيل وسيظهر هنا قريبًا.|The book entry form is being enabled and will appear here soon.|Le formulaire du livre sera bientôt disponible ici.
+تعذر فتح القسم|Couldn't open this section|Impossible d'ouvrir cette section
+تعذر تحميل كتبك. تحقق من اتصالك بالإنترنت وحاول مرة أخرى.|Couldn't load your books. Check your connection and try again.|Impossible de charger vos livres. Vérifiez votre connexion et réessayez.
+اسم الكتاب|Book title|Titre du livre
+وصف الكتاب|Book description|Description du livre
+الناشر|Publisher|Éditeur
+السعر (ج.م)|Price (EGP)|Prix (EGP)
+رابط ملف PDF|PDF file link|Lien du fichier PDF
+غلاف الكتاب|Book cover|Couverture du livre
+إرسال للمراجعة|Submit for review|Envoyer pour vérification
+اجعله 0 ليكون الكتاب مجانيًا|Set it to 0 to make the book free|Mettez 0 pour un livre gratuit
+الصق رابط الكتاب من Google Drive أو أي موقع آخر، وتأكد أن الرابط يعمل لمن لديه الرابط.|Paste the book link from Google Drive or any other site, and make sure it works for anyone with the link.|Collez le lien du livre depuis Google Drive ou un autre site, et vérifiez qu'il fonctionne pour toute personne ayant le lien.
+اختياري. إن لم ترفع صورة سيظهر الغلاف بالأيقونة واللون اللذين تختارهما.|Optional. If you don't upload an image, the cover shows the icon and colour you pick.|Facultatif. Sans image, la couverture affiche l'icône et la couleur choisies.
+رفع صورة الغلاف|Upload cover image|Téléverser la couverture
+إزالة الصورة|Remove image|Supprimer l'image
+أو اختر أيقونة ولونًا جاهزين|Or pick a ready-made icon and colour|Ou choisissez une icône et une couleur
+اختر التخصص|Choose a subject|Choisissez une matière
+جارٍ تحميل التخصصات…|Loading subjects…|Chargement des matières…
+جارٍ رفع الغلاف…|Uploading cover…|Téléversement de la couverture…
+جارٍ الإرسال…|Sending…|Envoi…
 `;
