@@ -242,16 +242,16 @@
         '<div class="wc-top"><div class="wc-brand"><em>' + IC.cap + '</em>Edu Wallet</div><div class="wc-chip"></div></div>' +
         '<div class="wc-mid"><div class="wc-lbl">الرصيد الحالي <span class="wc-eye" id="ew-eye" role="button" tabindex="0">' + (hide ? IC.eyeoff : IC.eye) + '</span></div>' +
         '<div class="wc-bal"><span>EGP</span><b id="ew-bal">' + (hide ? "••••" : money(bal)) + '</b></div></div>' +
-        '<div class="wc-bot"><div><div class="wc-name">' + esc(m.name) + '</div><div class="wc-id">•••• •••• •••• ' + tail + '</div></div>' + (teacher ? '' : '<span class="wc-tap">اضغط لإضافة رصيد ' + IC.chev + '</span>') + '</div>' +
+        '<div class="wc-bot"><div><div class="wc-name">' + esc(m.name) + '</div><div class="wc-id">•••• •••• •••• ' + tail + '</div></div>' + '<span class="wc-tap">اضغط لإضافة رصيد ' + IC.chev + '</span>' + '</div>' +
       '</button>' +
       '<div class="w-acts">' +
-        (teacher ? '' : '<button type="button" class="w-act add" data-t="topup"><i>' + IC.down + '</i><span><b>إضافة رصيد</b><small>عبر واتساب</small></span></button>') +
+        '<button type="button" class="w-act add" data-t="topup"><i>' + IC.down + '</i><span><b>إضافة رصيد</b><small>عبر واتساب</small></span></button>' +
       '</div>' +
       (Data.mode === "local" ? '<div class="w-note">' + IC.info + '<span>الوضع التجريبي: المحفظة تعمل على هذا الجهاز فقط. لتفعيلها شغّل ملفات SQL (wallet-courses ثم wallet-real ثم admin-ads) من Supabase.</span></div>' : '') +
       '<div class="ew-card"><h3>سجل العمليات</h3>' + (list.length ? list.map(txRow).join("") : '<div class="ew-empty">' + IC.wallet + 'لا توجد عمليات بعد</div>') + '</div>' +
       '</div>';
     var b = $("ew-bal"); if (!hide) { shown = 0; countUp(b, bal); } 
-    $("ew-card").onclick = function (e) { if (e.target.closest("#ew-eye")) return; if (hostRole !== "teacher") options(hostRole); };
+    $("ew-card").onclick = function (e) { if (e.target.closest("#ew-eye")) return; options(hostRole); };
     $("ew-eye").onclick = function (e) { e.stopPropagation(); LS.set("edu_w_hide", hide ? "0" : "1"); render(); };
     host.querySelectorAll(".w-act").forEach(function (a) { a.onclick = function () { flow(a.dataset.t); }; });
     chip(bal);

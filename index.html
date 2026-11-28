@@ -365,7 +365,7 @@ html.ld-done .hero .in,.noldr .hero .in{opacity:1;transform:none;transition:opac
     <a class="btn b-amber" href="teacher.html">ابدأ تجربتك المجانية</a>
   </div>
   <div class="frame">
-    <div class="bar"><i></i><i></i><i></i><span>eduassess-pro</span></div>
+    <div class="bar"><i></i><i></i><i></i><span>Edu Pro</span></div>
     <div class="vbox">
       <video id="promo" controls preload="metadata" playsinline poster="assets/poster.jpg" aria-label="فيديو تعريفي بمنصة Edu">
         <source src="assets/promo.mp4" type="video/mp4">
@@ -484,7 +484,7 @@ $$("[data-msg]").forEach(function(a){a.href=wa(a.dataset.msg);a.target="_blank";
   var g=$(".pgrid");if(g){g.style.gridTemplateColumns="minmax(0,620px)";g.style.justifyContent="center"}
   var mine=role==="teacher"?"بوابة المعلم":"بوابة الطالب";
   var t=$(".portals .sec-t h2");if(t)t.textContent="مرحبًا بعودتك";
-  var tp=$(".portals .sec-t p");if(tp)tp.textContent="أنت مسجّل كـ"+(role==="teacher"?"معلم":"طالب")+" — بوابتك جاهزة.";
+  var tp=$(".portals .sec-t p");if(tp)tp.textContent=role==="teacher"?"أنت مسجّل كمعلم — بوابتك جاهزة.":"أنت مسجّل كطالب — بوابتك جاهزة.";
   if(role==="student"){
     $$(".tabs button").forEach(function(b){if(b.dataset.t==="teacher")b.remove()});
     var st=$("#st-teacher");if(st)st.remove();

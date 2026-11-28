@@ -130,19 +130,38 @@
     while ((n = w.nextNode())) { var v = n.nodeValue.trim(); if (/[\u0600-\u06FF]/.test(v) && n.parentNode.nodeName !== "SCRIPT" && n.parentNode.nodeName !== "STYLE") out[v] = 1; }
     return Object.keys(out);
   }
+  /* نصوص داخل CSS (content:"جديد" في ::before/::after) لا تظهر كعقد نصية، فنترجمها مباشرة في قواعد الأنماط */
+  function cssFix() {
+    if (!lang || lang === "ar") return;
+    function walk(rules) {
+      for (var i = 0; i < rules.length; i++) {
+        var r = rules[i];
+        try {
+          if (r.cssRules && r.cssRules.length) walk(r.cssRules);
+          var c = r.style && r.style.getPropertyValue && r.style.getPropertyValue("content");
+          if (c && /[\u0600-\u06FF]/.test(c)) {
+            var m = /^(["'])([\s\S]*)\1$/.exec(c.trim());
+            if (m) { var n = conv(m[2]); if (n !== m[2]) r.style.setProperty("content", '"' + n.replace(/"/g, '\\"') + '"'); }
+          }
+        } catch (e) {}
+      }
+    }
+    for (var j = 0; j < document.styleSheets.length; j++) { try { walk(document.styleSheets[j].cssRules || []); } catch (e) {} }
+  }
   function apply() {
     var h = document.documentElement;
     h.setAttribute("lang", lang || "ar"); h.setAttribute("dir", LANGS[lang || "ar"].dir);
     if (lang && lang !== "ar") {
-      tr(document.body); document.title = conv(document.title || "");
+      tr(document.body); document.title = conv(document.title || ""); cssFix(); window.addEventListener("load", cssFix); setTimeout(cssFix, 1500);
       var q = 0, pend = [];
       new MutationObserver(function (ms) {
         ms.forEach(function (m) {
           if (m.type === "attributes") { pend.push({ attrs: m.target }); return; }
-          pend.push(m.type === "characterData" ? m.target : null); m.addedNodes.forEach(function (x) { pend.push(x); });
+          pend.push(m.type === "characterData" ? m.target : null); m.addedNodes.forEach(function (x) { pend.push(x); if (x.nodeName === "STYLE") setTimeout(cssFix, 0); });
         });
         if (!q) q = requestAnimationFrame(function () { q = 0; var l = pend; pend = []; l.forEach(function (x) { if (!x) return; if (x.attrs) trAttrs(x.attrs); else if (x.isConnected !== false) tr(x); }); });
       }).observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ATTR });
+      new MutationObserver(function (ms) { ms.forEach(function (m) { m.addedNodes.forEach(function (x) { if (x.nodeName === "STYLE") setTimeout(cssFix, 0); }); }); }).observe(document.head, { childList: true });
       /* عنوان الصفحة إن تغيّر لاحقًا */
       var ti = document.querySelector("title");
       if (ti) new MutationObserver(function () { var c = conv(document.title || ""); if (c !== document.title) document.title = c; }).observe(ti, { childList: true, characterData: true, subtree: true });
