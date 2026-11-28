@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Edu | منصة الاختبارات الإلكترونية والشهادات</title>
+<meta name="description" content="أنشئ اختبارات MCQ بمدة ومواعيد محددة، وانشرها لطلابك بتنبيه، وصحّح تلقائيًا، وأصدر شهادات التفوق وأطلق دوري الأبطال. بوابة للطالب وبوابة للمعلم. تجربة مجانية 3 أيام.">
+<meta name="theme-color" content="#050F2B">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png"><link rel="apple-touch-icon" sizes="180x180" href="assets/favicon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Edu">
+<link rel="manifest" href="manifest.webmanifest">
+<meta property="og:title" content="Edu — منصة الاختبارات الإلكترونية">
+<meta property="og:image" content="assets/poster.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Readex+Pro:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="assets/edu.css">
+<script src="assets/edu.js" data-min="1900"></script>
+<style>
+:root{
+  --navy:#050F2B; --navy2:#0A2260; --blue:#1F63E0; --sky:#4C8DFF; --amber:#FFB400; --amber2:#FFD15C; --teal:#13B59B;
+  --ink:#0B1633; --mut:#55627F; --paper:#F3F6FC; --grid:#DCE4F5; --card:#fff; --line:#E1E8F6; --ok:#0E9F7E; --bad:#D6453D;
+  --r:20px; --font-h:"Readex Pro","IBM Plex Sans Arabic",Tahoma,sans-serif; --font-b:"IBM Plex Sans Arabic","Readex Pro",Tahoma,sans-serif;
+}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth;scroll-padding-top:84px;-webkit-text-size-adjust:100%}
+body{font:400 16.5px/1.95 var(--font-b);color:var(--ink);background:var(--paper);overflow-x:hidden}
+/* ورق مسطّر بالمربعات — هوية «كراسة الامتحان» */
+.graph{background-color:var(--paper);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:34px 34px}
+h1,h2,h3,h4{font-family:var(--font-h);line-height:1.5;font-weight:700;letter-spacing:0}
+img,video{max-width:100%;display:block}
+a{color:inherit}
+.w{width:min(1160px,100% - 40px);margin-inline:auto}
+:focus-visible{outline:3px solid var(--amber);outline-offset:3px;border-radius:8px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* ------------------------------ الأزرار ------------------------------ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:13px 26px;border-radius:14px;border:0;font:600 16px var(--font-h);cursor:pointer;text-decoration:none;transition:transform .18s,box-shadow .25s,background .25s;white-space:nowrap}
+.btn:hover{transform:translateY(-3px)}
+.btn svg{width:20px;height:20px;flex:none}
+.b-amber{background:linear-gradient(135deg,var(--amber2),var(--amber));color:#2B1D00;box-shadow:0 10px 26px rgba(255,180,0,.35)}
+.b-blue{background:linear-gradient(135deg,var(--sky),var(--blue));color:#fff;box-shadow:0 10px 26px rgba(31,99,224,.35)}
+.b-navy{background:var(--navy2);color:#fff;box-shadow:0 10px 26px rgba(10,34,96,.3)}
+.b-line{background:transparent;color:var(--navy2);box-shadow:inset 0 0 0 2px var(--navy2)}
+.b-ghost{background:rgba(255,255,255,.1);color:#fff;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.35)}
+.b-wa{background:linear-gradient(135deg,#25D366,#13A84F);color:#fff;box-shadow:0 10px 26px rgba(37,211,102,.32)}
+.sm{padding:9px 18px;font-size:14.5px;border-radius:12px}
+
+/* ------------------------------ الشريط العلوي ------------------------------ */
+nav{position:sticky;top:0;z-index:50;background:rgba(243,246,252,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0)}
+nav .w{display:flex;align-items:center;justify-content:space-between;gap:14px;height:70px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+.brand img{width:44px;height:auto;border-radius:12px}
+.brand b{white-space:nowrap;font:700 20px var(--font-h);color:var(--navy2);direction:ltr;letter-spacing:.2px}
+.brand b i{font-style:normal;color:var(--amber)}
+.links{display:flex;gap:26px}
+.links a{text-decoration:none;color:var(--mut);font-weight:500;font-size:15px;position:relative;padding:4px 0}
+.links a::after{content:"";position:absolute;inset:auto 0 -2px;height:3px;border-radius:3px;background:var(--amber);transform:scaleX(0);transition:transform .25s}
+.links a:hover{color:var(--ink)} .links a:hover::after{transform:scaleX(1)}
+.nbtn{display:flex;gap:8px}
+
+/* ------------------------------ البطل ------------------------------ */
+.hero{position:relative;padding:54px 0 0;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;background:radial-gradient(55% 60% at 88% 8%,rgba(76,141,255,.22),transparent 70%),radial-gradient(40% 45% at 5% 40%,rgba(19,181,155,.14),transparent 70%);pointer-events:none}
+.hero .w{position:relative;display:grid;grid-template-columns:1.05fr .95fr;gap:54px;align-items:center}
+.hero h1{font-size:clamp(34px,5.4vw,60px);line-height:1.38;color:var(--navy);max-width:15em}
+.hero .lead{font-size:clamp(16.5px,2vw,19px);color:var(--mut);max-width:30em;margin:18px 0 28px}
+.hero .cta{display:flex;flex-wrap:wrap;gap:12px}
+.proof{display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:30px;font-size:14.5px;color:var(--mut);font-weight:500}
+.proof span{display:flex;align-items:center;gap:8px}
+.proof svg{width:20px;height:20px;color:var(--teal)}
+
+/* بطاقة الاختبار التفاعلية */
+.demo{position:relative;max-width:470px;margin-inline:auto;width:100%}
+.demo::before{content:"";position:absolute;inset:18px -14px -16px 14px;border-radius:30px;background:linear-gradient(135deg,var(--amber2),var(--amber));transform:rotate(-2.2deg);opacity:.9}
+.sheet{position:relative;background:#fff;border-radius:28px;padding:22px 22px 20px;box-shadow:0 30px 70px rgba(10,34,96,.2),0 0 0 1px var(--line)}
+.sheet-h{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px}
+.sheet-h b{font:600 14px var(--font-h);color:var(--mut)}
+.ring{position:relative;width:48px;height:48px;flex:none}
+.ring svg{width:48px;height:48px;transform:rotate(90deg) scaleX(-1)}
+.ring circle{fill:none;stroke-width:5;stroke-linecap:round}
+.ring .tr{stroke:#E6ECFA} .ring .fg{stroke:var(--blue);stroke-dasharray:113;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear,stroke .3s}
+.ring span{position:absolute;inset:0;display:grid;place-items:center;font:700 13px var(--font-h);color:var(--navy2)}
+.prog{height:6px;border-radius:6px;background:#E6ECFA;margin:8px 0 16px;overflow:hidden}
+.prog i{display:block;height:100%;width:33%;background:linear-gradient(90deg,var(--teal),var(--sky));border-radius:6px;transition:width .5s}
+.q{font:600 21px/1.7 var(--font-h);color:var(--navy);margin-bottom:14px}
+.opts{display:grid;gap:10px}
+.opt{display:flex;align-items:center;gap:12px;width:100%;text-align:start;padding:12px 14px;border:2px solid var(--line);border-radius:14px;background:#fff;font:500 18px var(--font-h);color:var(--ink);cursor:pointer;transition:border-color .2s,background .2s,transform .15s}
+.opt:hover:not(:disabled){border-color:var(--sky);transform:translateX(-3px)}
+.opt em{flex:none;width:30px;height:30px;border-radius:9px;background:#EEF3FF;color:var(--navy2);font:600 14px var(--font-h);display:grid;place-items:center;font-style:normal;transition:.2s}
+.opt.ok{border-color:var(--ok);background:#E8F8F3}.opt.ok em{background:var(--ok);color:#fff}
+.opt.no{border-color:var(--bad);background:#FDECEA}.opt.no em{background:var(--bad);color:#fff}
+.opt:disabled{cursor:default}
+.fb{min-height:62px;margin-top:14px;border-radius:14px;padding:11px 14px;font-size:14.8px;line-height:1.8;background:#F3F7FF;color:var(--mut);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.fb.ok{background:#E8F8F3;color:#066650}.fb.no{background:#FFF3E0;color:#8A4B00}
+.fb button{flex:none;border:0;background:var(--navy2);color:#fff;font:600 13px var(--font-h);padding:8px 14px;border-radius:10px;cursor:pointer}
+
+/* ------------------------------ البوابات ------------------------------ */
+.portals{position:relative;padding:64px 0 76px}
+.sec-t{max-width:640px;margin-bottom:34px}
+.sec-t h2{font-size:clamp(26px,4vw,40px);color:var(--navy)}
+.sec-t p{color:var(--mut);margin-top:6px}
+.sec-t.c{margin-inline:auto;text-align:center}
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.portal{position:relative;display:grid;grid-template-columns:auto 1fr;gap:6px 24px;align-items:center;padding:30px 28px 28px;border-radius:30px;text-decoration:none;color:#fff;overflow:hidden;isolation:isolate;transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s;box-shadow:0 22px 50px rgba(5,15,43,.25)}
+.portal.s{background:linear-gradient(150deg,#06303A 0%,#0A5F66 55%,#13B59B 130%)}
+.portal.t{background:linear-gradient(150deg,#050F2B 0%,#0A2260 55%,#1F63E0 130%)}
+.portal::before{content:"";position:absolute;z-index:-1;width:340px;height:340px;border-radius:50%;inset-block-start:-150px;inset-inline-end:-90px;background:radial-gradient(circle,rgba(255,255,255,.2),transparent 65%)}
+.portal::after{content:"";position:absolute;z-index:-1;inset:0;background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);background-size:30px 30px;-webkit-mask:linear-gradient(200deg,#000,transparent 60%);mask:linear-gradient(200deg,#000,transparent 60%)}
+.portal:hover{transform:translateY(-8px) rotate(-.4deg);box-shadow:0 34px 70px rgba(5,15,43,.35)}
+.portal .ic{grid-row:1/4;width:128px;height:128px;border-radius:34px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);display:grid;place-items:center;backdrop-filter:blur(6px);transition:transform .4s cubic-bezier(.2,1.4,.3,1)}
+.portal:hover .ic{transform:scale(1.07) rotate(-4deg)}
+.portal .ic img{width:92px;height:92px;object-fit:contain;filter:drop-shadow(0 10px 14px rgba(0,0,0,.3))}
+.portal h3{font-size:27px;line-height:1.4}
+.portal p{color:#CFE0F5;font-size:15px;line-height:1.85}
+.portal .go{margin-top:12px;display:inline-flex;align-items:center;gap:8px;justify-self:start;background:#fff;color:var(--navy);padding:10px 22px;border-radius:13px;font:700 15px var(--font-h);transition:gap .25s,background .25s}
+.portal:hover .go{gap:14px;background:var(--amber2)}
+.portal .go svg{width:18px;height:18px}
+
+/* ------------------------------ الفيديو ------------------------------ */
+.vsec{background:var(--navy);color:#fff;padding:84px 0;position:relative;overflow:hidden}
+.vsec::before{content:"";position:absolute;inset:0;background:radial-gradient(50% 55% at 12% 20%,rgba(31,99,224,.5),transparent 70%),radial-gradient(40% 45% at 95% 95%,rgba(19,181,155,.28),transparent 70%);pointer-events:none}
+.vsec .w{position:relative;display:grid;grid-template-columns:.8fr 1.2fr;gap:50px;align-items:center}
+.vsec h2{font-size:clamp(27px,4vw,40px)}
+.vsec p{color:#B9C6EA;margin:12px 0 22px}
+.vlist{list-style:none;padding:0;display:grid;gap:10px;margin-bottom:26px}
+.vlist li{display:flex;gap:12px;align-items:center;color:#DCE6FF}
+.vlist li i{flex:none;width:34px;height:34px;border-radius:11px;background:rgba(255,255,255,.1);display:grid;place-items:center;color:var(--amber2)}
+.vlist svg{width:19px;height:19px}
+.frame{border-radius:22px;background:#0B1B4A;padding:10px;box-shadow:0 40px 90px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.1);transform:perspective(1400px) rotateY(3deg)}
+.frame .bar{display:flex;align-items:center;gap:7px;padding:2px 8px 10px}
+.frame .bar i{width:11px;height:11px;border-radius:50%;background:#ff5f57}.frame .bar i:nth-child(2){background:#febc2e}.frame .bar i:nth-child(3){background:#28c840}
+.frame .bar span{margin-inline-start:auto;font:500 12px var(--font-h);color:#8FA2D4;direction:ltr}
+.vbox{position:relative;border-radius:14px;overflow:hidden;background:#000;aspect-ratio:16/9}
+.vbox video{width:100%;height:100%;object-fit:cover;display:block;background:#050F2B}
+.play{position:absolute;inset:0;display:grid;place-items:center;border:0;cursor:pointer;background:linear-gradient(180deg,rgba(5,15,43,.15),rgba(5,15,43,.55));transition:opacity .3s}
+.play span{width:92px;height:92px;border-radius:50%;background:linear-gradient(135deg,var(--amber2),var(--amber));display:grid;place-items:center;box-shadow:0 0 0 12px rgba(255,180,0,.22),0 18px 40px rgba(0,0,0,.45);animation:pulse 2.2s ease-out infinite}
+.play svg{width:38px;height:38px;color:#2B1D00;margin-inline-end:-4px}
+.play.hide{opacity:0;pointer-events:none}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,180,0,.5),0 18px 40px rgba(0,0,0,.45)}100%{box-shadow:0 0 0 30px rgba(255,180,0,0),0 18px 40px rgba(0,0,0,.45)}}
+
+/* ------------------------------ كيف تعمل ------------------------------ */
+.sec{padding:84px 0}
+.tabs{display:inline-flex;background:#fff;border:1px solid var(--line);border-radius:16px;padding:5px;gap:4px;margin-bottom:34px;box-shadow:0 8px 22px rgba(10,34,96,.06)}
+.tabs button{border:0;background:transparent;padding:10px 24px;border-radius:12px;font:600 15.5px var(--font-h);color:var(--mut);cursor:pointer;transition:.25s}
+.tabs button[aria-selected=true]{background:var(--navy2);color:#fff}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;counter-reset:s}
+.steps[hidden]{display:none}
+.step{position:relative;background:#fff;border:1px solid var(--line);border-radius:26px;padding:62px 26px 26px;box-shadow:0 14px 34px rgba(10,34,96,.06)}
+.step::before{counter-increment:s;content:counter(s,arabic-indic);position:absolute;top:-24px;inset-inline-start:24px;width:58px;height:58px;border-radius:19px;background:linear-gradient(135deg,var(--amber2),var(--amber));color:#2B1D00;display:grid;place-items:center;font:700 26px var(--font-h);box-shadow:0 12px 24px rgba(255,180,0,.4);transform:rotate(-6deg)}
+.step:nth-child(2)::before{background:linear-gradient(135deg,var(--sky),var(--blue));color:#fff;box-shadow:0 12px 24px rgba(31,99,224,.35);transform:rotate(4deg)}
+.step:nth-child(3)::before{background:linear-gradient(135deg,#43D9BE,var(--teal));color:#05352D;box-shadow:0 12px 24px rgba(19,181,155,.35)}
+.step h3{font-size:20px;margin-bottom:6px;color:var(--navy)}
+.step p{color:var(--mut);font-size:15.5px}
+
+/* ------------------------------ المزايا ------------------------------ */
+.feat{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.fc{background:#fff;border:1px solid var(--line);border-radius:24px;padding:26px 24px;transition:transform .3s,box-shadow .3s,border-color .3s}
+.fc:hover{transform:translateY(-6px);box-shadow:0 22px 46px rgba(10,34,96,.12);border-color:#C9D8F6}
+.fc i{display:grid;place-items:center;width:54px;height:54px;border-radius:17px;margin-bottom:14px;color:#fff}
+.fc i svg{width:27px;height:27px}
+.fc:nth-child(3n+1) i{background:linear-gradient(135deg,var(--sky),var(--blue))}
+.fc:nth-child(3n+2) i{background:linear-gradient(135deg,#43D9BE,var(--teal))}
+.fc:nth-child(3n) i{background:linear-gradient(135deg,var(--amber2),var(--amber));color:#2B1D00}
+.fc h3{font-size:18.5px;color:var(--navy);margin-bottom:2px}
+.fc p{color:var(--mut);font-size:15px;line-height:1.85}
+
+/* ------------------------------ الشهادات ------------------------------ */
+.csec{background:#fff;border-block:1px solid var(--line)}
+.certs{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.cert{border:0;padding:0;background:#fff;border-radius:18px;overflow:hidden;cursor:zoom-in;text-align:center;box-shadow:0 0 0 1px var(--line),0 12px 28px rgba(10,34,96,.08);transition:transform .3s,box-shadow .3s;font:inherit}
+.cert:hover{transform:translateY(-6px) rotate(-.6deg);box-shadow:0 0 0 2px var(--amber),0 22px 44px rgba(10,34,96,.16)}
+.cert img{width:100%;aspect-ratio:3/2;object-fit:cover;-webkit-user-drag:none;user-select:none}
+.cert span{display:block;padding:11px 8px;font:600 14px var(--font-h);color:var(--navy2)}
+.cnote{margin-top:28px;text-align:center;font:600 18px var(--font-h);color:var(--navy)}
+.cnote b{color:#9A6A00;background:#FFF1C2;border-radius:10px;padding:2px 12px}
+#lb{position:fixed;inset:0;background:rgba(3,9,28,.9);display:none;place-items:center;z-index:200;padding:16px;cursor:zoom-out}
+#lb img{max-width:min(960px,100%);max-height:90vh;border-radius:14px;box-shadow:0 30px 80px #000}
+
+/* ------------------------------ التحفيز ------------------------------ */
+.msec{padding:84px 0;background:linear-gradient(160deg,#0A2260,#1F63E0 120%);color:#fff;position:relative;overflow:hidden}
+.msec::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);background-size:38px 38px;-webkit-mask:radial-gradient(circle at 50% 50%,#000,transparent 75%);mask:radial-gradient(circle at 50% 50%,#000,transparent 75%)}
+.msec .w{position:relative}
+.qwrap{max-width:820px;margin:0 auto;text-align:center;min-height:210px;display:grid;align-content:center}
+.qmark{font:700 110px/0.6 var(--font-h);color:var(--amber);opacity:.9;height:54px}
+.qtxt{font:600 clamp(23px,3.6vw,36px)/1.75 var(--font-h);transition:opacity .45s,transform .45s}
+.qwho{display:inline-block;margin-top:18px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);padding:3px 18px;border-radius:99px;font:500 14px var(--font-h);transition:opacity .45s}
+.qwrap.swap .qtxt{opacity:0;transform:translateY(14px)} .qwrap.swap .qwho{opacity:0}
+.dots{display:flex;justify-content:center;gap:9px;margin-top:30px}
+.dots button{width:11px;height:11px;border-radius:99px;border:0;background:rgba(255,255,255,.35);cursor:pointer;padding:0;transition:.3s}
+.dots button[aria-current=true]{width:34px;background:var(--amber)}
+.mgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:50px}
+.mc{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.2);border-radius:22px;padding:22px;backdrop-filter:blur(4px)}
+.mc b{display:block;font:700 18px var(--font-h);margin-bottom:4px}
+.mc span{color:#CFE0FF;font-size:15px}
+.mc em{font-style:normal;font-size:30px;display:block;margin-bottom:6px}
+
+/* ------------------------------ الأسعار ------------------------------ */
+.seg{display:inline-grid;grid-template-columns:1fr 1fr;position:relative;background:#fff;border:1px solid var(--line);border-radius:18px;padding:5px;box-shadow:0 10px 26px rgba(10,34,96,.08);margin-top:20px}
+.seg button{position:relative;z-index:1;border:0;background:transparent;padding:11px 26px;border-radius:13px;font:600 15.5px var(--font-h);color:var(--mut);cursor:pointer;transition:color .25s;display:flex;align-items:center;gap:8px;justify-content:center}
+.seg button[aria-pressed=true]{color:#fff}
+.seg .thumb{position:absolute;z-index:0;inset-block:5px;width:calc(50% - 5px);inset-inline-start:5px;border-radius:13px;background:linear-gradient(135deg,var(--navy2),var(--blue));transition:transform .35s cubic-bezier(.3,1.3,.4,1)}
+.seg[data-r=world] .thumb{transform:translateX(100%)}
+[dir=rtl] .seg[data-r=world] .thumb{transform:translateX(-100%)}
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;align-items:stretch;margin-top:46px}
+.plan{position:relative;background:#fff;border:1px solid var(--line);border-radius:28px;padding:34px 26px 26px;display:flex;flex-direction:column;box-shadow:0 14px 34px rgba(10,34,96,.06);transition:transform .3s,box-shadow .3s}
+.plan:hover{transform:translateY(-6px);box-shadow:0 26px 54px rgba(10,34,96,.14)}
+.plan.hot{background:linear-gradient(170deg,#0A2260,#123C9C);color:#fff;border:0;box-shadow:0 30px 70px rgba(10,34,96,.4)}
+@media(min-width:861px){.plan.hot{transform:translateY(-14px)}.plan.hot:hover{transform:translateY(-20px)}}
+.ribbon{position:absolute;top:-15px;inset-inline-start:50%;transform:translateX(50%);background:linear-gradient(135deg,var(--amber2),var(--amber));color:#2B1D00;font:700 13px var(--font-h);padding:3px 18px;border-radius:99px;white-space:nowrap;box-shadow:0 8px 18px rgba(255,180,0,.4)}
+[dir=ltr] .ribbon{transform:translateX(-50%)}
+.plan h3{font-size:21px}
+.pr{display:flex;align-items:baseline;gap:8px;margin:10px 0 2px;direction:rtl}
+.pr b{font:700 56px/1.1 var(--font-h);color:var(--navy2);transition:transform .3s}
+.plan.hot .pr b{color:#fff}
+.pr small{font:600 20px var(--font-h);color:var(--mut)}
+.plan.hot .pr small{color:#B9C6EA}
+.pm{font-size:14px;color:var(--mut)} .plan.hot .pm{color:#B9C6EA}
+.sv{align-self:flex-start;margin:10px 0 0;font:600 13px var(--font-h);background:#E4F7F2;color:#066650;padding:2px 12px;border-radius:99px}
+.plan.hot .sv{background:rgba(19,181,155,.25);color:#7BF0D6}
+.plan ul{list-style:none;padding:0;margin:18px 0 24px;display:grid;gap:8px;font-size:15px}
+.plan li{display:flex;gap:10px;align-items:flex-start;line-height:1.7}
+.plan li::before{content:"";flex:none;width:20px;height:20px;margin-top:3px;border-radius:50%;background:var(--teal) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5.5 10.5l3 3 6-6.5' fill='none' stroke='white' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat}
+.plan .btn{margin-top:auto;width:100%}
+.extra{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:34px;color:var(--mut);font-size:14.5px;align-items:center}
+.extra b{background:#fff;border:1px solid var(--line);padding:3px 16px;border-radius:99px;font-weight:600;color:var(--ink)}
+.paynote{text-align:center;margin-top:14px;color:var(--mut);font-size:14.5px}
+
+/* ------------------------------ الختام ------------------------------ */
+.end{position:relative;overflow:hidden;border-radius:36px;padding:64px 28px;text-align:center;color:#fff;background:linear-gradient(150deg,#050F2B,#0A2260 60%,#1F63E0 140%);box-shadow:0 30px 70px rgba(5,15,43,.35)}
+.end::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:36px 36px;-webkit-mask:radial-gradient(circle,#000,transparent 75%);mask:radial-gradient(circle,#000,transparent 75%)}
+.end>*{position:relative}
+.end img{width:96px;margin:0 auto 16px;background:#fff;border-radius:28px;padding:12px;box-shadow:0 18px 44px rgba(0,0,0,.4)}
+.end h2{font-size:clamp(27px,4.2vw,42px)}
+.end p{color:#B9C6EA;margin:10px auto 28px;max-width:34em}
+.end .cta{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+footer{padding:36px 0 110px;color:var(--mut);font-size:14.5px}
+footer .w{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
+footer .brand img{width:36px;border-radius:10px}
+.fl{display:flex;gap:20px;flex-wrap:wrap}.fl a{text-decoration:none}.fl a:hover{color:var(--ink)}
+.fw{position:fixed;left:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));width:60px;height:60px;border-radius:50%;background:#25D366;display:grid;place-items:center;box-shadow:0 10px 28px rgba(0,0,0,.3);z-index:40;transition:transform .2s}
+.fw:hover{transform:scale(1.08)} .fw svg{width:33px;height:33px}
+
+/* حركة الدخول الوحيدة: تتابع الهيرو بعد زوال شاشة التحميل */
+.hero .in{opacity:0;transform:translateY(22px)}
+html.ld-done .hero .in,.noldr .hero .in{opacity:1;transform:none;transition:opacity .8s cubic-bezier(.2,.8,.2,1),transform .8s cubic-bezier(.2,.8,.2,1);transition-delay:calc(var(--i,0)*.12s)}
+
+/* ------------------------------ تجاوب ------------------------------ */
+@media(max-width:980px){
+  .hero .w,.vsec .w{grid-template-columns:1fr}
+  .hero{padding-top:36px}
+  .hero h1{max-width:none}
+  .links{display:none}
+  .frame{transform:none}
+  .certs{grid-template-columns:repeat(2,1fr)}
+  .feat{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:860px){
+  .pgrid,.steps,.plans,.mgrid{grid-template-columns:1fr}
+  .steps{gap:40px}.plans{gap:34px}
+  .sec,.vsec,.msec{padding:60px 0}
+  .portals{padding:48px 0 56px}
+  .portal{grid-template-columns:1fr;text-align:center;justify-items:center;padding:26px 20px}
+  .portal .ic{grid-row:auto;width:112px;height:112px}
+  .portal .go{justify-self:center}
+  .plan.hot{order:-1}
+}
+@media(max-width:560px){
+  .w{width:min(1160px,100% - 32px)}
+  .nbtn .btn span{display:none}.nbtn .btn{padding:9px 13px}
+  .brand b{font-size:15.5px}.brand img{width:34px}.brand{gap:8px}
+  .feat,.certs{grid-template-columns:1fr}
+  .certs{gap:14px}
+  .sheet{padding:18px 16px}
+  .q{font-size:19px}
+  .tabs{display:flex}.tabs button{flex:1;padding:10px 12px}
+  .seg button{padding:11px 16px;font-size:14.5px}
+  .hero .cta .btn{flex:1 1 100%}
+  .pr b{font-size:50px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}.hero .in{opacity:1;transform:none}}
+</style>
+<link rel="stylesheet" href="ui.css"><script src="i18n-dict.js"></script><script src="i18n.js" data-gate="1"></script><script src="ui.js"></script>
+</head>
+<body>
+
+<!-- أيقونات مشتركة -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-arrow" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="currentColor" opacity=".18"/><path d="M7.5 12.5l3 3 6-6.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15a1 1 0 0 0 1.5.9l12-7.5a1 1 0 0 0 0-1.8l-12-7.5A1 1 0 0 0 7 4.5z" fill="currentColor"/></symbol>
+<symbol id="i-wa" viewBox="0 0 32 32"><path fill="currentColor" d="M16 3a13 13 0 0 0-11 19.8L3 29l6.4-2A13 13 0 1 0 16 3zm0 2.4a10.6 10.6 0 1 1-5.6 19.6l-.4-.2-3.800 1.200 1.200-3.700-.3-.4A10.600 10.600 0 0 1 16 5.400zm-4 5.200c-.3 0-.7.1-1 .5-.4.4-1.300 1.300-1.300 3.100s1.300 3.600 1.500 3.800 2.600 4 6.400 5.500c3.200 1.200 3.800 1 4.500.9.700-.1 2.200-.9 2.500-1.800s.3-1.600.2-1.800c-.1-.2-.4-.3-.8-.5l-2.600-1.200c-.3-.1-.6-.2-.8.200l-1.100 1.300c-.2.300-.4.300-.8.100-.4-.2-1.600-.6-3-1.900-1.100-1-1.900-2.200-2.100-2.600-.2-.4 0-.6.200-.8l.6-.7c.2-.2.200-.4.400-.6.100-.3.100-.5 0-.7l-1.100-2.700c-.3-.7-.6-.6-.8-.6z"/></symbol>
+</defs></svg>
+
+<nav><div class="w">
+  <a class="brand" href="#top" aria-label="Edu"><img src="assets/icon-192.png" alt="" width="44" height="47"><b>Edu</b></a>
+  <div class="links"><a href="#video">شاهد المنصة</a><a href="#how">كيف تعمل</a><a href="#feat">المزايا</a><a href="#certs">الشهادات</a></div>
+  <div class="nbtn">
+    <a class="btn b-line sm" href="exam.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 2 9 2 12 0v-5"/></svg><span>بوابة</span> الطالب</a>
+    <a class="btn b-amber sm" href="teacher.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="12" rx="2"/><path d="M8 21h8M12 15v6"/></svg><span>بوابة</span> المعلم</a>
+  </div>
+</div></nav>
+
+<main id="top">
+<!-- ======================= البطل ======================= -->
+<header class="hero graph">
+  <div class="w">
+    <div>
+      <h1 class="in" style="--i:0">اختبارات إلكترونية، ونتيجتك تظهر في اللحظة</h1>
+      <p class="lead in" style="--i:1">يكتب المعلم أسئلته ويحدد مدة الاختبار وموعد بدايته ونهايته، فيصل الطلاب تنبيه برمز الدخول. يدخل الطالب من هاتفه ويجيب، وتظهر درجته فور التسليم، وتصله شهادة تفوق إن حصل على الدرجة النهائية.</p>
+      <div class="cta in" style="--i:2">
+        <a class="btn b-blue" href="exam.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 2 9 2 12 0v-5"/></svg>ادخل كطالب</a>
+        <a class="btn b-amber" href="teacher.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="12" rx="2"/><path d="M8 21h8M12 15v6"/></svg>ادخل كمعلم</a>
+      </div>
+      <div class="proof in" style="--i:3">
+        <span><svg><use href="#i-check"/></svg>٣ أيام تجربة مجانية للمعلمين</span>
+        <span><svg><use href="#i-check"/></svg>عدد غير محدود من الطلاب</span>
+        <span><svg><use href="#i-check"/></svg>شهادة تفوق لأصحاب الدرجة النهائية</span>
+      </div>
+    </div>
+
+    <!-- جرّب اختبارًا الآن -->
+    <div class="demo in" style="--i:2" aria-label="تجربة اختبار تفاعلي">
+      <div class="sheet">
+        <div class="sheet-h"><b id="dq-n">سؤال ١ من ٣ — جرّب بنفسك</b>
+          <div class="ring" aria-label="المؤقّت"><svg viewBox="0 0 48 48"><circle class="tr" cx="24" cy="24" r="18"/><circle class="fg" id="dq-ring" cx="24" cy="24" r="18"/></svg><span id="dq-t">٢٠</span></div></div>
+        <div class="prog"><i id="dq-p"></i></div>
+        <div class="q" id="dq-q"></div>
+        <div class="opts" id="dq-o"></div>
+        <div class="fb" id="dq-f"><span>اختر إجابتك قبل انتهاء الوقت.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================= البوابات ======================= -->
+  <div class="portals" id="portals"><div class="w" style="display:block">
+    <div class="sec-t"><h2>اختر بوابتك</h2><p>كل بوابة مصمّمة لدورك: ادخل واكمل من حيث توقفت.</p></div>
+    <div class="pgrid">
+      <a class="portal s" href="exam.html" aria-label="بوابة الطالب">
+        <div class="ic"><img src="assets/student.png" alt="" width="92" height="92"></div>
+        <h3>بوابة الطالب</h3>
+        <p>اشترك مع معلميك لتصلك تنبيهات الاختبارات، وادخل برمز الاختبار، واعرف درجتك فور التسليم، وتابع إحصائياتك وتقويمك وشهاداتك وفيديوهات الحل.</p>
+        <span class="go">ادخل الآن <svg><use href="#i-arrow"/></svg></span>
+      </a>
+      <a class="portal t" href="teacher.html" aria-label="بوابة المعلم">
+        <div class="ic"><img src="assets/teacher.png" alt="" width="92" height="92"></div>
+        <h3>بوابة المعلم</h3>
+        <p>أنشئ اختباراتك وانشرها بتنبيه لطلابك، ووجّهها لمجموعات بعينها، وتابع النتائج والرسوم البيانية، وأصدر الشهادات وأطلق دوري الأبطال من لوحة واحدة.</p>
+        <span class="go">ادخل الآن <svg><use href="#i-arrow"/></svg></span>
+      </a>
+    </div>
+  </div></div>
+</header>
+
+<!-- ======================= الفيديو ======================= -->
+<section class="vsec" id="video"><div class="w">
+  <div>
+    <h2>المنصة كاملة في ٢٨ ثانية</h2>
+    <p>شاهد كيف يدخل الطالب اختباره برمز الدخول، وكيف ينشئ المعلم اختباراته ويتابع نتائج طلابه.</p>
+    <ul class="vlist">
+      <li><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6"/></svg></i>مدة محددة للاختبار وموعد بداية ونهاية للدخول</li>
+      <li><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg></i>نتيجة فورية عند انتهاء الاختبار</li>
+      <li><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></i>نتائج ورسوم بيانية لكل طالب ولكل اختبار</li>
+    </ul>
+    <a class="btn b-amber" href="teacher.html">ابدأ تجربتك المجانية</a>
+  </div>
+  <div class="frame">
+    <div class="bar"><i></i><i></i><i></i><span>eduassess-pro</span></div>
+    <div class="vbox">
+      <video id="promo" controls preload="metadata" playsinline poster="assets/poster.jpg" aria-label="فيديو تعريفي بمنصة Edu">
+        <source src="assets/promo.mp4" type="video/mp4">
+      </video>
+      <button class="play" id="playbtn" aria-label="تشغيل الفيديو"><span><svg><use href="#i-play"/></svg></span></button>
+    </div>
+  </div>
+</div></section>
+
+<!-- ======================= كيف تعمل ======================= -->
+<section class="sec" id="how"><div class="w">
+  <div class="sec-t"><h2>ثلاث خطوات من البداية إلى النتيجة</h2></div>
+  <div class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-t="teacher">للمعلم</button>
+    <button role="tab" aria-selected="false" data-t="student">للطالب</button>
+  </div>
+  <div class="steps" id="st-teacher">
+    <div class="step"><h3>أنشئ اختبارك</h3><p>اكتب الأسئلة وخياراتها (مع صورة للسؤال عند الحاجة)، وحدّد مدة الاختبار وموعدي البداية والانتهاء.</p></div>
+    <div class="step"><h3>انشر الاختبار</h3><p>لكل اختبار رمز دخول، ويصل التنبيه بالرمز والمواعيد لمشتركيك أو لمجموعة محددة منهم.</p></div>
+    <div class="step"><h3>تابع النتائج وكرّم المتفوقين</h3><p>ترتيب الطلاب ورسوم الأداء، وشهادة تفوق تلقائية لأصحاب الدرجة النهائية، وفيديو الحل لمن أنهى الاختبار.</p></div>
+  </div>
+  <div class="steps" id="st-student" hidden>
+    <div class="step"><h3>أنشئ حسابك واشترك</h3><p>سجّل ببريدك ورقم هاتفك، ثم ابحث عن معلمك في صفحة «المعلمون» واشترك ليصلك تنبيه كل اختبار.</p></div>
+    <div class="step"><h3>ادخل برمز الاختبار</h3><p>اكتب الرمز في موعد الاختبار وأجب خلال المدة المحددة. لكل اختبار محاولة واحدة.</p></div>
+    <div class="step"><h3>اعرف نتيجتك فورًا</h3><p>تظهر درجتك مباشرة، وتتابع إحصائياتك وشهاداتك، وتتنافس في دوري الأبطال وتراسل معلمك.</p></div>
+  </div>
+</div></section>
+
+<!-- ======================= المزايا ======================= -->
+<section class="sec csec" id="feat"><div class="w">
+  <div class="sec-t c"><h2>لماذا Edu؟</h2><p>كل ما يحتاجه المعلم والطالب، بدون تعقيد.</p></div>
+  <div class="feat">
+    <div class="fc"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></i><h3>رمز دخول لكل اختبار</h3><p>لا يدخل الطالب إلا بالرمز، وفي الموعد الذي حدده المعلم.</p></div>
+    <div class="fc"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></i><h3>محاولة واحدة للطالب</h3><p>لا يدخل الطالب الاختبار إلا مرة واحدة، فتبقى النتائج عادلة.</p></div>
+    <div class="fc"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></i><h3>أرقام من كل دول العالم</h3><p>يسجّل الطالب برقم هاتفه الدولي بسهولة.</p></div>
+    <div class="fc"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg></i><h3>تصحيح فوري ودقيق</h3><p>تظهر الدرجة والنسبة والمدة مباشرة بعد التسليم.</p></div>
+    <div class="fc"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg></i><h3>تنبيهات ومراسلة</h3><p>تنبيه بمواعيد الاختبارات، ومراسلة مباشرة بين الطالب ومعلمه.</p></div>
+    <div class="fc"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M8.5 14L7 22l5-3 5 3-1.500-8"/></svg></i><h3>تكريم المتفوقين</h3><p>تصل شهادة التفوق تلقائيًا لصاحب الدرجة النهائية، ويمكن للمعلم منح الشهادات بنفسه.</p></div>
+  </div>
+</div></section>
+
+<!-- ======================= الشهادات ======================= -->
+<section class="sec" id="certs"><div class="w">
+  <div class="sec-t c"><h2>شهادات التقدير والتحفيز</h2><p>تصاميم تناسب كل مجال — اضغط على أي شهادة لعرضها كبيرة</p></div>
+  <div class="certs">
+    <button class="cert" data-src="assets/cert1.webp"><img src="assets/cert1.webp" alt="شهادة إسلامية"><span>القرآن والعلوم الشرعية</span></button>
+    <button class="cert" data-src="assets/cert2.webp"><img src="assets/cert2.webp" alt="شهادة البرمجة"><span>البرمجة والحاسوب</span></button>
+    <button class="cert" data-src="assets/cert3.webp"><img src="assets/cert3.webp" alt="شهادة اللغات"><span>اللغات</span></button>
+    <button class="cert" data-src="assets/cert4.webp"><img src="assets/cert4.webp" alt="شهادة العلوم"><span>الرياضيات والعلوم</span></button>
+  </div>
+  <p class="cnote">جميع الشهادات مجانية بالكامل دون أي رسوم</p>
+</div></section>
+
+<!-- ======================= التحفيز ======================= -->
+<section class="msec" id="motivate"><div class="w">
+  <div class="qwrap" id="qwrap" aria-live="polite">
+    <div class="qmark" aria-hidden="true">“</div>
+    <div class="qtxt" id="qtxt"></div>
+    <div><span class="qwho" id="qwho"></span></div>
+  </div>
+  <div class="dots" id="qdots" role="tablist" aria-label="رسائل تحفيزية"></div>
+  <div class="mgrid">
+    <div class="mc"><em>🎯</em><b>للطالب</b><span>ذاكر بذكاء، وثق بنفسك. الاختبار مرآة لجهدك وليس حكمًا على قدرك.</span></div>
+    <div class="mc"><em>🌟</em><b>للمعلم</b><span>كل اختبار تصنعه يفتح لطالب بابًا للفهم. أنت تصنع الفرق في كل نتيجة.</span></div>
+    <div class="mc"><em>🏆</em><b>للجميع</b><span>التميّز لا يأتي صدفة؛ هو اجتهاد صغير يتكرر كل يوم.</span></div>
+  </div>
+</div></section>
+  <br><br>
+<!-- ======================= الأسعار ======================= -->
+<section class="sec" id="price"><div class="w">
+  <div class="sec-t c"><h2>اشتراك واضح بدون رسوم خفية</h2><p>ابدأ بتجربة مجانية ٣ أيام، ثم اختر المدة المناسبة.</p>
+  </div>
+  <div class="plans" id="plans"></div>
+  <div class="extra">الكورسات والكتب والشهادات الإلكترونية مجانية بالكامل.</div>
+  <p class="paynote">أسعار اشتراكات المعلمين موضحة أعلاه، أما الكورسات والكتب والشهادات فهي مجانية بالكامل.</p>
+</div></section>
+
+<!-- ======================= الختام ======================= -->
+<section style="padding:0 0 70px"><div class="w"><div class="end">
+  <img src="assets/icon-192.png" alt="" width="96" height="102">
+  <h2>جاهز لتبدأ؟</h2>
+  <p>سواء كنت معلمًا يبني اختباره الأول أو طالبًا يستعد لاختباره القادم، بوابتك جاهزة.</p>
+  <div class="cta">
+    <a class="btn b-blue" href="exam.html">بوابة الطالب</a>
+    <a class="btn b-amber" href="teacher.html">بوابة المعلم</a>
+    <a class="btn b-ghost" data-msg="مرحباً، أريد الاستفسار عن خدمة Edu" href="#">تواصل واتساب</a>
+  </div>
+</div></div></section>
+</main>
+
+<footer><div class="w">
+  <a class="brand" href="#top"><img src="assets/icon-192.png" alt="" width="36" height="38"><b>Edu</b></a>
+  <div class="fl"><a href="exam.html">بوابة الطالب</a><a href="teacher.html">بوابة المعلم</a></div>
+  <span>© Edu — جميع الحقوق محفوظة</span>
+</div></footer>
+
+<a class="fw" data-msg="مرحباً، أريد الاستفسار عن خدمة Edu" href="#" aria-label="تواصل عبر واتساب"><svg viewBox="0 0 32 32" style="color:#fff"><use href="#i-wa"/></svg></a>
+<div id="lb"><img alt=""></div>
+
+<script>
+(function(){
+"use strict";
+var $=function(s,r){return (r||document).querySelector(s)}, $$=function(s,r){return [].slice.call((r||document).querySelectorAll(s))};
+var AR="٠١٢٣٤٥٦٧٨٩"; function ar(n){return String(n).replace(/\d/g,function(d){return AR[d]})}
+var WA=EDU.WA;
+function wa(msg){return "https://wa.me/"+WA+"?text="+encodeURIComponent(msg)}
+$$("[data-msg]").forEach(function(a){a.href=wa(a.dataset.msg);a.target="_blank";a.rel="noopener"});
+
+/* ---------- قفل الهوية: بعد إنشاء الحساب يبقى زر الهوية المناسبة فقط ---------- */
+(function(){
+  var role=null;try{role=localStorage.getItem("edu_role")}catch(e){}
+  if(role!=="student"&&role!=="teacher")return;
+  var drop=role==="teacher"?"exam.html":"teacher.html";
+  $$('a[href="'+drop+'"]').forEach(function(a){a.remove()});
+  $$(".portal").forEach(function(p){if(p.getAttribute("href")===drop)p.remove()});
+  var g=$(".pgrid");if(g){g.style.gridTemplateColumns="minmax(0,620px)";g.style.justifyContent="center"}
+  var mine=role==="teacher"?"بوابة المعلم":"بوابة الطالب";
+  var t=$(".portals .sec-t h2");if(t)t.textContent="مرحبًا بعودتك";
+  var tp=$(".portals .sec-t p");if(tp)tp.textContent="أنت مسجّل كـ"+(role==="teacher"?"معلم":"طالب")+" — بوابتك جاهزة.";
+  if(role==="student"){
+    $$(".tabs button").forEach(function(b){if(b.dataset.t==="teacher")b.remove()});
+    var st=$("#st-teacher");if(st)st.remove();
+    var tb=$$(".tabs button")[0];if(tb){tb.setAttribute("aria-selected","true");tb.textContent="رحلتك كطالب"}
+    var ss=$("#st-student");if(ss)ss.hidden=false;
+    var pr=$("#price");if(pr)pr.style.display="none";
+    $$('a[href="#price"]').forEach(function(a){a.remove()});
+  }else{
+    $$(".tabs button").forEach(function(b){if(b.dataset.t==="student")b.remove()});
+    var ss2=$("#st-student");if(ss2)ss2.remove();
+    var tb2=$$(".tabs button")[0];if(tb2)tb2.textContent="رحلتك كمعلم";
+  }
+  var tabs=$(".tabs");if(tabs&&$$("button",tabs).length===1)tabs.style.pointerEvents="none";
+  document.documentElement.setAttribute("data-role",role);
+})();
+
+/* لو لم تظهر شاشة التحميل لأي سبب لا نترك الهيرو مخفيًا */
+setTimeout(function(){document.documentElement.classList.add("noldr")},7000);
+
+/* ---------- اختبار تجريبي في الهيرو ---------- */
+var QS=[
+ {q:"ما ناتج ٦ × ٧ ؟",o:["٣٦","٤٢","٤٨"],a:1},
+ {q:"ما عاصمة المملكة العربية السعودية؟",o:["جدة","الدمام","الرياض"],a:2},
+ {q:"كم عدد أركان الإسلام؟",o:["أربعة","خمسة","ستة"],a:1}
+];
+var okMsg=["أحسنت! هكذا تظهر نتيجتك فور الانتهاء.","إجابة صحيحة! استمر على هذا المستوى.","ممتاز! هذا ما يصنعه الاجتهاد."];
+var noMsg="لا بأس — الإجابة الصحيحة ظاهرة أمامك. كل خطأ خطوة نحو الإتقان.";
+var di=0,answered=false,tm,left=20,TOT=20,CIRC=113;
+var dq={n:$("#dq-n"),q:$("#dq-q"),o:$("#dq-o"),f:$("#dq-f"),p:$("#dq-p"),t:$("#dq-t"),r:$("#dq-ring")};
+function renderQ(){
+  var x=QS[di]; answered=false; left=TOT;
+  dq.n.textContent="سؤال "+ar(di+1)+" من "+ar(QS.length)+" — جرّب بنفسك";
+  dq.p.style.width=((di+1)/QS.length*100)+"%";
+  dq.q.textContent=x.q;
+  dq.o.innerHTML="";
+  x.o.forEach(function(t,i){
+    var b=document.createElement("button");b.type="button";b.className="opt";
+    b.innerHTML="<em>"+"أبج"[i]+"</em><span></span>";b.lastChild.textContent=t;
+    b.onclick=function(){pick(i)};dq.o.appendChild(b);
+  });
+  dq.f.className="fb";dq.f.innerHTML="<span>اختر إجابتك قبل انتهاء الوقت.</span>";
+  tick(true);
+}
+function tick(reset){
+  clearInterval(tm);
+  paintT();
+  tm=setInterval(function(){
+    if(answered){clearInterval(tm);return}
+    left--; paintT();
+    if(left<=0){clearInterval(tm);reveal(-1)}
+  },1000);
+}
+function paintT(){dq.t.textContent=ar(Math.max(left,0));dq.r.style.strokeDashoffset=(CIRC*(1-left/TOT));dq.r.style.stroke=left<=5?"#D6453D":"";}
+function pick(i){if(answered)return;answered=true;clearInterval(tm);reveal(i)}
+function reveal(i){
+  var x=QS[di],bs=$$(".opt",dq.o);answered=true;
+  bs.forEach(function(b,k){b.disabled=true;if(k===x.a)b.classList.add("ok");else if(k===i)b.classList.add("no")});
+  var good=i===x.a;
+  dq.f.className="fb "+(good?"ok":"no");
+  dq.f.innerHTML="<span></span><button type='button'>سؤال آخر</button>";
+  dq.f.firstChild.textContent=i===-1?"انتهى الوقت! هكذا يُحسب الزمن داخل الاختبار.":(good?okMsg[di%okMsg.length]:noMsg);
+  dq.f.lastChild.onclick=function(){di=(di+1)%QS.length;renderQ()};
+}
+renderQ();
+
+/* ---------- الفيديو ---------- */
+var v=$("#promo"),pb=$("#playbtn");
+pb.onclick=function(){v.play()};
+v.addEventListener("play",function(){pb.classList.add("hide")});
+v.addEventListener("pause",function(){if(!v.ended)return;pb.classList.remove("hide")});
+v.addEventListener("ended",function(){pb.classList.remove("hide")});
+
+/* ---------- تبويب «كيف تعمل» ---------- */
+$$(".tabs button").forEach(function(b){b.onclick=function(){
+  $$(".tabs button").forEach(function(x){x.setAttribute("aria-selected",x===b)});
+  $("#st-teacher").hidden=b.dataset.t!=="teacher";$("#st-student").hidden=b.dataset.t!=="student";
+}});
+
+/* ---------- الشهادات ---------- */
+var lb=$("#lb");
+$$(".cert").forEach(function(c){c.onclick=function(){lb.firstElementChild.src=c.dataset.src;lb.style.display="grid"}});
+lb.onclick=function(){lb.style.display="none"};
+document.addEventListener("keydown",function(e){if(e.key==="Escape")lb.style.display="none"});
+$$(".cert img,#lb img").forEach(function(i){i.draggable=false;i.oncontextmenu=function(e){e.preventDefault()}});
+
+/* ---------- الرسائل التحفيزية ---------- */
+var Q=[
+ ["كل اختبار خطوة، وكل خطوة تقرّبك من حلمك.","للطالب"],
+ ["لا تقارن بدايتك بنهاية غيرك؛ تقدّم قليلًا كل يوم.","للطالب"],
+ ["المعلم الذي يؤمن بطلابه يصنع منهم ما لا يتوقعونه.","للمعلم"],
+ ["الخطأ ليس نهاية الطريق، بل أوضح علامة على الطريق الصحيح.","للجميع"],
+ ["ما تتعلمه اليوم هو رأس مالك غدًا.","للطالب"],
+ ["نتيجة واحدة جيدة قد تغيّر ثقة طالب بنفسه إلى الأبد.","للمعلم"],
+ ["الاجتهاد لا يخذل صاحبه، والصبر مفتاح كل إتقان.","للجميع"]
+];
+var qi=0,qt,qw=$("#qwrap"),dots=$("#qdots");
+Q.forEach(function(_,i){var b=document.createElement("button");b.type="button";b.setAttribute("aria-label","رسالة "+ar(i+1));b.onclick=function(){show(i,true)};dots.appendChild(b)});
+function show(i,manual){
+  var go=function(){qi=i;$("#qtxt").textContent=Q[i][0];$("#qwho").textContent=Q[i][1];
+    $$("button",dots).forEach(function(b,k){b.setAttribute("aria-current",k===i)});qw.classList.remove("swap")};
+  if(!qw.classList.contains("swap")&&$("#qtxt").textContent){qw.classList.add("swap");setTimeout(go,420)}else go();
+  if(manual)restart();
+}
+function restart(){clearInterval(qt);if(!matchMedia("(prefers-reduced-motion:reduce)").matches)qt=setInterval(function(){show((qi+1)%Q.length)},5500)}
+qw.onmouseenter=function(){clearInterval(qt)};qw.onmouseleave=restart;
+show(0);restart();
+
+/* ---------- الأسعار ---------- */
+function drawPlans(){
+  var best=EDU.bestPlan();
+  $("#plans").innerHTML=EDU.PLANS.map(function(p){
+    var pr=EDU.price(p),hot=p.m===best.m,sv=EDU.saving(p);
+    return '<div class="plan'+(hot?' hot':'')+'">'+(hot?'<span class="ribbon">الأوفر شهريًا</span>':'')+
+      '<h3>'+p.name+'</h3>'+
+      '<div class="pr"><b>'+ar(pr.n)+'</b><small>جنيه</small></div>'+
+      '<div class="pm">≈ '+ar(Math.round(p.egp/p.m*100)/100)+' جنيه / شهر</div>'+
+      (sv?'<div class="sv">وفّر '+ar(sv)+' جنيهات</div>':'')+
+      '<ul><li>اختبارات وطلاب بلا حدود</li><li>تصحيح تلقائي ونتائج فورية</li><li>نتائج وترتيب الطلاب</li><li>مجموعات وتنبيهات ومراسلة</li></ul>'+
+      '<button class="btn '+(hot?'b-amber':'b-navy')+'" data-m="'+p.m+'">اشترك الآن</button></div>';
+  }).join("");
+  $$("#plans [data-m]").forEach(function(b){b.onclick=function(){subscribe(+b.dataset.m)}});
+}
+function subscribe(m){
+  var p=EDU.PLANS.filter(function(x){return x.m===m})[0];
+  EDU.store.set("eduassess_plan_choice",String(m));
+  EDU.showWelcome({icon:"check",title:"باقة "+p.name+" — "+p.egp+" ج.م",text:"سجّل دخولك كمعلم واشحن محفظتك ثم اشترك بضغطة واحدة."},{
+    closeLabel:"لاحقًا",
+    actions:[{label:"سجّل دخولك أو أنشئ حسابًا",href:"teacher.html"}]
+  });
+}
+drawPlans();
+})();
+</script>
+<script src="push.js"></script><script src="native.js"></script>
+</body>
+</html>
